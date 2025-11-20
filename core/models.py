@@ -96,6 +96,26 @@ class Usuario(AbstractUser):
         self.ultimo_intento_fallido = None
         self.save()
 
+class CodigoRecuperacion(models.Model):
+    """Modelo para almacenar códigos de recuperación de contraseña"""
+    email = models.EmailField()
+    codigo = models.CharField(max_length=6)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    usado = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'core_codigo_recuperacion'
+        verbose_name = 'Código de Recuperación'
+        verbose_name_plural = 'Códigos de Recuperación'
+    
+    def __str__(self):
+        return f"{self.email} - {self.codigo}"
+    
+    def es_valido(self):
+        """Verifica si el código sigue siendo válido (10 minutos)"""
+        tiempo_expiracion = self.creado_en + timedelta(minutes=10)
+        return not self.usado and timezone.now() < tiempo_expiracion
+
 class Empresa(models.Model):
     id_empresa = models.AutoField(primary_key=True)
     nombre_empresa = models.CharField(max_length=100)
