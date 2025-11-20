@@ -5,7 +5,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "bash build.sh"
-    startCommand: "gunicorn --chdir /opt/render/project/src EcoFactProject.wsgi:application"
+    startCommand: "gunicorn -c gunicorn.conf.py EcoFactProject.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
