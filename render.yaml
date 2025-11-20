@@ -4,8 +4,8 @@ services:
     name: ecofact-project
     runtime: python
     plan: free
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn EcoFactProject.wsgi:application"
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn EcoFactProject.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
