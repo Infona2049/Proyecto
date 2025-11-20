@@ -5,10 +5,10 @@ services:
     runtime: python
     plan: free
     buildCommand: "bash build.sh"
-    startCommand: "gunicorn -c gunicorn.conf.py EcoFactProject.wsgi:application"
+    startCommand: "gunicorn EcoFactProject.wsgi:application -c gunicorn.conf.py"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.4
+        value: 3.11.9
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
