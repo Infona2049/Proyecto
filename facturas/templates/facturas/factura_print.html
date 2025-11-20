@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura #{{ factura.id }}</title>
+  <link rel="stylesheet" href="{% static 'facturas/css/factura_print.css' %}">
+
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <div class="encabezado">
+    <img src="{% static 'img/logo azul sin fondo.png' %}" alt="Logo EcoFact" class="logo">
+    <img src="{% static 'img/logo empresa.png' %}" alt="Logo Empresa" class="logo">
+    <h1>FACTURA ELECTRÓNICA</h1>
+  </div>
+
+  <!-- Datos de empresa y cliente -->
+  <div class="datos-container">
+    <div class="empresa-info">
+      <p><strong>Apple Pereira S.A.S</strong></p>
+      <p><strong>NIT:</strong> 901.456.789-3</p>
+      <p><strong>Dirección:</strong> Cra 7 #23-15, Pereira - Risaralda</p>
+      <p><strong>Teléfono:</strong> (6) 311 2233</p>
+      <p><strong>Correo:</strong> contacto@applepereira.com</p>
+    </div>
+
+    <div class="datos-factura">
+      <p><strong>Número de Factura:</strong> {{ factura.id }}</p>
+      <p><strong>Cliente:</strong> {{ factura.nombre_receptor }}</p>
+      <p><strong>NIT:</strong> {{ factura.nit_receptor }}</p>
+      <p><strong>Correo:</strong> {{ factura.correo_cliente }}</p>
+      <p><strong>Fecha de emisión:</strong> {{ factura.fecha_factura|date:"d/m/Y" }}</p>
+      <p><strong>Método de pago:</strong> {{ factura.metodo_pago_factura|title }}</p>
+    </div>
+  </div>
+
+  <!-- Tabla de productos -->
+  <table>
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th>Precio Unitario</th>
+        <th>IVA</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in factura.detalles.all %}
+      <tr>
+        <td>{{ item.producto.nombre_producto }}</td>
+        <td>{{ item.cantidad }}</td>
+        <td>${{ item.precio|floatformat:2 }}</td>
+        <td>${{ item.iva|floatformat:2 }}</td>
+        <td>${{ item.total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Totales -->
+  <div class="totales">
+    <p>Subtotal: ${{ factura.sutotal_factura|floatformat:2 }}</p>
+    <p>IVA: ${{ factura.iva_total_factura|floatformat:2 }}</p>
+    <p>Total a pagar: ${{ factura.total_factura|floatformat:2 }}</p>
+  </div>
+
+  <!-- CUFE + QR -->
+  <div class="cufe-qr">
+    <p class="cufe"><strong>CUFE:</strong> {{ factura.cufe_factura }}</p>
+    <img src="data:image/png;base64,{{ qr_base64 }}" alt="Código QR de la factura" class="qr-img">
+  </div>
+
+  <!-- Pie de página -->
+  <footer>
+    <p>Gracias por su compra.</p>
+    <p>EcoFact | {{ factura.fecha_factura|date:"Y" }}</p>
+  </footer>
+
+</body>
+</html>

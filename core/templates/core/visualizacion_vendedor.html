@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="{% static 'core/css/visualizacion_vendedor.css' %}">
+</head>
+<body>
+    <!-- Barra superior -->
+    <div class="top-bar">
+        <div class="left-side">
+            <a href="{% url 'visualizacion_vendedor' %}">
+                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+            </a>
+        </div>
+
+        <div class="right-side">
+            <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+            <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+            <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+        </div> 
+    </div>
+
+  <!-- Barra de navegación -->
+  <header>
+    <nav class="menu">
+      <a href="{% url 'acerca_nosotros' %}">Acerca de nosotros</a>
+      <a href="{% url 'historial_factura' %}">Historial factura</a>
+      <a href="{% url 'crear_factura' %}">Crear factura</a>
+    </nav>
+  </header> 
+
+  <!-- Sección de bienvenida -->
+  <section class="welcome">
+    <img src="{% static 'img/ecofact_final_sin_franja.jpg' %}" alt="Bienvenida EcoFact" />
+  </section>
+
+  <!-- Pie de página -->
+    <footer>
+        <div class="footer-bar"> 
+            <div class="footer-item">
+                <img src="{% static 'img/mensaje.png' %}" alt="Correo"> 
+                Ecofactproyect@gmail.com
+            </div>
+            <div class="footer-item">
+                <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+                333-333-333
+            </div>
+        </div>
+        <div class="footer-bottom">@2025-ECOFACT</div> 
+    </footer>
+
+  <script src="{% static 'core/js/visualizacion_vendedor.js' %}"></script>
+</body>
+</html>

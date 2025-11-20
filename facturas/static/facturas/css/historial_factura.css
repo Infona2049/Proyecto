@@ -1,0 +1,423 @@
+/* RESET GENERAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+ 
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(6px, 2vw, 10px) clamp(8px, 4vw, 20px);
+  height: clamp(50px, 12vw, 60px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar .left-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3vw, 30px);
+}
+
+.logo1, .logo2 {
+  height: clamp(28px, 8vw, 40px);
+  width: auto;
+}
+
+.top-bar .right-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 20px);
+}
+
+.icono {
+  width: clamp(18px, 5vw, 25px);
+  height: clamp(18px, 5vw, 25px);
+  margin-right: clamp(1px, 1vw, 6px);
+  transition: transform 0.2s ease;
+}
+
+.icono:hover {
+  transform: scale(1.1);
+}
+
+/* MENÚ DE NAVEGACIÓN */
+header {
+  background-color: #003f87;
+  position: fixed;
+  top: clamp(50px, 12vw, 60px);
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.menu {
+  display: flex;
+  padding: clamp(8px, 2vw, 13px) clamp(10px, 4vw, 30px);
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(12px, 3vw, 16px);
+  transition: color 0.3s ease;
+}
+
+.menu a:hover {
+  color: #38b6ff;
+}
+
+/* FILTROS Y TABLA */
+/* Título igual al de inventario */
+.titulo-historial {
+  font-size: clamp(20px, 5vw, 28px);
+  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  color: #003f87;
+  font-weight: bold;
+  position: relative;
+}
+.titulo-historial::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(50px, 12vw, 80px);
+  height: 3px;
+  background: linear-gradient(90deg, #003f87, #38b6ff);
+  border-radius: 2px;
+}
+/* FILTROS Y TABLA — MISMO ANCHO Y ESTILO */
+.filtros,
+.cuadro-tabla {
+  background: white;
+  padding: clamp(20px, 3vw, 25px);
+  width: 95%;
+  max-width: 1200px; /* igual que la tabla */
+  margin: clamp(120px, 25vw, 140px) auto clamp(15px, 3vw, 25px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+
+
+/* FILTROS */
+.titulo {
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: bold;
+  margin-bottom: clamp(10px, 2vw, 15px);
+  text-align: center;
+}
+
+.filtros-linea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 250px; /* separación entre los dos campos */
+  flex-wrap: nowrap; /* evita que se partan en dos líneas */
+}
+
+.campo-fecha {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* espacio entre texto e input */
+  white-space: nowrap; /* mantiene “Fecha Inicial” y “Fecha Final” en una sola línea */
+}
+
+.campo-fecha label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Cuadro del input */
+.campo-fecha input[type="date"] {
+  background-color: #c0cee9;
+  border: none;
+  padding: clamp(8px, 1.5vw, 10px);
+  border-radius: 12px;
+  font-size: clamp(14px, 2.5vw, 16px);
+  min-width: 160px;
+  width: clamp(170px, 22%, 190px); /* agranda el cuadro un poco */
+}
+
+/* ------------------------------------------------------------------------------------------*/
+
+.campo-boton {
+  margin-top: clamp(20px, 2vw, 40px);
+  text-align: center;
+  display: flex;              /* activa el gap */
+  justify-content: center;    /* centra los botones */
+  align-items: center;        /* los alinea verticalmente */
+  gap: 25px; /*Separa los botones entre si*/
+}
+
+
+.boton-limpiar {
+  background-color: #d9d9d9; /* gris más suave */
+  color: #003f87; /* azul oscuro */
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(11px, 2.3vw, 13px);
+  transition: all 0.3s ease;
+  min-height: 35px;
+}
+
+.boton-limpiar:hover {
+  background-color: #bfbfbf; /* gris más oscuro al pasar el mouse */
+  color: #002f6c; /* azul más intenso */
+}
+
+
+.boton-buscar { 
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(12px, 2.5vw, 14px);
+  transition: background-color 0.3s;
+  min-height: 40px;
+ 
+}
+
+.boton-buscar:hover {
+  background-color: darkgreen; 
+}
+
+.boton-buscar,
+.boton-limpiar {
+  width: 110px;
+  height: 40px;
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+/* ============================
+   TABLA HISTORIAL DE FACTURAS
+   ============================ */
+
+.cuadro-tabla {
+  background: white;
+  padding: 20px;
+  width: 95%;
+  max-width: 1200px;
+  margin: 20px auto 80px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.tabla-facturas {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(13px, 2.5vw, 15px);
+  border-bottom: 3px solid #38b6ff;
+  table-layout: fixed;
+  
+}
+
+/* ENCABEZADO */
+.tabla-facturas thead th {
+  background: linear-gradient(135deg, #003f87, #0056b3);
+  color: white;
+  padding: clamp(12px, 2.5vw, 16px) clamp(10px, 2vw, 15px);
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #38b6ff !important;
+  border-right: none !important; /* SIN líneas verticales */
+}
+
+/* FILAS */
+.tabla-facturas tbody tr {
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.tabla-facturas tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.tabla-facturas tbody tr:hover {
+  background-color: #eef4ff;
+}
+
+/* CELDAS */
+.tabla-facturas td {
+  padding: clamp(10px, 2vw, 14px) clamp(10px, 2vw, 15px);
+  text-align: center;
+  border-bottom: 1px solid #ddd !important;
+  border-right: none !important;  /* QUITA las líneas verticales */
+  border-left: none !important;
+}
+
+/* Bordes redondeados visibles */
+.tabla-facturas th:first-child {
+  border-top-left-radius: 10px;
+}
+.tabla-facturas th:last-child {
+  border-top-right-radius: 10px;
+}
+.tabla-facturas tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+.tabla-facturas tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  margin-top: auto;
+}
+
+.footer-bar {
+  background-color: #003f87;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vw, 6px) clamp(10px, 15vw, 120px);
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+.footer-item {
+  display: flex;
+  align-items: center; 
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.footer-item img {
+  width: clamp(14px, 3vw, 18px);
+  height: clamp(14px, 3vw, 18px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: clamp(4px, 2vw, 10px);
+  background-color: white;
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+/* Enlaces sin decoración */
+a {
+  text-decoration: none;
+}
+
+a img {
+  border: none;
+  outline: none;
+  display: inline-block;
+}
+
+/* PAGINACIÓN */
+.paginacion {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.paginacion span,
+.paginacion a {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: #003f87;
+  background-color: #e6eef8;
+  transition: background 0.3s;
+}
+
+.paginacion a:hover {
+  background-color: #003f87;
+  color: white;
+}
+
+.paginacion .current {
+  background-color: #003f87;
+  color: white;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .cuadro-tabla {
+    overflow-x: auto;
+  }
+
+  .tabla-facturas {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .tabla-facturas th,
+  .tabla-facturas td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .footer-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtros,
+  .cuadro-tabla {
+    width: 98%;
+    padding: 15px 10px;
+  }
+
+  .tabla-facturas {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabla-facturas::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .tabla-facturas::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .tabla-facturas::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  .tabla-facturas th,
+  .tabla-facturas td {
+    min-width: 100px;
+    padding:8px 4px;
+  }
+}
+

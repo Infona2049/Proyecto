@@ -1,0 +1,93 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 40px;
+  color: #333;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #0056b3;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  height: 40px;
+}
+
+h1 {
+  color: #0056b3;
+  text-align: center;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.datos-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.empresa-info, .datos-factura {
+  width: 48%;
+}
+
+.empresa-info p, .datos-factura p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.datos-factura {
+  text-align: right;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #0056b3;
+  color: white;
+}
+
+.totales {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.totales p {
+  font-weight: bold;
+}
+
+footer {
+  text-align: center;
+  margin-top: 90px;
+  font-size: 12px;
+  color: #666;
+}
+
+
+.cufe-qr {
+  display: block;
+  text-align: left; 
+  margin-top: 10px;
+}
+
+.cufe-qr .qr-img {
+  display: block;
+  margin-top: 8px;
+  width: 120px;
+  height: 120px;
+}
+

@@ -1,0 +1,253 @@
+/* RESET GENERAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+  
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(6px, 2vw, 10px) clamp(8px, 4vw, 20px);
+  height: clamp(50px, 12vw, 60px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar .left-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3vw, 30px);
+}
+
+.logo1, .logo2 {
+  height: clamp(28px, 8vw, 40px);
+  width: auto;
+}
+
+.top-bar .right-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 20px);
+}
+
+.icono {
+  width: clamp(18px, 5vw, 25px);
+  height: clamp(18px, 5vw, 25px);
+  margin-right: clamp(1px, 1vw, 6px);
+  transition: transform 0.2s ease;
+}
+
+.icono:hover {
+  transform: scale(1.1);
+}
+
+/* MENÚ DE NAVEGACIÓN */
+header {
+  background-color: #003f87;
+  position: fixed;
+  top: clamp(50px, 12vw, 60px);
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.menu {
+  display: flex;
+  padding: clamp(8px, 2vw, 13px) clamp(10px, 4vw, 30px);
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(12px, 3vw, 16px);
+  transition: color 0.3s ease;
+}
+
+.menu a:hover {
+  color: #38b6ff;
+}
+
+/* DOCUMENTOS */
+.documentos {
+  width: clamp(90%, 80vw, 60%);
+  max-width: 800px;
+  margin: clamp(120px, 25vw, 160px) auto clamp(100px, 15vw, 120px);
+  border: 1px solid #999;
+  border-radius: clamp(8px, 1vw, 12px);
+  padding: clamp(20px, 5vw, 40px);
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.documentos h3 {
+  margin: 0 0 clamp(12px, 3vw, 20px) 0;
+  font-family: Arial, sans-serif;
+  font-size: clamp(20px, 5vw, 27px);
+  text-align: center;
+  color: #003f87;
+  font-weight: bold;
+}
+
+.doc-item {  
+  display: block;
+  background-color: rgba(58, 99, 168, 0.5);
+  color: #000; 
+  padding: clamp(12px, 3vw, 15px);
+  margin: clamp(6px, 1.5vw, 10px) 0;
+  border-radius: clamp(6px, 1vw, 8px);
+  text-decoration: none;
+  font-size: clamp(14px, 3vw, 16px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  text-align: center;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-item:hover {
+  background-color: #5c7fa5;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-color: #003f87;
+}
+
+.doc-item:active {
+  transform: translateY(0);
+}
+
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  margin-top: auto;
+}
+
+.footer-bar {
+  background-color: #003f87;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vw, 6px) clamp(10px, 15vw, 120px);
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+.footer-item {
+  display: flex;
+  align-items: center; 
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.footer-item img {
+  width: clamp(14px, 3vw, 18px);
+  height: clamp(14px, 3vw, 18px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: clamp(4px, 2vw, 10px);
+  background-color: white;
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+/* RESPONSIVE MÍNIMO */
+@media (max-width: 768px) {
+  .documentos {
+    width: 95%;
+    margin: 110px auto 100px;
+  }
+  
+  .footer-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .documentos {
+    width: 98%;
+    padding: 20px 15px;
+    margin: 100px auto 90px;
+  }
+  
+  .doc-item {
+    margin: 8px 0;
+    padding: 15px 10px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .documentos {
+    margin: 100px auto 80px;
+    padding: 20px;
+  }
+  
+  .documentos h3 {
+    margin-bottom: 15px;
+  }
+  
+  .doc-item {
+    margin: 5px 0;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .documentos {
+    max-width: 900px;
+  }
+  
+  .doc-item {
+    font-size: 18px;
+    padding: 18px;
+  }
+}
+
+/* Enlaces sin decoración */
+a {
+  text-decoration: none;
+}
+
+a img {
+  border: none;
+  outline: none;
+  display: inline-block;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .icono,
+  .doc-item {
+    transition: none;
+  }
+}
+
+/* Focus para accesibilidad */
+.doc-item:focus {
+  outline: 3px solid #38b6ff;
+  outline-offset: 2px;
+}

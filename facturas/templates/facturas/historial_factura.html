@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial factura</title>
+  <link rel="stylesheet" href="{% static 'facturas/css/historial_factura.css' %}">
+</head> 
+<body>
+  <!-- Barra superior -->
+  <div class="top-bar">
+    <div class="left-side">
+      <a href="{% url 'admin_dashboard' %}">
+        <img src="{% static 'img/logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+        <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
+      </a>
+    </div>
+    <div class="right-side">
+      <a href="#"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+      <a href="#"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+      <a href="#"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+      <a href="{% url 'logout' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+    </div>
+  </div>
+
+  <!-- Navegación --> 
+  <header>
+    <nav class="menu">
+      <a href="{% url 'admin_dashboard' %}">Inicio</a>
+    </nav>
+  </header> 
+
+  <!-- Filtros -->
+  <div class="filtros">
+  <h2 class="titulo-historial">Historial de factura</h2>
+
+    <div class="filtros-linea">
+      <div class="campo-fecha">
+        <label for="fecha-inicial">Fecha Inicial:</label>
+        <input type="date" id="fecha-inicial" />
+      </div>
+
+      <div class="campo-fecha">
+        <label for="fecha-final">Fecha Final:</label>
+        <input type="date" id="fecha-final" />
+      </div>
+    </div>
+
+    <div class="campo-boton">
+      <button class="boton-buscar">BUSCAR</button>
+      <button class="boton-limpiar">LIMPIAR</button>
+    </div>
+  </div>
+
+
+  <!-- Tabla -->
+  <div class="cuadro-tabla"> 
+    <table class="tabla-facturas"> 
+      <thead>
+        <tr>
+          <th>Número factura</th>
+          <th>Cliente</th>
+          <th>Fecha de emisión</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in facturas %}
+        <tr>
+          <td>{{ f.id }}</td>
+          <td>{{ f.nombre_receptor }}</td>
+          <td>{{ f.fecha_factura|date:"d/m/Y" }}</td>
+          <td>${{ f.total_factura|floatformat:2 }}</td>
+          <td>
+            <!-- Imprimir -->
+            <a href="{% url 'factura_print' f.id %}" target="_blank">
+              <img src="{% static 'facturas/img/imprimir (1).png' %}" alt="Imprimir" width="20">
+            </a>
+            <!-- Descargar PDF -->
+            <a href="{% url 'factura_pdf' f.id %}" target="_blank">
+              <img src="{% static 'facturas/img/pdf (1).png' %}" alt="Descargar PDF" width="20">
+            </a>
+            <!-- Descargar XML -->
+            <a href="{% url 'factura_xml' f.id %}">
+              <img src="{% static 'facturas/img/extension-xml (1).png' %}" alt="Descargar XML" width="20">
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">No hay facturas registradas</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="paginacion">
+      {% if facturas.has_previous %}
+        <a href="?page=1{% if request.GET.fecha_inicial %}&fecha_inicial={{ request.GET.fecha_inicial }}{% endif %}{% if request.GET.fecha_final %}&fecha_final={{ request.GET.fecha_final }}{% endif %}">« Primera</a>
+        <a href="?page={{ facturas.previous_page_number }}{% if request.GET.fecha_inicial %}&fecha_inicial={{ request.GET.fecha_inicial }}{% endif %}{% if request.GET.fecha_final %}&fecha_final={{ request.GET.fecha_final }}{% endif %}">‹ Anterior</a>
+      {% endif %}
+
+      <span class="current">Página {{ facturas.number }} de {{ facturas.paginator.num_pages }}</span>
+
+      {% if facturas.has_next %}
+        <a href="?page={{ facturas.next_page_number }}{% if request.GET.fecha_inicial %}&fecha_inicial={{ request.GET.fecha_inicial }}{% endif %}{% if request.GET.fecha_final %}&fecha_final={{ request.GET.fecha_final }}{% endif %}">Siguiente ›</a>
+        <a href="?page={{ facturas.paginator.num_pages }}{% if request.GET.fecha_inicial %}&fecha_inicial={{ request.GET.fecha_inicial }}{% endif %}{% if request.GET.fecha_final %}&fecha_final={{ request.GET.fecha_final }}{% endif %}">Última »</a>
+      {% endif %}
+    </div>
+  </div> 
+
+  <!-- Pie de página -->
+  <footer>
+    <div class="footer-bar"> 
+      <div class="footer-item">
+        <img src="{% static 'img/mensaje.png' %}" alt="Correo"> 
+        Ecofactproyect@gmail.com
+      </div>
+      <div class="footer-item">
+        <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+        333-333-333
+      </div>
+    </div>
+    <div class="footer-bottom">@2025-ECOFACT</div> 
+  </footer>
+  
+  <script src="{% static 'facturas/js/historial_factura.js' %}"></script>
+</body>
+</html>

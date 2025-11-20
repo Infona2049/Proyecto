@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de nosotros</title>
+    <link rel="stylesheet" href="{% static 'core/css/acerca_nosotros.css' %}">
+</head> 
+<body>
+    <!-- Barra superior -->
+    <div class="top-bar">
+        <div class="left-side">
+            <a href="{% url 'visualizacion_admin' %}">
+                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+            </a>
+        </div>
+
+        <div class="right-side">
+            <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+            <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+            <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+        </div>
+    </div>
+
+  <!-- Barra de navegación -->
+  <header>
+    <nav class="menu">
+      <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+    </nav>
+  </header>
+
+  <!-- Sección acerca de nosotros -->
+  <section class="nosotros-section">
+    <h2 class="titulo-nosotros">ACERCA DE NOSOTROS</h2>
+    <div class="info-boxes">
+      <div class="box">
+        <h3>¿Quiénes somos?</h3>
+        <p>
+          Somos un equipo comprometido con la educación digital y el fortalecimiento de competencias tributarias en Colombia. A través del desarrollo de un aplicativo web de simulación de facturación electrónica, buscamos brindar una experiencia de aprendizaje práctica, accesible y alineada con las exigencias normativas de la DIAN.
+        </p>
+      </div>
+      <div class="box">
+        <h3>Visión</h3>
+        <p>
+          Convertirnos en los próximos cinco años en la plataforma educativa de referencia en Colombia para la simulación de facturación electrónica, reconocida por su exactitud normativa, accesibilidad, robustez técnica y valor pedagógico. Aspiramos a contribuir significativamente a la formación de profesionales y aprendices altamente competentes en el uso de tecnologías digitales aplicadas al cumplimiento fiscal, impulsando así la transformación digital y la cultura tributaria en el país.
+        </p>
+      </div>
+      <div class="box">
+        <h3>Misión</h3>
+        <p>
+          Simular de manera precisa, segura y eficiente el proceso de facturación electrónica exigido por la DIAN, mediante el desarrollo de un aplicativo web orientado al fortalecimiento de competencias técnicas y tributarias. Nuestra misión es facilitar entornos de aprendizaje prácticos que promuevan la comprensión del modelo fiscal colombiano, integrando buenas prácticas de desarrollo de software, cumplimiento normativo y tecnologías emergentes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pie de página -->
+    <footer>
+        <div class="footer-bar"> 
+            <div class="footer-item">
+                <img src="{% static 'img/mensaje.png' %}" alt="Ubicación">
+                Ecofactproyect@gmail.com
+            </div>
+            <div class="footer-item">
+                <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+                333-333-333
+            </div>
+        </div>
+        <div class="footer-bottom">@2025-ECOFACT</div> 
+    </footer>
+    
+  <script src="{% static 'core/js/acerca_nosotros.js' %}"></script>
+</body>
+</html>

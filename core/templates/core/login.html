@@ -1,0 +1,71 @@
+{% load static %} <!-- Carga la etiqueta 'static' de Django para poder acceder a archivos estáticos (CSS, JS, imágenes) -->
+
+<!DOCTYPE html>
+<html lang="es"> 
+
+<head>
+  <meta charset="UTF-8"> 
+  <title>Iniciar sesión - EcoFact</title> 
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+
+  <!-- Vincula el archivo CSS de estilos principales para el formulario de inicio de sesión -->
+  <link rel="stylesheet" href="{% static 'core/css/login.css' %}">
+
+  <!-- Importa los íconos de Font Awesome (para el ojito de la contraseña y otros íconos posibles) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Librería SweetAlert2: permite mostrar alertas modernas y personalizadas -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body> <!-- Inicio del cuerpo visible del documento -->
+
+  <!-- Contenedor principal del formulario -->
+  <div class="form-content">
+    
+    <!-- Logo de la empresa EcoFact -->
+    <img class="logo" src="{% static 'img/Logo azul sin fondo.png' %}" alt="Logo EcoFact">
+
+    <!-- Formulario de inicio de sesión -->
+    <!-- Usa el método POST para enviar los datos de forma segura -->
+    <!-- onsubmit llama a la función login(event) definida en login.js -->
+    <form method="post" onsubmit="login(event)">
+      
+      {% csrf_token %} <!-- Token de seguridad para evitar ataques CSRF (Cross-Site Request Forgery) -->
+
+      <!-- Campo para ingresar el correo electrónico -->
+      <input type="email" name="email" required placeholder="Correo">
+
+      <!-- Campo de contraseña con ícono para mostrar/ocultar -->
+      <div class="password-container">
+        <!-- Campo de texto de tipo contraseña -->
+        <input type="password" name="password" id="password" placeholder="Contraseña" required>
+
+        <!-- Ícono de ojito para alternar la visibilidad de la contraseña -->
+        <span class="toggle-password" id="togglePassword">
+          <i class="fa-solid fa-eye"></i> <!-- Ícono de ojo proveniente de Font Awesome -->
+        </span>
+      </div>
+
+      <!-- Enlace para recuperar contraseña en caso de olvido -->
+      <p class="recuperar">
+         <a href="{% url 'olvido_contraseña' %}"><u>¿Olvidó su contraseña?</u></a>
+      </p>
+
+      <!-- Botón principal del formulario -->
+      <button type="submit" class="boton2">Iniciar Sesión</button>
+
+      <!-- Enlace para los usuarios que aún no tienen cuenta -->
+      <p class="registro">
+        <a href="{% url 'registro' %}"><u>¿No estás registrado?  Regístrate aquí</u></a> 
+      </p>
+    </form> <!-- Cierre del formulario -->
+  </div> <!-- Cierre del contenedor principal -->
+
+  <!-- Archivo JavaScript propio para manejar el inicio de sesión -->
+  <!-- 'defer' hace que se ejecute cuando todo el HTML haya cargado -->
+  <script src="{% static 'core/js/login.js' %}" defer></script>
+
+</body> 
+</html> 

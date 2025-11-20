@@ -1,0 +1,309 @@
+/* RESET GENERAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(100px, 20vw, 120px) clamp(10px, 3vw, 20px) clamp(80px, 15vw, 100px);
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(6px, 2vw, 10px) clamp(8px, 4vw, 20px);
+  height: clamp(50px, 12vw, 60px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar .left-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3vw, 30px);
+}
+
+.logo1, .logo2 {
+  height: clamp(28px, 8vw, 40px);
+  width: auto;
+}
+
+.top-bar .right-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 20px);
+}
+
+.icono {
+  width: clamp(18px, 5vw, 25px);
+  height: clamp(18px, 5vw, 25px);
+  margin-right: clamp(1px, 1vw, 6px);
+  transition: transform 0.2s ease;
+}
+
+.icono:hover {
+  transform: scale(1.1);
+}
+
+/* MENÚ DE NAVEGACIÓN */
+header {
+  background-color: #003f87;
+  position: fixed;
+  top: clamp(50px, 12vw, 60px);
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.menu {
+  display: flex;
+  padding: clamp(8px, 2vw, 13px) clamp(10px, 4vw, 30px);
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(12px, 3vw, 16px);
+  transition: color 0.3s ease;
+}
+
+.menu a:hover {
+  color: #38b6ff;
+}
+
+/* SECCIÓN ACERCA DE NOSOTROS */
+.nosotros-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(20px, 4vw, 40px) clamp(10px, 3vw, 20px);
+}
+
+.titulo-nosotros {
+  font-size: clamp(20px, 5vw, 32px);
+  font-weight: bold;
+  text-align: center;
+  color: #023e8a;
+  margin-bottom: clamp(30px, 6vw, 50px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.titulo-nosotros::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(60px, 15vw, 100px);
+  height: 3px;
+  background: linear-gradient(90deg, #023e8a, #38b6ff);
+  border-radius: 2px;
+}
+
+.info-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(20px, 4vw, 30px);
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: clamp(20px, 4vw, 40px);
+}
+
+.box {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  padding: clamp(20px, 4vw, 30px);
+  border-radius: clamp(10px, 2vw, 15px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border: 2px solid #e7ecf4;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #023e8a, #38b6ff);
+}
+
+.box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  border-color: #38b6ff;
+}
+
+.box h3 {
+  font-size: clamp(16px, 3.5vw, 20px);
+  font-weight: bold;
+  margin-bottom: clamp(15px, 3vw, 25px);
+  color: #023e8a;
+  text-align: center;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.box h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: #38b6ff;
+  border-radius: 1px;
+}
+
+.box p {
+  font-size: clamp(14px, 2.5vw, 16px);
+  line-height: 1.6;
+  color: #333;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.footer-bar {
+  background-color: #003f87;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vw, 6px) clamp(10px, 15vw, 120px);
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+.footer-item {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.footer-item img {
+  width: clamp(14px, 3vw, 18px);
+  height: clamp(14px, 3vw, 18px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: clamp(4px, 2vw, 10px);
+  background-color: white;
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+/* RESPONSIVE MÍNIMO */
+@media (max-width: 768px) {
+  .info-boxes {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .box {
+    margin: 0 auto;
+    max-width: 500px;
+  }
+  
+  .footer-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 90px 10px 90px;
+  }
+  
+  .nosotros-section {
+    padding: 15px 10px;
+  }
+  
+  .box p {
+    text-align: left;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    padding: 80px 15px 70px;
+  }
+  
+  .nosotros-section {
+    padding: 15px;
+  }
+  
+  .titulo-nosotros {
+    margin-bottom: 20px;
+  }
+  
+  .info-boxes {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+  
+  .box {
+    padding: 15px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .info-boxes {
+    max-width: 1400px;
+  }
+  
+  .box {
+    padding: 35px;
+  }
+}
+
+/* Enlaces sin decoración */
+a {
+  text-decoration: none;
+}
+
+a img {
+  border: none;
+  outline: none;
+  display: inline-block;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .box,
+  .icono {
+    transition: none;
+  }
+  
+  .box:hover {
+    transform: none;
+  }
+}

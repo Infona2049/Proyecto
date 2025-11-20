@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro - EcoFact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'core/css/registro.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="form-content">
+  <img class="logo" src="{% static 'img/Logo azul sin fondo.png' %}" alt="Logo EcoFact">
+
+  <!-- Mostrar mensajes de error/éxito -->
+  {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Mostrar errores de formulario -->
+  {% if form.errors %}
+    <div class="alert alert-error">
+      <strong>Por favor corrige los siguientes errores:</strong>
+      <ul>
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <!-- Columna izquierda -->
+      <div class="form-col">
+        {{ form.nombre_usuario }}
+        {{ form.segundo_nombre_usuario }}
+        {{ form.apellido_usuario }}
+        {{ form.segundo_apellido_usuario }}
+        {{ form.tipo_documento_usuario }}
+        {{ form.numero_documento_usuario }}
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="form-col">
+        {{ form.correo_electronico_usuario }}
+        {{ form.direccion_usuario }}
+        {{ form.telefono_usuario }}
+
+        <div class="password-container">
+          {{ form.password1 }}
+          <button type="button" id="togglePassword" class="toggle-password">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="password-container">
+          {{ form.password2 }}
+          <button type="button" id="toggleConfirmPassword" class="toggle-password">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos ocultos -->
+    {{ form.username }}
+    {{ form.rol_usuario }}
+
+    <!-- Botón centrado -->
+    <button type="submit" class="boton2">Registrarse</button>
+
+    <p class="registro">¿Ya tienes cuenta? 
+      <a href="{% url 'login' %}"><u>Inicia sesión aquí</u></a>
+    </p>
+  </form>
+</div>
+
+<script src="{% static 'core/js/registro.js' %}"></script>
+
+</body>
+</html>

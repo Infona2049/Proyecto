@@ -1,0 +1,127 @@
+/* === RESET GENERAL === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === ESTILO GENERAL DEL BODY === */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at 50% 50%, #a6a6a6 0%, #ffffff 100%);
+}
+
+/* === CENTRO DEL FORMULARIO === */
+.form-content {
+  width: 90%;
+  max-width: 25rem;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+/* === LOGO === */
+.logo {
+  width: 100%;
+  max-width: 18rem;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+/* === INPUTS === */
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* espacio para el ojito */
+  margin-bottom: 1rem;
+  background-color: rgba(58, 99, 168, 0.5);
+  border: none;
+  font-size: 1rem;
+  color: #023e8a;
+  outline: none;
+  border-radius: 5px;
+}
+
+/* === PLACEHOLDER === */
+input::placeholder {
+  color: #023e8a;
+}
+
+/* === CONTENEDOR DE CONTRASEÑA === */
+/* Contenedor */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Input */
+.password-container input {
+  width: 100%;
+  padding-right: 40px; /* deja espacio al ojo */
+}
+
+/* Ojo */
+.password-container .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #003366; /* mismo tono que registro */
+  font-size: 1rem;
+}
+
+
+/* === BOTÓN INICIAR SESIÓN === */
+.boton2 {
+  background-color: #08a000;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 1.25rem;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 2rem auto 1.5rem;
+  display: block;
+  text-transform: uppercase;
+  width: 60%;
+  max-width: 15rem;
+  transition: background-color 0.3s ease;
+}
+
+.boton2:hover {
+  background-color: #066f00;
+}
+
+/* === TEXTOS DEBAJO DEL FORMULARIO === */
+.recuperar,
+.registro {
+  font-size: 0.9rem;
+  color: #38b6ff;
+  margin-top: 1.5rem;
+  cursor: pointer;
+}
+
+.recuperar:hover,
+.registro:hover {
+  text-decoration: underline;
+}
+
+/* === MEDIA QUERY PARA MÓVILES === */
+@media (max-width: 480px) {
+  .form-content {
+    padding: 1.5rem;
+  }
+
+  .boton2 {
+    width: 80%;
+  }
+}

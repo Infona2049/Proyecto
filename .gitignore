@@ -1,0 +1,41 @@
+# Entorno virtual
+venv/
+env/
+ENV/
+
+# Base de datos SQLite (ya no se usa, pero por si acaso)
+*.sqlite3
+db.sqlite3
+
+# Archivos de configuración locales
+.env
+.env.local
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de VSCode
+.vscode/
+*.vscode
+
+# Archivos de logs
+*.log
+
+# Archivos de media (imágenes subidas por usuarios)
+# Descomenta la siguiente línea si no quieres subir imágenes subidas por usuarios
+# media/
+
+# Archivos estáticos compilados (solo si usas collectstatic)
+staticfiles/

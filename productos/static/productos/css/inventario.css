@@ -1,0 +1,452 @@
+
+
+/* RESET GENERAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(100px, 20vw, 120px) clamp(10px, 3vw, 20px) clamp(80px, 15vw, 100px);
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(6px, 2vw, 10px) clamp(8px, 4vw, 20px);
+  height: clamp(50px, 12vw, 60px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar .left-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3vw, 30px);
+}
+
+.logo1, .logo2 {
+  height: clamp(28px, 8vw, 40px);
+  width: auto;
+}
+
+.top-bar .right-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 20px);
+}
+
+.icono {
+  width: clamp(18px, 5vw, 25px);
+  height: clamp(18px, 5vw, 25px);
+  margin-right: clamp(1px, 1vw, 6px);
+  transition: transform 0.2s ease;
+}
+
+.icono:hover {
+  transform: scale(1.1);
+}
+
+/* MENÚ DE NAVEGACIÓN */
+header {
+  background-color: #003f87;
+  position: fixed;
+  top: clamp(50px, 12vw, 60px);
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.menu {
+  display: flex;
+  padding: clamp(8px, 2vw, 13px) clamp(10px, 4vw, 30px);
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(12px, 3vw, 16px);
+  transition: color 0.3s ease;
+}
+
+.menu a:hover {
+  color: #38b6ff;
+}
+
+/* CONTENIDO PRINCIPAL */
+.contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 4vw, 40px);
+  max-width: 1800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* TÍTULO */
+h2 {
+  font-size: clamp(20px, 5vw, 28px);
+  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  color: #003f87;
+  font-weight: bold;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(50px, 12vw, 80px);
+  height: 3px;
+  background: linear-gradient(90deg, #003f87, #38b6ff);
+  border-radius: 2px;
+}
+
+.cuadro-blanco {
+  background-color: white;          /* Fondo blanco */
+  border-radius: 15px;              /* Bordes redondeados */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Sombra suave */
+  padding: 30px;                    /* Espacio interno */
+  width: 80%;                       /* Ancho ajustable */
+  margin: 20px auto;                /* Centrado */
+}
+
+/* ------------------------------------------------------------------------------------------*/
+/* BOTONES BUSCAR Y FILTRAR*/
+
+.campo-boton {
+  margin-top: clamp(20px, 2vw, 40px);
+  text-align: center;
+  display: flex;              /* activa el gap */
+  justify-content: center;    /* centra los botones */
+  align-items: center;        /* los alinea verticalmente */
+  gap: 25px; /*Separa los botones entre si*/
+}
+
+
+.boton-limpiar {
+  background-color: #d9d9d9; /* gris más suave */
+  color: #003f87; /* azul oscuro */
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(11px, 2.3vw, 13px);
+  transition: all 0.3s ease;
+  min-height: 35px;
+}
+
+.boton-limpiar:hover {
+  background-color: #bfbfbf; /* gris más oscuro al pasar el mouse */
+  color: #002f6c; /* azul más intenso */
+}
+
+
+.boton-buscar { 
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(12px, 2.5vw, 14px);
+  transition: background-color 0.3s;
+  min-height: 40px;
+ 
+}
+
+.boton-buscar:hover {
+  background-color: darkgreen; 
+}
+
+.boton-buscar,
+.boton-limpiar {
+  width: 110px;
+  height: 40px;
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+/* CONTENEDOR DE TABLA */
+
+
+
+/* TABLA DE INVENTARIO */
+.tabla-inventario {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  border-radius: 15px;             
+  font-size: clamp(11px, 5vw, 15px);
+}
+
+
+.tabla-inventario thead {
+  background: linear-gradient(135deg, #003f87, #0056b3);
+  border-radius: 15px;            
+  color: white;
+}
+
+.tabla-inventario th {
+  padding: clamp(10px, 1.5vw, 14px) clamp(8px, 1.5vw, 12px);
+  text-align: left;
+  font-weight: bold;
+  font-size: clamp(14px, 2.5vw, 16px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #38b6ff;
+  
+}
+
+.tabla-inventario th:last-child,
+.tabla-inventario td:last-child {
+  text-align: center;
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+/* Bordes redondeados en el encabezado azul de la tabla */
+.tabla-inventario th:first-child {
+  border-top-left-radius: 12px;
+}
+.tabla-inventario th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.tabla-inventario td {
+  padding: clamp(8px, 1vw, 10px) clamp(8px, 1vw, 10px);
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+  
+}
+
+.tabla-inventario tbody tr {
+  transition: all 0.2s ease;
+}
+
+.tabla-inventario tbody tr:hover {
+  background-color: #f8f9ff;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0,63,135,0.1);
+}
+
+.tabla-inventario tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-inventario tbody tr:nth-child(even):hover {
+  background-color: #f0f4ff;
+}
+
+/* ESTADOS DE STOCK */
+.tabla-inventario td:nth-child(3) {
+  font-weight: bold;
+}
+
+.tabla-inventario td:nth-child(4) {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* RESPONSIVE PARA TABLA */
+@media (max-width: 768px) {
+  .tabla-container {
+    overflow-x: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tabla-inventario {
+    min-width: 1100px;
+  }
+  
+  .tabla-inventario th,
+  .tabla-inventario td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  
+  .tabla-inventario th {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .contenido {
+    padding: 15px 10px;
+  }
+  
+  .tabla-inventario {
+    min-width: 500px;
+  }
+  
+  .tabla-inventario th:nth-child(n+4),
+  .tabla-inventario td:nth-child(n+4) {
+    display: none;
+  }
+  
+  .tabla-container::after {
+    content: "Desliza para ver más →";
+    display: block;
+    text-align: center;
+    padding: 8px;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-size: 12px;
+    font-style: italic;
+  }
+}
+
+/* SCROLLBAR PERSONALIZADA */
+.tabla-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tabla-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #003f87, #38b6ff);
+  border-radius: 4px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #002a5c, #2196f3);
+}
+
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.footer-bar {
+  background-color: #003f87;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vw, 6px) clamp(10px, 15vw, 120px);
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+.footer-item {
+  display: flex;
+  align-items: center; 
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.footer-item img {
+  width: clamp(14px, 3vw, 18px);
+  height: clamp(14px, 3vw, 18px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: clamp(4px, 2vw, 10px);
+  background-color: white;
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+/* RESPONSIVE MÍNIMO */
+@media (max-width: 768px) {
+  .footer-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    padding: 80px 15px 70px;
+  }
+  
+  .contenido {
+    padding: 15px 20px;
+  }
+  
+  h2 {
+    margin-bottom: 15px;
+  }
+}
+
+/* Enlaces sin decoración */
+a {
+  text-decoration: none;
+}
+
+a img {
+  border: none;
+  outline: none;
+  display: inline-block;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .tabla-inventario tbody tr,
+  .icono {
+    transition: none;
+  }
+  
+  .tabla-inventario tbody tr:hover {
+    transform: none;
+  }
+}
+
+/* Estados vacíos */
+.tabla-inventario tbody:empty::after {
+  content: "No hay productos en el inventario";
+  display: block;
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+  font-size: 16px;
+}
+
+/* PAGINACIÓN ESTILO HISTORIAL FACTURA */
+.paginacion {
+  margin: 15px 0;
+  text-align: center;
+}
+.paginacion span,
+.paginacion a {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: #003f87;
+  background-color: #e6eef8;
+  transition: background 0.3s;
+}
+.paginacion a:hover {
+  background-color: #003f87;
+  color: white;
+}
+.paginacion .current {
+  background-color: #003f87;
+  color: white;
+}

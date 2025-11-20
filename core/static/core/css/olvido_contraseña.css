@@ -1,0 +1,280 @@
+/* =========================
+   RESET GENERAL
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; 
+}
+
+/* =========================
+   CONFIGURACIÓN GENERAL
+========================= */
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  min-height: 100vh;
+  display: flex; 
+  flex-direction: column;
+}
+
+/* =========================
+   BARRA SUPERIOR
+========================= */
+.top-bar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(6px, 2vw, 10px) clamp(8px, 4vw, 20px);
+  height: clamp(50px, 12vw, 60px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-bar .left-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3vw, 30px);
+}
+
+.logo1, .logo2 {
+  height: clamp(28px, 8vw, 40px);
+  width: auto;
+}
+
+.top-bar .right-side {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 20px);
+}
+
+.icono {
+  width: clamp(18px, 5vw, 25px);
+  height: clamp(18px, 5vw, 25px);
+  margin-right: clamp(1px, 1vw, 6px);
+  transition: transform 0.2s ease;
+}
+
+.icono:hover {
+  transform: scale(1.1);
+}
+
+/* MENÚ DE NAVEGACIÓN */
+header {
+  background-color: #003f87;
+  position: fixed;
+  top: clamp(50px, 12vw, 60px);
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.menu {
+  display: flex;
+  padding: clamp(8px, 2vw, 13px) clamp(10px, 4vw, 30px);
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(12px, 3vw, 16px);
+  transition: color 0.3s ease;
+}
+
+/* FOOTER*/
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.footer-bar {
+  background-color: #003f87;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vw, 6px) clamp(10px, 15vw, 120px);
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+.footer-item {
+  display: flex;
+  align-items: center; 
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.footer-item img {
+  width: clamp(14px, 3vw, 18px);
+  height: clamp(14px, 3vw, 18px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: clamp(4px, 2vw, 10px);
+  background-color: white;
+  font-size: clamp(11px, 2.5vw, 14px);
+}
+
+/* =========================
+   SECCIÓN LOGIN / OLVIDO CONTRASEÑA
+========================= */
+:root {
+  --card-bg: #fff;
+  --accent: #007bff;
+  --accent-hover: #0056b3;
+  --muted: #6b7280;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --radius: 12px;
+}
+
+/* Fondo especial para páginas de login */
+body.login-page {
+  font-family: Inter, Arial, sans-serif;
+  background: radial-gradient(circle at 50% 50%, #a6a6a6 0%, #ffffff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  background: var(--card-bg);
+  padding: 28px;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgba(2,6,23,0.08);
+  width: 380px;
+  max-width: 100%;
+  text-align: center;
+}
+
+h2 {
+  margin: 0 0 14px;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+p.small {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0;
+  border: 1px solid #e6e9ef;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+}
+
+button {
+  width: 100%;
+  padding: 11px;
+  margin-top: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid #e6e9ef;
+  margin-top: 8px;
+}
+
+button:hover { 
+  background: var(--accent-hover); 
+}
+
+.hidden { display: none; }
+
+.message-error {
+  background: #fff5f5;
+  color: var(--danger);
+  border: 1px solid rgba(220,38,38,0.12);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.message-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(22,163,74,0.08);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.12);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin: 10px 0 6px;
+}
+
+.check {
+  width: 20px;
+  height: 20px;
+  display:inline-grid;
+  place-items:center;
+  background: rgba(16,185,129,0.16);
+  color: var(--success);
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.small-note { 
+  color: var(--muted); 
+  font-size: 13px; 
+  margin-top: 6px; 
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 480px) {
+  .footer-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  nav.menu {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .menu::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  .menu::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .welcome img {
+    max-height: 250px;
+  }
+}

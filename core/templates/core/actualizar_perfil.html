@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar factura</title>
+    <link rel="stylesheet" href="{% static 'core/css/actualizar_perfil.css' %}">
+</head> 
+<body>
+    <!-- Barra superior --> 
+    <div class="top-bar">
+        <div class="left-side">
+            <a href="{% url 'visualizacion_admin' %}">
+                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+            </a>
+        </div>
+
+        <div class="right-side">
+            <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+            <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+            <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+        </div>
+    </div>
+
+<!-- Barra de navegación -->
+    <header>
+        <nav class="menu">
+            <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+        </nav>
+    </header>
+
+  <!-- FORMULARIO DE ACTUALIZACIÓN DE PERFIL -->
+  <main class="form-container">
+    <form class="form-box" id="formulario">
+      <!-- Imagen de perfil centrada -->
+      <div class="logo-centro">
+        <img src="{% static 'img/logo_foto_perfil.png' %}" alt="Foto de perfil" />
+      </div>
+
+      <!-- Grilla de campos del formulario -->
+      <div class="form-grid">
+        <!-- ===== Columna izquierda ===== -->
+        <div class="col">
+          <label for="nombre">Nombre</label> 
+          <input type="text" id="nombre" name="nombre" required />
+
+          <label for="segundoNombre">Segundo nombre</label>
+          <input type="text" id="segundoNombre" name="segundoNombre" />
+
+          <label for="apellido">Apellido</label>
+          <input type="text" id="apellido" name="apellido" required />
+
+          <label for="segundoApellido">Segundo apellido</label>
+          <input type="text" id="segundoApellido" name="segundoApellido" />
+        </div>
+  
+        <!-- ===== Columna derecha ===== -->
+        <div class="col">
+          <label for="tipoDocumento">Tipo documento</label>
+          <select id="tipoDocumento" name="tipoDocumento" required>
+            <option value="">Seleccione…</option>
+            <option value="cc">Cédula de ciudadanía</option>
+            <option value="ce">Cédula de extranjería</option>
+            <option value="nit">NIT</option>
+            <option value="ti">Tarjeta de identidad</option>
+            <option value="pp">Pasaporte</option>
+          </select>
+
+          <label for="numeroDocumento">Número documento</label>
+          <input type="text" id="numeroDocumento" name="numeroDocumento"
+                 maxlength="12" pattern="\d+" required />
+
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="direccion">Dirección</label>
+          <input type="text" id="direccion" name="direccion" required />
+        </div>
+      </div>
+
+      <!-- ===== Botones de acción ===== -->
+      <div class="form-buttons">
+        <button type="button" id="btn-cancelar">Cancelar</button>
+        <button type="submit" id="btn-siguiente">Actualizar</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Pie de página -->
+    <footer>
+        <div class="footer-bar"> 
+            <div class="footer-item">
+                <img src="{% static 'img/mensaje.png' %}" alt="Ubicación">
+                Ecofactproyect@gmail.com
+            </div>
+            <div class="footer-item">
+                <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+                333-333-333
+            </div>
+        </div>
+        <div class="footer-bottom">@2025-ECOFACT</div> 
+    </footer>
+
+  <!-- MODAL DE ÉXITO (se muestra tras actualizar)     -->
+  <div id="modal-exito" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <p>¡Información de perfil actualizada!</p>
+    </div>
+  </div>
+
+  <!-- Scripts JavaScript                              -->
+  <script src="{% static 'core/js/actualizar_perfil.js' %}" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Factura generada</title>
+  <link rel="stylesheet" href="{% static 'facturas/css/crear_factura.css' %}">
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="left-side">
+            <a href="{% url 'visualizacion_admin' %}">
+                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de navegación -->
+    <header>
+        <nav class="menu">
+        </nav>
+    </header>  
+
+  <div style="max-width:700px; margin:60px auto; background:white; padding:30px; border-radius:8px; text-align:center;">
+    <h2>Factura generada y enviada con éxito </h2>
+    <p>La factura fue enviada al cliente y se generó el CUFE.</p>
+    <a href="{% url 'crear_factura' %}" class="btn-siguiente" style="display:inline-block; margin-top:20px;">Crear otra factura</a>
+  </div>
+
+  <footer>
+        <div class="footer-bar"> 
+            <div class="footer-item">
+                <img src="{% static 'img/mensaje.png' %}" alt="Ubicación">
+                Ecofactproyect@gmail.com
+            </div>
+            <div class="footer-item">
+                <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+                333-333-333
+            </div>
+        </div>
+        <div class="footer-bottom">@2025-ECOFACT</div> 
+    </footer>
+
+</body>
+</html>

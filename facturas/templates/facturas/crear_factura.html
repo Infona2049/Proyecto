@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crear factura</title>
+  <link rel="stylesheet" href="{% static 'facturas/css/crear_factura.css' %}" />
+</head>
+<body>
+
+  <!-- Token CSRF oculto -->
+  <form style="display:none;">{% csrf_token %}</form>
+
+  <!-- Barra superior -->
+  <div class="top-bar">
+    <div class="left-side">
+      <a href="{% url 'visualizacion_admin' %}">
+        <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+        <img src="{% static 'img/logo empresa.png' %}" alt="Logo Empresa" class="logo2" />
+      </a>
+    </div>
+
+    <div class="right-side">
+      <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+      <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+      <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+      <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+    </div>
+  </div>
+
+  <!-- Menú -->
+  <header>
+    <nav class="menu">
+      <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+    </nav>
+  </header>
+
+  <h2>Nueva factura</h2>
+
+  <!-- Sección: Datos generales -->
+  <div class="seccion-factura">
+    <div class="card-datos">
+      <h3>Datos generales</h3>
+      <hr />
+      <div class="form-group">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" readonly />
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Datos del cliente -->
+  <div class="seccion-factura">
+    <div class="card-datos">
+      <h3>Datos del cliente</h3>
+      <hr />
+
+      <div class="form-group">
+        <label for="nombreCliente">Nombre</label>
+        <input type="text" id="nombreCliente" placeholder="Nombre completo" />
+      </div>
+
+      <div class="form-group">
+        <label for="tipoDocumento">Tipo de documento</label>
+        <select id="tipoDocumento">
+          <option value="" disabled selected>Seleccione</option>
+          <option value="cedula">Cédula</option>
+          <option value="cedula_extranjera">Cédula extranjera</option>
+          <option value="pasaporte">Pasaporte</option>
+          <option value="ppt">Permiso por protección temporal</option>
+          <option value="nit">NIT</option>
+          <option value="cif">CIF</option>
+          <option value="ruc">RUC</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="cedulaCliente">Número de documento</label>
+        <input type="text" id="cedulaCliente" placeholder="Ej. 1234567890" />
+      </div>
+
+      <div class="form-group">
+        <label for="correoCliente">Correo</label>
+        <input type="email" id="correoCliente" placeholder="correo@ejemplo.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="number" id="telefono" placeholder="Ej. 3001234567" />
+      </div>
+
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" id="direccion" placeholder="Barrio / Conjunto" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Información del producto -->
+  <div class="seccion-factura">
+    <div class="card-datos">
+      <h3>Información del producto</h3>
+      <hr />
+
+      <!-- Campo del lector de código de barras -->
+      <div class="form-group">
+        <label for="codigo_barras_input">Escanee o escriba el código de barras:</label>
+        <input type="text" id="codigo_barras_input" placeholder="Escanee el código aquí" autofocus autocomplete="off">
+      </div>
+
+     <table id="tablaProductos" style="width:100%; border-collapse:collapse; text-align:center;">
+        <thead style="background-color:#007bff; color:white;">
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>IVA (19%)</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+
+        <!-- Totales -->
+        <div style="margin-top:15px; text-align:right; font-weight:bold; font-size:16px;">
+          <p>Subtotal: <span id="subtotal">0</span> COP</p>
+          <p>IVA: <span id="ivaTotal">0</span> COP</p>
+          <p style="font-size:18px; color:#007bff;">Total: <span id="granTotal">0</span> COP</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Datos terceros -->
+  <div class="seccion-factura">
+    <div class="card-datos">
+      <h3>Datos terceros</h3>
+      <hr />
+      <div class="form-group">
+        <label for="medioPago">Medio de pago</label>
+        <select id="medioPago">
+          <option value="" disabled selected>Seleccione</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="transferencia">Transferencia</option>
+        </select>
+      </div>
+      <button type="button" class="btn-siguiente" id="btnGenerarFactura">GENERAR FACTURA</button>
+    </div>
+  </div>
+
+  <!-- Pie de página -->
+  <footer>
+    <div class="footer-bar"> 
+      <div class="footer-item">
+        <img src="{% static 'img/mensaje.png' %}" alt="Correo">
+        Ecofactproyect@gmail.com
+      </div>
+      <div class="footer-item">
+        <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono"> 
+        333-333-333
+      </div>
+    </div>
+    <div class="footer-bottom">@2025 - ECOFACT</div> 
+  </footer>
+
+  <script src="{% static 'facturas/js/crear_factura.js' %}"></script>
+</body>
+</html>

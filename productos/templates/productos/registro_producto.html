@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registro producto</title>
+    <!-- Carga la hoja de estilos CSS específica para el registro de productos -->
+    <link rel="stylesheet" href="{% static 'productos/css/registro_producto.css' %}">
+    <!-- Librería SweetAlert2 para mostrar alertas bonitas -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Barra superior con logos y accesos rápidos -->
+    <div class="top-bar">
+        <div class="left-side">
+            <!-- Enlace a la vista principal del administrador -->
+            <a href="{% url 'visualizacion_admin' %}">
+                <!-- Logos de la aplicación y empresa -->
+                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
+            </a>
+        </div>
+        <div class="right-side">
+            <!-- Iconos con enlaces a documentos, perfil, cambio de contraseña y logout -->
+            <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+            <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+            <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+        </div>
+    </div>
+
+    <!-- Barra de navegación principal -->
+    <header>
+        <nav class="menu">
+            <!-- Enlace a la página de inicio para el administrador -->
+            <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+        </nav>
+    </header>
+
+    <!-- Contenedor principal con el formulario para registrar un producto -->
+    <main class="contenedor">
+        <h2>Registro de producto</h2>
+
+        <!-- Mostrar errores de validación si el formulario fue enviado con errores -->
+        {% if form.errors and request.method == "POST" %}
+            <div class="form-errors">
+                <ul>
+                    <!-- Itera sobre cada campo del formulario y muestra sus errores -->
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    <!-- Muestra errores generales no asociados a un campo específico -->
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Formulario para registrar un producto -->
+        <form method="post" enctype="multipart/form-data" class="form-card" id="form-registro-producto">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.categoria_producto.label_tag }}
+                {{ form.categoria_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.nombre_producto.label_tag }}
+                {{ form.nombre_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.modelo_producto.label_tag }}
+                {{ form.modelo_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.capacidad_producto.label_tag }}
+                {{ form.capacidad_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.color_producto.label_tag }}
+                {{ form.color_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.precio_producto.label_tag }}
+                {{ form.precio_producto }}
+            </div>
+            <div class="form-group">
+                {{ form.stock_actual_inventario.label_tag }}
+                {{ form.stock_actual_inventario }}
+            </div>
+            <div class="form-group">
+                {{ form.imagen_producto.label_tag }}
+                {{ form.imagen_producto }}
+            </div>
+            <button type="submit" class="btn-guardar">Registrar producto</button>
+        </form>
+    </main>
+
+    <!-- Pie de página con información de contacto -->
+    <footer>
+        <div class="footer-bar">
+            <div class="footer-item">
+                <img src="{% static 'img/mensaje.png' %}" alt="Correo">
+                Ecofactproyect@gmail.com
+            </div>
+            <div class="footer-item">
+                <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono">
+                333-333-333
+            </div>
+        </div>
+        <div class="footer-bottom">@2025-ECOFACT</div>
+    </footer>
+
+    <!-- Si la variable 'exito' está presente, muestra una alerta de éxito con SweetAlert2 -->
+    {% if exito %}
+    <script>
+        Swal.fire({
+            icon: "success",
+            title: "¡El producto se ha registrado exitosamente!",
+            confirmButtonText: "OK",
+            allowOutsideClick: false
+        });
+    </script>
+    {% endif %}
+
+    <!-- Script JavaScript específico para la página de registro de producto -->
+    <script src="{% static 'productos/js/registro_producto.js' %}"></script>
+</body>
+</html>
