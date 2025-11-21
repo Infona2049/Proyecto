@@ -221,12 +221,12 @@ def enviar_codigo_recuperacion(request):
         
         # Verificar que el usuario existe
         try:
-            usuario = Usuario.objects.get(email=email)
-            print(f"✅ Usuario encontrado: {usuario.nombre_usuario} (ID: {usuario.id})")
+            usuario = Usuario.objects.get(correo_electronico_usuario=email)
+            print(f"✅ Usuario encontrado: {usuario.nombre_usuario} (PK: {usuario.pk})")
         except Usuario.DoesNotExist:
             print(f"❌ Usuario NO encontrado con email: '{email}'")
             print("📋 Verificando todos los emails en la BD...")
-            todos_emails = Usuario.objects.values_list('email', 'nombre_usuario')
+            todos_emails = Usuario.objects.values_list('correo_electronico_usuario', 'nombre_usuario')
             for db_email, nombre in todos_emails:
                 print(f"   - '{db_email}' ({nombre})")
             # Por seguridad, no revelar si el correo existe o no
@@ -253,53 +253,287 @@ def enviar_codigo_recuperacion(request):
         
         html_content = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="es">
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }}
-                .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                .header {{ text-align: center; margin-bottom: 30px; }}
-                h1 {{ color: #2563eb; margin: 0; }}
-                .code-box {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin: 30px 0; }}
-                .code {{ font-size: 48px; font-weight: bold; letter-spacing: 10px; margin: 10px 0; }}
-                .info {{ color: #64748b; font-size: 14px; line-height: 1.6; }}
-                .warning {{ background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin: 20px 0; color: #92400e; }}
-                .footer {{ text-align: center; color: #94a3b8; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; }}
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                body {{
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 40px 20px;
+                    line-height: 1.6;
+                }}
+                .email-wrapper {{
+                    max-width: 650px;
+                    margin: 0 auto;
+                    background-color: white;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                }}
+                .header {{
+                    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                    padding: 40px 30px;
+                    text-align: center;
+                    border-bottom: 5px solid #fbbf24;
+                }}
+                .logo-container {{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 30px;
+                    margin-bottom: 20px;
+                    border: none;
+                }}
+                .logo {{
+                    max-width: 80px;
+                    height: auto;
+                }}
+                .header h1 {{
+                    color: #1e3a8a;
+                    font-size: 28px;
+                    font-weight: 700;
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                }}
+                .header p {{
+                    color: #475569;
+                    font-size: 14px;
+                    margin-top: 8px;
+                }}
+                .content {{
+                    padding: 50px 40px;
+                    background-color: #ffffff;
+                }}
+                .greeting {{
+                    font-size: 18px;
+                    color: #1f2937;
+                    margin-bottom: 20px;
+                }}
+                .greeting strong {{
+                    color: #1e40af;
+                    font-size: 20px;
+                }}
+                .message {{
+                    color: #4b5563;
+                    font-size: 16px;
+                    margin-bottom: 30px;
+                    line-height: 1.8;
+                }}
+                .code-section {{
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-radius: 15px;
+                    padding: 40px;
+                    text-align: center;
+                    margin: 35px 0;
+                    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+                    position: relative;
+                    overflow: hidden;
+                }}
+                .code-section::before {{
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    right: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    animation: pulse 3s ease-in-out infinite;
+                }}
+                @keyframes pulse {{
+                    0%, 100% {{ transform: scale(1); }}
+                    50% {{ transform: scale(1.1); }}
+                }}
+                .code-label {{
+                    color: #e0e7ff;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin-bottom: 15px;
+                    font-weight: 600;
+                }}
+                .code {{
+                    font-size: 56px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    letter-spacing: 18px;
+                    margin: 20px 0;
+                    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    position: relative;
+                    z-index: 1;
+                    font-family: 'Courier New', monospace;
+                }}
+                .code-validity {{
+                    color: #fbbf24;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin-top: 15px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                }}
+                .code-validity::before {{
+                    content: '⏱';
+                    font-size: 18px;
+                }}
+                .warning-box {{
+                    background: linear-gradient(to right, #fef3c7, #fde68a);
+                    border-left: 6px solid #f59e0b;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin: 30px 0;
+                    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+                }}
+                .warning-box h3 {{
+                    color: #92400e;
+                    font-size: 16px;
+                    margin-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }}
+                .warning-box h3::before {{
+                    content: '⚠️';
+                    font-size: 20px;
+                }}
+                .warning-box ul {{
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                }}
+                .warning-box li {{
+                    color: #92400e;
+                    font-size: 14px;
+                    margin: 8px 0;
+                    padding-left: 20px;
+                    position: relative;
+                }}
+                .warning-box li::before {{
+                    content: '•';
+                    position: absolute;
+                    left: 0;
+                    color: #f59e0b;
+                    font-size: 20px;
+                    line-height: 1;
+                }}
+                .help-section {{
+                    background-color: #f0f9ff;
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin: 30px 0;
+                    text-align: center;
+                    border: 2px solid #bfdbfe;
+                }}
+                .help-section p {{
+                    color: #1e40af;
+                    font-size: 14px;
+                    margin: 0;
+                }}
+                .footer {{
+                    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                    padding: 35px 30px;
+                    text-align: center;
+                }}
+                .footer-logos {{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 30px;
+                    margin-bottom: 20px;
+                    border: none;
+                }}
+                .footer-logo {{
+                    max-width: 70px;
+                    height: auto;
+                    opacity: 0.9;
+                }}
+                .footer h3 {{
+                    color: #1e3a8a;
+                    font-size: 18px;
+                    margin-bottom: 10px;
+                    font-weight: 700;
+                }}
+                .footer p {{
+                    color: #000000;
+                    font-size: 13px;
+                    margin: 8px 0;
+                }}
+                .footer .contact {{
+                    color: #1e40af;
+                    font-size: 14px;
+                    margin: 15px 0 10px;
+                    font-weight: 600;
+                }}
+                .divider {{
+                    height: 1px;
+                    background: linear-gradient(to right, transparent, #374151, transparent);
+                    margin: 20px 0;
+                }}
             </style>
         </head>
         <body>
-            <div class="container">
+            <div class="email-wrapper">
+                <!-- Header con logos -->
                 <div class="header">
-                    <h1>Recuperación de Contraseña</h1>
+                    <div class="logo-container">
+                        <img src="cid:logo_ecofact" alt="EcoFact Logo" class="logo">
+                        <img src="cid:logo_apple" alt="Apple Pereira Logo" class="logo">
+                    </div>
+                    <h1>🔐 Recuperación de Contraseña</h1>
+                    <p>Sistema de Seguridad EcoFact</p>
                 </div>
                 
-                <p>Hola <strong>{usuario.nombre_usuario}</strong>,</p>
-                
-                <p class="info">
-                    Recibimos una solicitud para restablecer la contraseña de tu cuenta en EcoFact.
-                    Usa el siguiente código para continuar con el proceso:
-                </p>
-                
-                <div class="code-box">
-                    <div style="font-size: 14px; margin-bottom: 10px;">Tu código de verificación es:</div>
-                    <div class="code">{codigo}</div>
-                    <div style="font-size: 12px; margin-top: 10px;">Válido por 10 minutos</div>
+                <!-- Contenido principal -->
+                <div class="content">
+                    <div class="greeting">
+                        Hola <strong>{usuario.nombre_usuario}</strong>,
+                    </div>
+                    
+                    <p class="message">
+                        Recibimos una solicitud para restablecer la contraseña de tu cuenta en EcoFact.
+                        Por tu seguridad, hemos generado un código de verificación único que deberás ingresar
+                        para continuar con el proceso de recuperación.
+                    </p>
+                    
+                    <!-- Sección del código -->
+                    <div class="code-section">
+                        <div class="code-label">Tu código de verificación es:</div>
+                        <div class="code">{codigo}</div>
+                        <div class="code-validity">Válido por 10 minutos</div>
+                    </div>
+                    
+                    <!-- Advertencias -->
+                    <div class="warning-box">
+                        <h3>Información Importante</h3>
+                        <ul>
+                            <li>Este código es válido únicamente por <strong>10 minutos</strong></li>
+                            <li>No compartas este código con nadie, ni siquiera con personal de EcoFact</li>
+                            <li>Si no solicitaste este cambio, ignora este correo y tu cuenta permanecerá segura</li>
+                            <li>Después de usar el código, será inválido automáticamente</li>
+                        </ul>
+                    </div>
+                    
                 </div>
                 
-                <div class="warning">
-                    <strong>⚠️ Importante:</strong><br>
-                    • Este código expira en 10 minutos<br>
-                    • No compartas este código con nadie<br>
-                    • Si no solicitaste este cambio, ignora este correo
-                </div>
-                
-                <p class="info">
-                    Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.
-                </p>
-                
+                <!-- Footer -->
                 <div class="footer">
-                    <p><strong>EcoFact - Sistema de Facturación Electrónica</strong></p>
-                    <p>Este es un correo automático, por favor no responder.</p>
+                    <div class="footer-logos">
+                        <img src="cid:logo_ecofact" alt="EcoFact" class="footer-logo">
+                        <img src="cid:logo_apple" alt="Apple Pereira" class="footer-logo">
+                    </div>
+                    <h3>EcoFact</h3>
+                    <p>Sistema de Facturación Electrónica</p>
+                    <p style="margin: 15px 0; font-size: 14px;">¿Tienes problemas? Contáctanos:</p>
+                    <p class="contact">📧 ecofactproyect@gmail.com | 📞 333-333-333</p>
+                    <p>Este es un correo automático, por favor no responder directamente.</p>
                     <p>© 2025 EcoFact. Todos los derechos reservados.</p>
                 </div>
             </div>
@@ -343,26 +577,45 @@ def enviar_codigo_recuperacion(request):
         print(f"EMAIL_HOST_PASSWORD configurado: {'Sí' if password else 'No'} (primeros 4 chars: {password[:4] if password else 'N/A'})")
         print("="*60 + "\n")
         
-        # Intentar con send_mail primero (más simple)
-        try:
-            print("📤 Intentando con send_mail (método simple)...")
-            resultado_simple = send_mail(
-                subject=subject,
-                message=text_content,
-                from_email=from_email,
-                recipient_list=[email],
-                fail_silently=False,
-            )
-            print(f"✅ send_mail resultado: {resultado_simple}")
-        except Exception as e:
-            print(f"❌ send_mail falló: {e}")
-            import traceback
-            traceback.print_exc()
-        
-        # Intentar con EmailMultiAlternatives (con HTML)
-        print("📤 Intentando con EmailMultiAlternatives (con HTML)...")
+        # Enviar email con HTML y logos
+        print("📤 Enviando email con diseño profesional...")
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         msg.attach_alternative(html_content, "text/html")
+        
+        # Adjuntar logos como imágenes embebidas
+        import os
+        from django.conf import settings as django_settings
+        from email.mime.image import MIMEImage
+        
+        # Ruta de los logos
+        logo_ecofact_path = os.path.join(django_settings.BASE_DIR, 'static', 'img', 'Logo azul sin fondo.png')
+        logo_apple_path = os.path.join(django_settings.BASE_DIR, 'static', 'img', 'logo empresa.png')
+        
+        print(f"📁 Buscando logos en:")
+        print(f"   EcoFact: {logo_ecofact_path}")
+        print(f"   Apple: {logo_apple_path}")
+        
+        # Adjuntar logo EcoFact
+        try:
+            with open(logo_ecofact_path, 'rb') as img:
+                logo_ecofact = MIMEImage(img.read())
+                logo_ecofact.add_header('Content-ID', '<logo_ecofact>')
+                logo_ecofact.add_header('Content-Disposition', 'inline', filename='logo_ecofact.png')
+                msg.attach(logo_ecofact)
+                print("✅ Logo EcoFact adjuntado")
+        except Exception as e:
+            print(f"⚠️ No se pudo adjuntar logo EcoFact: {e}")
+        
+        # Adjuntar logo Apple Pereira
+        try:
+            with open(logo_apple_path, 'rb') as img:
+                logo_apple = MIMEImage(img.read())
+                logo_apple.add_header('Content-ID', '<logo_apple>')
+                logo_apple.add_header('Content-Disposition', 'inline', filename='logo_apple.png')
+                msg.attach(logo_apple)
+                print("✅ Logo Apple Pereira adjuntado")
+        except Exception as e:
+            print(f"⚠️ No se pudo adjuntar logo Apple: {e}")
         
         resultado = msg.send(fail_silently=False)
         print(f"✅ Email enviado exitosamente. Resultado: {resultado}")
@@ -460,7 +713,7 @@ def restablecer_contrasena(request):
         
         # Actualizar contraseña
         try:
-            usuario = Usuario.objects.get(email=email)
+            usuario = Usuario.objects.get(correo_electronico_usuario=email)
             usuario.set_password(nueva_password)
             usuario.save()
             
