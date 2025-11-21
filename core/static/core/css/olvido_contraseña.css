@@ -12,10 +12,13 @@
 ========================= */
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background-color: #f0f4f8;
   min-height: 100vh;
   display: flex; 
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
 /* =========================
@@ -150,12 +153,14 @@ body.login-page {
 
 .container {
   background: var(--card-bg);
-  padding: 28px;
+  padding: 40px;
   border-radius: var(--radius);
-  box-shadow: 0 6px 24px rgba(2,6,23,0.08);
-  width: 380px;
-  max-width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  width: 420px;
+  max-width: 90%;
   text-align: center;
+  margin: auto;
+  position: relative;
 }
 
 h2 {
@@ -193,6 +198,26 @@ button {
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
+}
+
+.resend-link {
+  display: inline-block;
+  margin-top: 15px;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.resend-link:hover {
+  color: var(--accent-hover);
+}
+
+.resend-link.disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: none;
 }
 
 button.secondary {

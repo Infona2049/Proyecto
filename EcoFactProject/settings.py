@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os  # Importamos os para manejar rutas de archivos en el sistema operativo
 from decouple import config
+import dj_database_url
 
 # Construye rutas dentro del proyecto, BASE_DIR apunta a la carpeta raíz del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,8 +27,14 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-b%oh&@$)n5f89ef_#8%l9
 DEBUG = config('DEBUG', default=True, cast=bool)
 # Modo debug activado para desarrollo, desactivar en producción
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 # Lista de hosts permitidos para servir la app, vacía permite localhost
+
+# Agregar el host de Render si está en producción
+if not DEBUG:
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Aplicaciones instaladas en el proyecto
@@ -46,6 +53,7 @@ INSTALLED_APPS = [
 # Middleware: capas que procesan las peticiones y respuestas
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir archivos estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',  # Protección CSRF
@@ -79,30 +87,43 @@ WSGI_APPLICATION = 'EcoFactProject.wsgi.application'
 
 
 # Configuración de base de datos (PostgreSQL preferido, SQLite como fallback)
-USE_POSTGRESQL = config('USE_POSTGRESQL', default=False, cast=bool)
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-if USE_POSTGRESQL:
+if DATABASE_URL:
+    # Si existe DATABASE_URL (Render), usarla con dj-database-url
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='ecofact'),
-            'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default='123'),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'sslmode': 'require', #asegura que la conexión con tu base de datos Neon sea segura y encriptada, pero no valida contra qué servidor te conectas
-            },
-     }
-}
-else:
-    # SQLite como fallback para desarrollo
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
+else:
+    # Configuración manual para desarrollo local
+    USE_POSTGRESQL = config('USE_POSTGRESQL', default=False, cast=bool)
+    
+    if USE_POSTGRESQL:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME', default='ecofact'),
+                'USER': config('DB_USER', default='postgres'),
+                'PASSWORD': config('DB_PASSWORD', default='123'),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+                'OPTIONS': {
+                    'sslmode': 'require', #asegura que la conexión con tu base de datos Neon sea segura y encriptada, pero no valida contra qué servidor te conectas
+                },
+         }
+    }
+    else:
+        # SQLite como fallback para desarrollo
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Validadores de contraseña para mejorar seguridad
@@ -133,6 +154,16 @@ STATICFILES_DIRS = [
 
 # Para producción - donde Django recogerá todos los archivos estáticos
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Configuración de WhiteNoise para servir archivos estáticos en producción
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 

@@ -125,7 +125,6 @@ python manage.py runserver 8001
 
 | Rol | Email | Contraseña | URL de acceso |
 |-----|-------|------------|---------------|
-| **Superadmin** | superadmin@ecofact.com | superadmin123 | `/admin/` (Django Admin) |
 | **Administrador** | admin@ecofact.com | admin123 | `/admin-dashboard/` |
 | **Vendedor** | vendedor@ecofact.com | vendedor123 | `/vendedor-dashboard/` |
 | **Cliente** | cliente@ecofact.com | cliente123 | `/cliente-dashboard/` |
@@ -142,13 +141,13 @@ python manage.py runserver 8001
 ## 📱 Funcionalidades
 
 ### ✅ Implementadas
-- [x] Sistema de autenticación por email
+- 
 - [x] Registro de nuevos usuarios (solo clientes)
 - [x] Login con redirección automática por rol
 - [x] Dashboards específicos por rol
 - [x] Control de acceso por decoradores
 - [x] Gestión de archivos estáticos
-- [x] Base de datos con SQLite
+
 
 ### 🔄 Sistema de Roles
 - **Admin:** Acceso completo al sistema

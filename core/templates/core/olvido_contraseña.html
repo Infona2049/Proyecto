@@ -63,10 +63,11 @@
     <!-- PANTALLA 2: Verificación del código -->
     <div id="codigo" class="hidden"> <!-- Inicialmente oculta -->
       <h2>Verifica tu correo</h2>
-      <p class="small">Introduce el código que llegaría a tu correo.</p>
-      <input id="codigo-input" type="text" placeholder="Ingresa el código recibido"> <!-- Campo para código -->
+      <p class="small">Introduce el código que llegó a tu correo.</p>
+      <input id="codigo-input" type="text" placeholder="Ingresa el código de 6 dígitos" maxlength="6"> <!-- Campo para código -->
       <div id="codigo-error" class="message-error hidden"></div> <!-- Mensaje de error -->
       <button onclick="verificarCodigo()">Verificar código</button> <!-- Botón de validación -->
+      <a id="reenviar-codigo" class="resend-link" onclick="reenviarCodigo()">Reenviar código</a>
       <button class="secondary" onclick="mostrarPantalla('correo')">Volver</button> <!-- Botón para regresar -->
     </div>
 
