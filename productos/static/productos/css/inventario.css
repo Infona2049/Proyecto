@@ -7,6 +7,11 @@
   box-sizing: border-box;
 }
 
+/* Evitar scroll horizontal de la página; el scroll horizontal solo estará en .tabla-container */
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -119,6 +124,165 @@ h2::after {
   border-radius: 2px;
 }
 
+/* --- Estilos del bloque de filtros (copiado/adaptado de historial_factura.css) --- */
+.titulo-historial {
+  font-size: clamp(20px, 5vw, 28px);
+  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  color: #003f87;
+  font-weight: bold;
+  position: relative;
+}
+.titulo-historial::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(50px, 12vw, 80px);
+  height: 3px;
+  background: linear-gradient(90deg, #003f87, #38b6ff);
+  border-radius: 2px;
+}
+
+.filtros {
+  /* keep the section compact inside the existing cuadro-blanco */
+  background: transparent;
+  padding: 0 10px 10px 10px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center child rows */
+}
+
+.filtros-linea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(18px, 6vw, 120px); /* separación responsiva entre los campos */
+}
+
+/* Cuando queremos los 3 campos en una sola fila */
+.filtros-linea.single-row { gap: clamp(20px, 6vw, 60px); width: 100%; max-width: 980px; justify-content: center; }
+.filtros-linea.single-row > .campo-fecha { flex: 1 1 220px; max-width: 320px; min-width: 140px; box-sizing: border-box; }
+
+/* Contenedor centrado con ancho similar al de historial_factura */
+.filtros-centro {
+  width: 100%;
+  margin: 0 auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Force the inner row to a fixed width and center it: keep a predictable group width */
+.filtros-centro .filtros-linea.single-row {
+  width: 760px;
+  max-width: 92%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between; /* distribute the three fixed-width campos evenly */
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap; /* permitir que los campos salten de línea en pantallas estrechas */
+}
+.filtros-centro .filtros-linea.single-row > .campo-fecha {
+  flex: 1 1 220px; /* permitir que cada campo crezca o encoja según el espacio */
+  min-width: 160px;
+  box-sizing: border-box;
+}
+
+/* Labels: keep them compact so they no longer push fields apart */
+.filtros-centro .filtros-linea.single-row > .campo-fecha label {
+  min-width: 90px;
+  text-align: right;
+  margin-right: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Dentro de cada campo: la etiqueta y el select/input */
+.campo-fecha { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.campo-fecha select, .campo-fecha input[type="date"] { flex: 1 1 auto; min-width: 0; }
+
+/* versión de dos columnas (izq / der) en la primera fila */
+.filtros-linea-dos { width: 100%; justify-content: space-between; }
+.filtros-linea-dos { width: 100%; justify-content: space-between; align-items: center; box-sizing: border-box; }
+.filtros-linea-dos .campo-izquierda { margin-left: 40px; }
+.filtros-linea-dos .campo-derecha { margin-right: 40px; }
+
+/* Cada campo en la fila superior ocupa una columna flexible */
+.filtros-linea-dos > .campo-fecha { flex: 0 0 45%; display: flex; align-items: center; }
+
+
+/* fila centrada para el campo de almacenamiento */
+.filtros-linea-centro { justify-content: center; margin-top: 8px; }
+.campo-centro { justify-content: center; }
+
+.campo-fecha {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* espacio entre texto e input/select */
+  white-space: nowrap;
+}
+
+.campo-fecha label {
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 110px; /* ancho reducido para evitar empujar los selects fuera del contenedor */
+  text-align: right; /* etiqueta a la izquierda del select, alineada a la derecha */
+  margin-right: 12px;
+}
+
+.campo-fecha input[type="date"],
+.campo-fecha select {
+  background-color: #c0cee9;
+  border: none;
+  padding: clamp(8px, 1.5vw, 10px);
+  border-radius: 12px;
+  font-size: clamp(14px, 2.5vw, 16px);
+  min-width: 120px;
+  box-sizing: border-box;
+}
+
+/* Ajustes para que los selects se vean más anchos y tipo "pill" en pantallas grandes */
+@media (min-width: 992px) {
+  .campo-fecha select { width: 100%; }
+  /* Mantener los tres filtros en una sola línea en pantallas de escritorio */
+  .filtros-centro .filtros-linea.single-row {
+    flex-wrap: nowrap; /* evitar salto de línea */
+    gap: clamp(20px, 6vw, 60px);
+    justify-content: center;
+  }
+  .filtros-centro .filtros-linea.single-row > .campo-fecha {
+    flex: 0 0 260px; /* ancho fijo para que quepan 3 en línea */
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtros-linea-dos { flex-direction: column; gap: 12px; align-items: center; }
+  .filtros-linea-dos .campo-izquierda, .filtros-linea-dos .campo-derecha { margin: 0; }
+  .campo-fecha label { text-align: left; min-width: 0; margin-right: 8px; }
+  .campo-fecha select { width: 90%; }
+}
+
+/* small adjustment to keep form-select consistent with the look */
+.filtros-form .form-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Ensure buttons keep spacing when placed inside filtros */
+.filtros .campo-boton { margin-top: clamp(20px, 2vw, 40px); }
+
+/* --- end filtros styles --- */
+
 .cuadro-blanco {
   background-color: white;          /* Fondo blanco */
   border-radius: 15px;              /* Bordes redondeados */
@@ -127,6 +291,8 @@ h2::after {
   width: 80%;                       /* Ancho ajustable */
   margin: 20px auto;                /* Centrado */
 }
+
+.cuadro-blanco { overflow:hidden; }
 
 /* ------------------------------------------------------------------------------------------*/
 /* BOTONES BUSCAR Y FILTRAR*/
@@ -187,11 +353,11 @@ h2::after {
 
 /* TABLA DE INVENTARIO */
 .tabla-inventario {
-  width: 100%;
-  min-width: 1000px;
+  width: max-content; /* size to content so horizontal scroll can show columns */
   border-collapse: collapse;
-  border-radius: 15px;             
+  border-radius: 15px;
   font-size: clamp(11px, 5vw, 15px);
+  table-layout: auto; /* allow natural column widths */
 }
 
 
@@ -298,17 +464,6 @@ h2::after {
   .tabla-inventario td:nth-child(n+4) {
     display: none;
   }
-  
-  .tabla-container::after {
-    content: "Desliza para ver más →";
-    display: block;
-    text-align: center;
-    padding: 8px;
-    background-color: #e3f2fd;
-    color: #1976d2;
-    font-size: 12px;
-    font-style: italic;
-  }
 }
 
 /* SCROLLBAR PERSONALIZADA */
@@ -328,6 +483,39 @@ h2::after {
 
 .tabla-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(90deg, #002a5c, #2196f3);
+}
+
+/* Make the table scrollable inside the white card so it doesn't overflow the layout */
+.tabla-container {
+  width: 100%;
+  position: relative;
+  overflow-x: auto; /* horizontal scroll to see all columns */
+  overflow-y: auto; /* vertical scroll when many rows */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px; /* space for custom scrollbar */
+  max-height: 460px; /* keep the table inside the white card, adjust as needed */
+}
+
+/* Let the table size to its content and allow horizontal scrolling when needed */
+.tabla-container > .tabla-inventario {
+  width: max-content; /* keep table sized by its content so horizontal scroll can appear */
+  max-width: none;
+}
+
+/* Sticky header so column titles remain visible when scrolling vertically */
+.tabla-container thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(135deg, #003f87, #0056b3);
+  color: white;
+}
+
+/* small visual hint removed: no inline 'Desliza' helper */
+
+/* Ensure the white card clips visual overflow (keeps rounded corners tidy) */
+.cuadro-blanco {
+  overflow: hidden;
 }
 
 /* FOOTER */
