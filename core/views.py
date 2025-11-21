@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.db.models import Q
 from functools import wraps
 import json
-from .forms import RegistroUsuarioForm
+from .forms import RegistroUsuarioForm, PerfilForm
 from .models import Usuario, CodigoRecuperacion
 
 def role_required(allowed_roles):
@@ -142,7 +142,84 @@ def documentos_view(request):
 
 @login_required
 def actualizar_perfil_view(request):
-    return render(request, 'core/actualizar_perfil.html')
+    """
+
+    Esta vista permite que el usuario actual edite la información básica
+    de su perfil: correo electrónico, dirección y teléfono.
+
+    Contiene validaciones personalizadas altamente específicas:
+    - Validación manual de formato del correo (debe contener "@")
+    - Validación del teléfono (solo números, longitud entre 7 y 10)
+    - Comparación individual campo por campo
+    - Mensajería informativa si no hay cambios
+    - Actualización del username si se modifica el correo
+    - Evita duplicados en base de datos
+
+    Además, la vista informa qué campos fueron modificados mediante mensajes
+    dinámicos y vuelve a iniciar sesión al usuario para mantener su sesión activa
+    tras cambiar las credenciales relacionadas.
+    """
+
+    user = request.user
+
+    if request.method == 'POST':
+        original_user = Usuario.objects.get(pk=user.pk)
+        form = PerfilForm(request.POST, instance=user)
+
+        if form.is_valid():
+            cleaned = form.cleaned_data
+            new_email = cleaned.get("correo_electronico_usuario", "").strip()
+            new_direccion = cleaned.get("direccion_usuario", "").strip()
+            new_telefono = cleaned.get("telefono_usuario", "").strip()
+
+            cambios = []
+
+            # VALIDACION CORREO
+            if new_email and "@" not in new_email:
+                messages.error(request, "❌ El correo debe contener '@'.")
+                return render(request, "core/actualizar_perfil.html", {"form": form})
+
+            # VALIDACION TELÉFONO
+            if new_telefono:
+                if not new_telefono.isdigit():
+                    messages.error(request, "❌ El telefono solo debe contener numeros.")
+                    return render(request, "core/actualizar_perfil.html", {"form": form})
+                if len(new_telefono) < 7 or len(new_telefono) > 10:
+                    messages.error(request, "❌ El telefono debe tener entre 7 y 10 digitos.")
+                    return render(request, "core/actualizar_perfil.html", {"form": form})
+
+            # COMPARACION CAMPO A CAMPO
+            if new_email.lower() != (original_user.correo_electronico_usuario or "").lower():
+                if Usuario.objects.filter(correo_electronico_usuario=new_email).exclude(pk=user.pk).exists():
+                    messages.error(request, "❌ Este correo ya esta registrado.")
+                    return redirect("actualizar_perfil")
+
+                user.correo_electronico_usuario = new_email
+                user.username = new_email
+                cambios.append("correo electronico")
+
+            if new_direccion != (original_user.direccion_usuario or ""):
+                user.direccion_usuario = new_direccion
+                cambios.append("direccion")
+
+            if new_telefono != (original_user.telefono_usuario or ""):
+                user.telefono_usuario = new_telefono
+                cambios.append("telefono")
+
+            # GUARDAR CAMBIOS
+            if cambios:
+                user.save()
+                login(request, user)
+                messages.success(request, f"✅ Perfil actualizado correctamente ({', '.join(cambios)})")
+            else:
+                messages.info(request, "ℹ️ No realizaste ningun cambio.")
+
+            return render(request, "core/actualizar_perfil.html", {"form": PerfilForm(instance=user)})
+
+    else:
+        form = PerfilForm(instance=user)
+
+    return render(request, "core/actualizar_perfil.html", {"form": form})
 
 def cambiocontraseña_view(request):
     return render(request, 'core/olvido_contraseña.html')

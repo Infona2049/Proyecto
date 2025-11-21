@@ -145,3 +145,31 @@ class RegistroUsuarioForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class PerfilForm(forms.ModelForm):
+    """
+    Formulario creado para permitir que el usuario actualice:
+    - Correo electrónico
+    - Dirección
+    - Teléfono
+
+    Este formulario no permite modificar nombres, apellidos,
+    documento ni rol (por seguridad del sistema).
+
+    Es usado por la vista actualizar_perfil_view que contiene
+    la lógica de validaciones personalizadas implementadas por Sebastián.
+    """
+
+    class Meta:
+        model = Usuario
+        fields = [
+            "correo_electronico_usuario",
+            "direccion_usuario",
+            "telefono_usuario",
+        ]
+        widgets = {
+            "correo_electronico_usuario": forms.EmailInput(attrs={"class": "form-control"}),
+            "direccion_usuario": forms.TextInput(attrs={"class": "form-control"}),
+            "telefono_usuario": forms.TextInput(attrs={"class": "form-control"}),
+        }
