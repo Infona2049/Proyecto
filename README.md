@@ -6,15 +6,10 @@ Sistema de facturación con autenticación por roles desarrollado en Django.
 
 ### Opción A: Script Automático (Más Fácil)
 
-**En Windows:**
-```bash
-git clone https://github.com/Infona2049/front-ecofact.git
-cd front-ecofact
-setup.bat
-```
 
 
-### Opción B: Configuración Manual
+
+
 
 ## 🚀 Instalación y Configuración para Nuevos Miembros del Equipo
 
@@ -67,7 +62,7 @@ python manage.py migrate
 ```bash
 python manage.py create_superuser
 ```
-Esto te permitirá acceder a http://localhost:8001/admin/ para gestionar usuarios.
+
 
 ### 8. Ejecutar el servidor
 ```bash
