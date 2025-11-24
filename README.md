@@ -2,16 +2,12 @@
 
 Sistema de facturación con autenticación por roles desarrollado en Django.
 
-## 🚀 Configuración Rápida para Nuevos Miembros (Recomendado)
-
-### Opción A: Script Automático (Más Fácil)
+ Configuración Rápida para Nuevos Miembros (Recomendado)
 
 
 
 
-
-
-## 🚀 Instalación y Configuración para Nuevos Miembros del Equipo
+##  Instalación y Configuración para Nuevos Miembros del Equipo
 
 ### Requisitos previos
 - Python 3.11 o superior
@@ -34,11 +30,6 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-**En Linux/Mac:**
-```bash
-source venv/bin/activate
-```
-
 ### 4. Instalar dependencias
 ```bash
 pip install -r requirements.txt
@@ -49,16 +40,16 @@ pip install -r requirements.txt
 copy .env.example .env
 ```
 
-**✅ CONFIGURACIÓN ACTUAL: Base de datos Neon (en la nube)**
-El proyecto ya está configurado para usar Neon. El archivo `.env.example` 
+**✅ CONFIGURACIÓN ACTUAL: Base de datos Neon (La cual se encuentra en la nube)**
+El proyecto  está configurado para usar Neon. El archivo `.env.example` 
 contiene las credenciales correctas de la base de datos compartida.
 
-### 6. Ejecutar migraciones (solo primera vez)
+### 6. Ejecutar migraciones la primera vez o cada que se hagan cambios en la base de datos
 ```bash
 python manage.py migrate
 ```
 
-### 7. Crear superusuario para panel admin (opcional)
+### 7. Crear superusuario para panel de Administracion
 ```bash
 python manage.py create_superuser
 ```
@@ -66,14 +57,13 @@ python manage.py create_superuser
 
 ### 8. Ejecutar el servidor
 ```bash
-python manage.py runserver 8001
+python manage.py runserver 8000
 ```
 
-### 9. ¡Listo! Acceder a la aplicación
-- **Aplicación principal:** http://localhost:8001/
-- **Panel de administración:** http://localhost:8001/admin/
+### 9.  Acceder a la aplicación
+- **Aplicación principal:** http://localhost:8000/
+- **Panel de administración:** http://localhost:8000/admin/
 
-## 🔗 Configuración para Equipos
 
 ### ✅ **Configuración Actual: Base de Datos en la Nube (Neon)**
 
@@ -87,8 +77,8 @@ python manage.py runserver 8001
 
 ```bash
 # 1. Clonar repositorio
-git clone https://github.com/Infona2049/front-ecofact.git
-cd front-ecofact
+git clone https://https://github.com/Infona2049/Proyecto
+
 
 # 2. Crear entorno virtual  
 python -m venv venv
@@ -101,22 +91,22 @@ pip install -r requirements.txt
 copy .env.example .env
 
 # 5. ¡Listo! La BD ya está configurada
-python manage.py runserver 8001
+python manage.py runserver 8000
 ```
 
-### 👥 **Usuarios disponibles para todos:**
+### 👥 **Usuarios disponibles pre creados:**
 - **Admin:** admin@ecofact.com / admin123
 - **Vendedor:** vendedor@ecofact.com / vendedor123  
 - **Cliente:** cliente@ecofact.com / cliente123
 
-### 📊 **Ventajas de la configuración actual:**
+###  **Ventajas de la configuración actual:**
 - ✅ **Base de datos compartida en la nube**
 - ✅ **Sin conflictos entre miembros del equipo**
 - ✅ **Acceso desde cualquier ubicación**
 - ✅ **Backup automático en Neon**
-- ✅ **512MB gratuitos (más que suficiente)**
+- ✅ **512MB Espacio **
 
-## 🔐 Usuarios de Prueba
+##  Usuarios de Prueba
 
 | Rol | Email | Contraseña | URL de acceso |
 |-----|-------|------------|---------------|
@@ -124,24 +114,14 @@ python manage.py runserver 8001
 | **Vendedor** | vendedor@ecofact.com | vendedor123 | `/vendedor-dashboard/` |
 | **Cliente** | cliente@ecofact.com | cliente123 | `/cliente-dashboard/` |
 
-> **Nota:** Los usuarios se crean automáticamente con los scripts de instalación.
 
-## 🌐 URLs Principales
+##  URLs Principales
 
 - **Página principal:** `http://127.0.0.1:8001/` (redirige al login)
 - **Login:** `http://127.0.0.1:8001/login/`
 - **Registro:** `http://127.0.0.1:8001/registro/`
 - **Admin Panel:** `http://127.0.0.1:8001/admin/`
 
-## 📱 Funcionalidades
-
-### ✅ Implementadas
-- 
-- [x] Registro de nuevos usuarios (solo clientes)
-- [x] Login con redirección automática por rol
-- [x] Dashboards específicos por rol
-- [x] Control de acceso por decoradores
-- [x] Gestión de archivos estáticos
 
 
 ### 🔄 Sistema de Roles
@@ -185,9 +165,9 @@ python manage.py migrate
 ### Error de archivos estáticos
 Si las imágenes no cargan, verifica que el servidor esté ejecutándose y que las rutas en los templates usen `{% static 'img/nombre-imagen.png' %}`.
 
-## 📝 Notas de Desarrollo
+##  Notas de Desarrollo
 
-- **Base de datos:** SQLite (para desarrollo)
+- **Base de datos:** SQLite (para desarrollo Integrada) y Neon en la nube
 - **Puerto por defecto:** 8001 (evita conflictos)
 - **Archivos de media:** Las imágenes están en `static/img/`
 - **Registro:** Solo permite crear usuarios con rol "Cliente"
@@ -198,5 +178,5 @@ Si las imágenes no cargan, verifica que el servidor esté ejecutándose y que l
 Si tienes problemas con la instalación o ejecución, contacta al equipo de desarrollo.
 
 ---
-**Desarrollado por:** Equipo EcoFact  
-**Última actualización:** Septiembre 2025
+**Desarrollado por:** Equipo de Desarrollo EcoFact  
+**Última actualización:** Septiembre Noviembre
