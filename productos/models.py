@@ -28,7 +28,7 @@ class Producto(models.Model):
         max_length=20,
         choices=[('No Aplica', 'No Aplica'), ('128GB', '128GB'), ('256GB', '256GB'), ('512GB', '512GB')]
     )  # Capacidad con opciones limitadas
-    color_producto = models.CharField(max_length=20, choices=COLOR_PRODUCTO_CHOICES)  # Color con opciones limitadas
+    color_producto = models.CharField(max_length=50)  # Color del producto (texto libre)
     descripcion_producto = models.TextField(blank=True, null=True)  # Descripción opcional
     precio_producto = models.DecimalField(max_digits=10, decimal_places=2)  # Precio con dos decimales
     codigo_barras_producto = models.CharField(max_length=100, unique=True, blank=True)  # Código de barras único, puede generarse automáticamente

@@ -107,6 +107,23 @@ def editar_inventario_view(request, pk):
 
     producto.save()
 
+    # Procesar archivos enviados (imagen del producto / imagen del inventario)
+    # Guardamos la imagen del producto si se ha enviado un archivo
+    if 'imagen_producto' in request.FILES:
+        try:
+            producto.imagen_producto = request.FILES['imagen_producto']
+            producto.save()
+        except Exception:
+            # No bloquear la edición por errores en la subida; podríamos loguear
+            pass
+
+    # Si se envía imagen específica para inventario, manejarla también
+    if 'imagen_inventario' in request.FILES:
+        try:
+            inventario.imagen_inventario = request.FILES['imagen_inventario']
+        except Exception:
+            pass
+
     # Actualizar campos de inventario (intentar convertir a int si procede)
     stock_actual = request.POST.get('stock_actual_inventario')
     if stock_actual is not None and stock_actual != '':

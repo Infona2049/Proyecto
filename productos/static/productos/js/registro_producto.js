@@ -187,26 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ------------------------------
    Confirmación de eliminación con SweetAlert2
    ------------------------------ */
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.btn-eliminar').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const form = btn.closest('form');
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¡Esta acción eliminará el registro de forma permanente!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Enviar el form que contiene el botón (se espera método POST y CSRF token en plantilla)
-          form.submit();
-        }
-      });
-    });
-  });
-});
+/* Confirmación de eliminación (moved to inventario.js) */
+
+/* ------------------------------
+   Modal visualizador de imagen (moved from template)
+   - Abre el modal con la imagen cuando se hace click en el botón .btn-visualizar
+   - Limpia el src al cerrar
+   ------------------------------ */
+/* Modal visualizador de imagen (moved to inventario.js) */

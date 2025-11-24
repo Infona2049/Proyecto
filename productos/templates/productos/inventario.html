@@ -111,6 +111,7 @@
               <th>Stock Mínimo</th>
               <th>Última Actualización</th>
               <th>Código de barras</th>
+              <th>Imagen</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -128,6 +129,25 @@
                 <td>{{ inventario.stock_minimo_inventario }}</td>
                 <td>{{ inventario.fecha_actualizacion_inventario|date:"d/m/Y H:i" }}</td>
                 <td>{{ inventario.codigo_barras_inventario }}</td>
+                <td>
+                  {% if inventario.producto.imagen_producto %}
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                      <button type="button" class="btn btn-link p-0 btn-visualizar" data-image-url="{{ inventario.producto.imagen_producto.url }}" aria-label="Visualizar imagen">
+                        <!-- Ojo SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#004b8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                  {% elif inventario.imagen_inventario %}
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                      <button type="button" class="btn btn-link p-0 btn-visualizar" data-image-url="{{ inventario.imagen_inventario.url }}" aria-label="Visualizar imagen">
+                        <!-- Ojo SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#004b8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                  {% else %}
+                    <span>No hay imagen</span>
+                  {% endif %}
+                </td>
                 <td>
                   <!--
                     Editar: abre modal Bootstrap específico para este inventario.
@@ -168,7 +188,7 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
 
-                    <form method="post" action="{% url 'editar_inventario' inventario.id_inventario %}">
+                    <form method="post" action="{% url 'editar_inventario' inventario.id_inventario %}" enctype="multipart/form-data">
                       {% csrf_token %}
                       <div class="modal-body">
                         <div class="mb-3">
@@ -193,11 +213,7 @@
 
                         <div class="mb-3">
                           <label class="form-label">Color</label>
-                          <select class="form-control" name="color_producto" required>
-                            <option value="negro" {% if inventario.producto.color_producto == 'negro' %}selected{% endif %}>Negro</option>
-                            <option value="blanco" {% if inventario.producto.color_producto == 'blanco' %}selected{% endif %}>Blanco</option>
-                            <option value="dorado" {% if inventario.producto.color_producto == 'dorado' %}selected{% endif %}>Dorado</option>
-                          </select>
+                          <input type="text" class="form-control" name="color_producto" value="{{ inventario.producto.color_producto }}" placeholder="Escriba el color" required>
                         </div>
 
                         <div class="mb-3">
@@ -209,7 +225,6 @@
                             <option value="512GB" {% if inventario.producto.capacidad_producto == '512GB' %}selected{% endif %}>512GB</option>
                           </select>
                         </div>
-
                         <div class="mb-3">
                           <label class="form-label">Precio</label>
                           <input type="number" step="0.01" min="0.01" class="form-control" name="precio_producto" value="{{ inventario.producto.precio_producto }}" required title="El precio debe ser positivo">
@@ -224,6 +239,12 @@
                           <label class="form-label">Stock Mínimo</label>
                           <input type="number" class="form-control" name="stock_minimo_inventario" value="{{ inventario.stock_minimo_inventario }}" min="0" required title="El stock mínimo no puede ser negativo">
                         </div>
+                        
+                        <div class="mb-3">
+                          <label class="form-label">Imagen (opcional)</label>
+                          <input type="file" class="form-control" name="imagen_producto" accept="image/*">
+                          <div class="form-text">Si subes una imagen, reemplazará la imagen actual del producto.</div>
+                        </div>
                       </div>
 
                       <div class="modal-footer">
@@ -237,7 +258,7 @@
             {% empty %}
               <!-- Mensaje cuando no hay elementos en inventario -->
               <tr>
-                <td colspan="11">No hay productos en el inventario.</td>
+                <td colspan="12">No hay productos en el inventario.</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -268,6 +289,7 @@
   <footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{% static 'productos/js/registro_producto.js' %}"></script>
+  <script src="{% static 'productos/js/inventario.js' %}"></script>
     <div class="footer-bar">
       <div class="footer-item">
         <img src="{% static 'img/mensaje.png' %}" alt="Correo">
@@ -280,5 +302,15 @@
     </div>
     <div class="footer-bottom">@2025-ECOFACT</div>
   </footer>
+  <!-- Modal único para visualizar imagen en grande -->
+  <div class="modal fade" id="imagenModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-transparent border-0">
+        <div class="modal-body d-flex justify-content-center align-items-center">
+          <img id="imagenModalImg" src="" alt="Imagen producto" style="max-width:90%;max-height:80vh;box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
