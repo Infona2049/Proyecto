@@ -197,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => { // Esperar a que el DOM es
             let codigo = this.value.trim(); // Obtener el código escaneado
 
             if (!codigo) { // Validar que no esté vacío
-                alert("Escanee un código."); // Mostrar alerta si está vacío
                 return; // Salir si no hay código
             }
 
@@ -208,9 +207,10 @@ document.addEventListener("DOMContentLoaded", () => { // Esperar a que el DOM es
                 .then(data => { // Manejar datos recibidos
                     console.log("Respuesta recibida:", data); // Log de la respuesta recibida
 
-                    // Si backend manda error, solo loggear, no mostrar alert
+                    // Si backend manda error, mostrar alerta personalizada
                     if (data.error) {
                         console.warn("Producto no encontrado:", data.error);
+                        showCustomAlert();
                         this.value = "";
                         return;
                     }
@@ -261,6 +261,66 @@ document.addEventListener("DOMContentLoaded", () => { // Esperar a que el DOM es
         console.log("Botón 'Generar Factura' conectado");// Log de confirmación para el botón de generar factura
     } else {
         console.log("No se encontró el botón con id 'btnGenerarFactura'");
+    }
+});
+
+// --- AUTOCOMPLETAR DATOS DEL CLIENTE POR DOCUMENTO ---
+document.addEventListener("DOMContentLoaded", () => {
+    const inputDocumento = document.getElementById("cedulaCliente");
+
+    if (inputDocumento) {
+        inputDocumento.addEventListener("blur", function () { // Evento blur se activa cuando el campo pierde el foco
+            let documento = this.value.trim();
+
+            if (!documento) {
+                return; // Salir si no hay documento
+            }
+
+            console.log("Buscando usuario con documento:", documento);
+
+            fetch(`/facturas/buscar_usuario/?documento=${documento}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Respuesta recibida:", data);
+
+                    if (data.error) {
+                        console.warn("Usuario no encontrado:", data.error);
+                        // Mostrar alerta de documento no registrado
+                        showDocumentoAlert();
+                        return;
+                    }
+
+                    // Autocompletar campos con los datos del usuario
+                    const nombreInput = document.getElementById("nombreCliente");
+                    const correoInput = document.getElementById("correoCliente");
+                    const telefonoInput = document.getElementById("telefono");
+                    const direccionInput = document.getElementById("direccion");
+                    const tipoDocInput = document.getElementById("tipoDocumento");
+
+                    if (nombreInput) nombreInput.value = data.nombre;
+                    if (correoInput) correoInput.value = data.correo;
+                    if (telefonoInput) telefonoInput.value = data.telefono;
+                    if (direccionInput) direccionInput.value = data.direccion;
+                    if (tipoDocInput && data.tipo_documento) {
+                        // Mapear el valor del backend al valor del select
+                        const tipoDocMap = {
+                            'cc': 'cedula',
+                            'ce': 'cedula_extranjera',
+                            'pa': 'pasaporte',
+                            'ppt': 'ppt',
+                            'nit': 'nit',
+                            'cif': 'cif',
+                            'ruc': 'ruc'
+                        };
+                        tipoDocInput.value = tipoDocMap[data.tipo_documento] || '';
+                    }
+
+                    console.log("✅ Campos autocompletados");
+                })
+                .catch(err => {
+                    console.error("Error al buscar usuario:", err);
+                });
+        });
     }
 });
 
@@ -367,10 +427,123 @@ function generarFactura() { // Función para generar la factura al hacer click e
       // Redirigir directamente sin alert
       window.location.href = "/facturas/exitosa/";
     } else {
-      console.error("Error al generar la factura:", result.message || "Error desconocido");
+      // Verificar si es un error de correo no registrado
+      if (result.message && result.message.includes("no está registrado")) {
+        showEmailAlert(result.message);
+      } else {
+        console.error("Error al generar la factura:", result.message || "Error desconocido");
+        alert("Error: " + (result.message || "Error desconocido"));
+      }
     }
   })
   .catch(error => {
     console.error("Error al generar factura:", error);
   });
+}
+
+// --- FUNCIONES PARA ALERTA PERSONALIZADA ---
+function showCustomAlert() {
+    const overlay = document.getElementById("customAlertOverlay");
+    if (overlay) {
+        overlay.classList.add("show");
+        // Enfocar en el input de código de barras después de cerrar
+        setTimeout(() => {
+            const input = document.getElementById("codigo_barras_input");
+            if (input) input.focus();
+        }, 100);
+    }
+}
+
+function closeCustomAlert() {
+    const overlay = document.getElementById("customAlertOverlay");
+    if (overlay) {
+        overlay.classList.remove("show");
+        // Enfocar en el input de código de barras después de cerrar
+        const input = document.getElementById("codigo_barras_input");
+        if (input) input.focus();
+    }
+}
+
+// Cerrar alerta al hacer clic fuera de la caja
+document.addEventListener("DOMContentLoaded", () => {
+    const overlay = document.getElementById("customAlertOverlay");
+    if (overlay) {
+        overlay.addEventListener("click", function(e) {
+            if (e.target === overlay) {
+                closeCustomAlert();
+            }
+        });
+    }
+    
+    // También para la alerta de correo
+    const emailOverlay = document.getElementById("customAlertEmailOverlay");
+    if (emailOverlay) {
+        emailOverlay.addEventListener("click", function(e) {
+            if (e.target === emailOverlay) {
+                closeEmailAlert();
+            }
+        });
+    }
+    
+    // También para la alerta de documento
+    const documentoOverlay = document.getElementById("customAlertDocumentoOverlay");
+    if (documentoOverlay) {
+        documentoOverlay.addEventListener("click", function(e) {
+            if (e.target === documentoOverlay) {
+                closeDocumentoAlert();
+            }
+        });
+    }
+});
+
+// --- FUNCIONES PARA ALERTA DE CORREO NO REGISTRADO ---
+function showEmailAlert(message) {
+    const overlay = document.getElementById("customAlertEmailOverlay");
+    const messageElement = document.getElementById("emailAlertMessage");
+    
+    if (overlay) {
+        if (messageElement && message) {
+            messageElement.textContent = message;
+        }
+        overlay.classList.add("show");
+        // Enfocar en el input de correo después de cerrar
+        setTimeout(() => {
+            const input = document.getElementById("correoCliente");
+            if (input) input.focus();
+        }, 100);
+    }
+}
+
+function closeEmailAlert() {
+    const overlay = document.getElementById("customAlertEmailOverlay");
+    if (overlay) {
+        overlay.classList.remove("show");
+        // Enfocar en el input de correo después de cerrar
+        const input = document.getElementById("correoCliente");
+        if (input) input.focus();
+    }
+}
+
+// --- FUNCIONES PARA ALERTA DE DOCUMENTO NO REGISTRADO ---
+function showDocumentoAlert() {
+    const overlay = document.getElementById("customAlertDocumentoOverlay");
+    
+    if (overlay) {
+        overlay.classList.add("show");
+        // Enfocar en el input de documento después de cerrar
+        setTimeout(() => {
+            const input = document.getElementById("cedulaCliente");
+            if (input) input.focus();
+        }, 100);
+    }
+}
+
+function closeDocumentoAlert() {
+    const overlay = document.getElementById("customAlertDocumentoOverlay");
+    if (overlay) {
+        overlay.classList.remove("show");
+        // Enfocar en el input de documento después de cerrar
+        const input = document.getElementById("cedulaCliente");
+        if (input) input.focus();
+    }
 }

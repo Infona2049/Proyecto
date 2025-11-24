@@ -556,3 +556,155 @@ a img {
 .alert-button:active {
   transform: translateY(0);
 }
+
+/* ALERTA PERSONALIZADA PARA CÓDIGO DE BARRAS INCORRECTO */
+.custom-alert-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.custom-alert-overlay.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-alert-box {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+  text-align: center;
+}
+
+.custom-alert-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 0.6s ease;
+}
+
+.custom-alert-icon::before {
+  content: "⚠";
+  font-size: 50px;
+  color: white;
+}
+
+.custom-alert-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.custom-alert-message {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.custom-alert-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.custom-alert-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #21618c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.custom-alert-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ICONO PARA ALERTA DE CORREO ELECTRÓNICO */
+.custom-alert-icon-email {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 0.6s ease;
+}
+
+.custom-alert-icon-email::before {
+  content: "✉";
+  font-size: 50px;
+  color: white;
+}
+
+/* ICONO PARA ALERTA DE DOCUMENTO NO REGISTRADO */
+.custom-alert-icon-warning {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 0.6s ease;
+}
+
+.custom-alert-icon-warning::before {
+  content: "⚠";
+  font-size: 50px;
+  color: white;
+}

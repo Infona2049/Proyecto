@@ -106,7 +106,7 @@
       <!-- Campo del lector de código de barras -->
       <div class="form-group">
         <label for="codigo_barras_input">Escanee o escriba el código de barras:</label>
-        <input type="text" id="codigo_barras_input" placeholder="Escanee el código aquí" autofocus autocomplete="off">
+        <input type="text" id="codigo_barras_input" placeholder="Escanee el código aquí" autocomplete="off">
       </div>
 
      <table id="tablaProductos" style="width:100%; border-collapse:collapse; text-align:center;">
@@ -153,6 +153,36 @@
   </div>
 
   <!-- Pie de página -->
+  <!-- Alerta personalizada para código de barras incorrecto -->
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon"></div>
+      <div class="custom-alert-title">Código de barras incorrecto</div>
+      <div class="custom-alert-message">El código escaneado no se encuentra registrado.</div>
+      <button class="custom-alert-btn" onclick="closeCustomAlert()">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- Alerta personalizada para correo no registrado -->
+  <div class="custom-alert-overlay" id="customAlertEmailOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon-email"></div>
+      <div class="custom-alert-title">Correo electrónico no registrado</div>
+      <div class="custom-alert-message" id="emailAlertMessage">El correo ingresado no está registrado en el sistema.</div>
+      <button class="custom-alert-btn" onclick="closeEmailAlert()">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- Alerta personalizada para documento no registrado -->
+  <div class="custom-alert-overlay" id="customAlertDocumentoOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon-warning"></div>
+      <div class="custom-alert-title">Documento no registrado</div>
+      <div class="custom-alert-message">El número de documento ingresado no está registrado en el sistema.<br><br><strong>Por favor, regístrese antes de generar una factura.</strong></div>
+      <button class="custom-alert-btn" onclick="closeDocumentoAlert()">Aceptar</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-bar"> 
       <div class="footer-item">

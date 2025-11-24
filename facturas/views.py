@@ -22,6 +22,7 @@ from datetime import date                                # Manejo de fechas
 # === IMPORTS DE MODELOS ===
 from .models import Factura, DetalleFactura             # Modelos de factura
 from productos.models import Producto, Inventario        # Modelos de productos e inventario
+from core.models import Usuario                          # Modelo de usuarios para validar correos
 from .services import enviar_a_intermediario             # Servicio de generación de CUFE
 
 # === IMPORTS PARA PDF Y QR ===
@@ -84,12 +85,25 @@ def crear_factura(request):
             campos_obligatorios = ["nombre_receptor", "nit_receptor", "correo_cliente", "productos"]
             for campo in campos_obligatorios:
                 if campo not in data or not data[campo]:
-                    print(f"❌ FALTA EL CAMPO: {campo}")
+                    print(f"   FALTA EL CAMPO: {campo}")
                     print(f"   Valor recibido: {data.get(campo, 'NO EXISTE')}")
                     return JsonResponse({
                         "status": "error", 
                         "message": f"El campo '{campo}' es obligatorio."
                     }, status=400)
+
+            # === VALIDACIÓN DE CORREO REGISTRADO ===
+            # Verificar que el correo del cliente esté registrado en la base de datos
+            correo_cliente = data.get("correo_cliente", "").strip()
+            try:
+                usuario = Usuario.objects.get(correo_electronico_usuario=correo_cliente)
+                print(f"  Correo validado: {correo_cliente} pertenece a {usuario.nombre_usuario} {usuario.apellido_usuario}")
+            except Usuario.DoesNotExist:
+                print(f"   Correo no registrado: {correo_cliente}")
+                return JsonResponse({
+                    "status": "error",
+                    "message": f"El correo '{correo_cliente}' no está registrado en el sistema. Solo se pueden enviar facturas a correos registrados."
+                }, status=400)
 
             # === VALIDACIÓN DE PRODUCTOS ===
             # Asegurar que hay al menos un producto en la factura
@@ -205,8 +219,10 @@ def crear_factura(request):
 
             # === ENVIAR CORREO AL CLIENTE ===
             # Notificar al cliente por email con los datos de su factura, logos y PDF adjunto
+            print(f" Intentando enviar correo a: {factura.correo_cliente}")
             if factura.correo_cliente:
                 try:
+                    print(" Generando PDF para adjuntar al correo...")
                     # Generar el PDF de la factura con el mismo formato que factura_pdf()
                     from reportlab.lib.pagesizes import letter
                     from reportlab.lib import colors
@@ -240,25 +256,25 @@ def crear_factura(request):
                         logo_path = base_path / "logo empresa.png"
                         if os.path.exists(logo_path):
                             empresa_logo = str(logo_path)
-                            print(f"✅ Logo Apple Pereira encontrado en: {empresa_logo}")
+                            print(f" Logo Apple Pereira encontrado en: {empresa_logo}")
                             break
                     
                     if not ecofact_logo:
-                        print(f"❌ Logo EcoFact NO encontrado. Rutas buscadas: {[str(p / 'Logo azul sin fondo.png') for p in base_paths]}")
+                        print(f" Logo EcoFact NO encontrado. Rutas buscadas: {[str(p / 'Logo azul sin fondo.png') for p in base_paths]}")
                     if not empresa_logo:
-                        print(f"❌ Logo Apple Pereira NO encontrado. Rutas buscadas: {[str(p / 'logo empresa.png') for p in base_paths]}")
+                        print(f" Logo Apple Pereira NO encontrado. Rutas buscadas: {[str(p / 'logo empresa.png') for p in base_paths]}")
 
                     y = height - 50
                     try:
                         # Logos juntos en la parte superior izquierda
                         if ecofact_logo and os.path.exists(ecofact_logo):
                             pdf_canvas.drawImage(ImageReader(ecofact_logo), 40, y - 30, width=60, height=30, preserveAspectRatio=True, mask='auto')
-                            print("✅ Logo EcoFact dibujado en PDF")
+                            print("  Logo EcoFact dibujado en PDF")
                         if empresa_logo and os.path.exists(empresa_logo):
                             pdf_canvas.drawImage(ImageReader(empresa_logo), 110, y - 30, width=60, height=30, preserveAspectRatio=True, mask='auto')
-                            print("✅ Logo Apple Pereira dibujado en PDF")
+                            print("  Logo Apple Pereira dibujado en PDF")
                     except Exception as e:
-                        print(f"⚠️ Error cargando logos para correo: {e}")
+                        print(f"  Error cargando logos para correo: {e}")
                         import traceback
                         traceback.print_exc()
 
@@ -357,9 +373,24 @@ def crear_factura(request):
                     # === QR Y CUFE JUNTOS ===
                     y -= 50
                     
-                    # Generar QR
-                    qr_data = f"CUFE: {factura.cufe_factura}\nTotal: ${factura.total_factura}\nFecha: {factura.fecha_factura}"
-                    qr_img = qrcode.make(qr_data)
+                    # Generar QR con información detallada de la factura
+                    qr_info = f"Factura No: {factura.id}\n"
+                    qr_info += f"Fecha: {factura.fecha_factura}\n"
+                    qr_info += f"Cliente: {factura.nombre_receptor}\n"
+                    qr_info += f"NIT/CC: {factura.nit_receptor}\n"
+                    qr_info += f"\nProductos:\n"
+                    
+                    # Obtener detalles de productos para el QR
+                    detalles_factura = DetalleFactura.objects.filter(factura=factura)
+                    for detalle in detalles_factura:
+                        qr_info += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
+                    
+                    qr_info += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
+                    qr_info += f"IVA: ${factura.iva_total_factura:,.0f}\n"
+                    qr_info += f"Total: ${factura.total_factura:,.0f}\n"
+                    qr_info += f"\nCUFE: {factura.cufe_factura}"
+                    
+                    qr_img = qrcode.make(qr_info)
                     qr_buffer_temp = BytesIO()
                     qr_img.save(qr_buffer_temp, format="PNG")
                     qr_buffer_temp.seek(0)
@@ -489,13 +520,154 @@ def crear_factura(request):
                     msg.attach(f"Factura_{factura.id}.pdf", pdf_buffer.getvalue(), "application/pdf")
                     
                     # Enviar
+                    print("  Enviando correo electrónico...")
                     msg.send(fail_silently=False)
-                    print(f"✅ Correo enviado exitosamente a {factura.correo_cliente}")
+                    print(f" Correo enviado exitosamente a {factura.correo_cliente}")
                     
                 except Exception as e:
-                    print(f"❌ Error enviando correo: {e}")
-                    # No fallar la creación de factura si el correo falla
+                    print(f"❌ Error enviando correo con PDF: {e}")
+                    print(f"❌ Tipo de error: {type(e).__name__}")
+                    import traceback
+                    traceback.print_exc()
+                    
+                    # Intentar enviar correo sin PDF adjunto pero con formato HTML
+                    try:
+                        print(" Intentando enviar correo sin PDF adjunto...")
+                        
+                        # Obtener detalles de productos para mostrar en el correo
+                        detalles_email = DetalleFactura.objects.filter(factura=factura)
+                        productos_html = ""
+                        for detalle in detalles_email:
+                            productos_html += f"""
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">{detalle.producto.nombre_producto}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center;">{detalle.cantidad}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right;">${detalle.precio:,.2f}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right;">${detalle.total:,.2f}</td>
+                            </tr>
+                            """
+                        
+                        html_simple = f"""
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <style>
+                                body {{{ 'font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;' }}}
+                                .container {{{ 'max-width: 650px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);' }}}
+                                .header {{{ 'text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #2563eb, #1e40af); padding: 30px; border-radius: 10px; color: white;' }}}
+                                h1 {{{ 'margin: 0; font-size: 28px;' }}}
+                                .info {{{ 'background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;' }}}
+                                .info-row {{{ 'display: flex; justify-content: space-between; margin: 10px 0; padding: 8px 0;' }}}
+                                .label {{{ 'font-weight: bold; color: #475569;' }}}
+                                .value {{{ 'color: #1e293b;' }}}
+                                table {{{ 'width: 100%; border-collapse: collapse; margin: 20px 0;' }}}
+                                th {{{ 'background-color: #2563eb; color: white; padding: 12px; text-align: left;' }}}
+                                .total {{{ 'background-color: #2563eb; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: right; font-size: 20px; font-weight: bold;' }}}
+                                .download-btn {{{ 'display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold;' }}}
+                                .footer {{{ 'text-align: center; margin-top: 30px; color: #64748b; font-size: 12px; padding-top: 20px; border-top: 1px solid #e2e8f0;' }}}
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">
+                                    <h1>📄 Factura Electrónica</h1>
+                                    <p style="margin: 10px 0 0 0; font-size: 18px;">Gracias por su compra</p>
+                                </div>
+                                
+                                <div class="info">
+                                    <div class="info-row">
+                                        <span class="label">Factura No:</span>
+                                        <span class="value">#{factura.id}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="label">Fecha:</span>
+                                        <span class="value">{factura.fecha_factura}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="label">Cliente:</span>
+                                        <span class="value">{factura.nombre_receptor}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="label">Documento:</span>
+                                        <span class="value">{factura.nit_receptor}</span>
+                                    </div>
+                                </div>
+                                
+                                <h3 style="color: #1e293b; margin-top: 30px;">Detalle de productos</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th style="text-align: center;">Cantidad</th>
+                                            <th style="text-align: right;">Precio Unit.</th>
+                                            <th style="text-align: right;">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {productos_html}
+                                    </tbody>
+                                </table>
+                                
+                                <div style="text-align: right; margin-top: 20px;">
+                                    <p style="margin: 5px 0;"><strong>Subtotal:</strong> ${factura.sutotal_factura:,.2f}</p>
+                                    <p style="margin: 5px 0;"><strong>IVA (19%):</strong> ${factura.iva_total_factura:,.2f}</p>
+                                </div>
+                                
+                                <div class="total">
+                                    Total: ${factura.total_factura:,.2f} COP
+                                </div>
+                                
+                                <div style="text-align: center;">
+                                    <a href="http://127.0.0.1:8000/facturas/pdf/{factura.id}/" class="download-btn">
+                                         Descargar Factura PDF
+                                    </a>
+                                </div>
+                                
+                                <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                                    <p style="margin: 0; font-size: 12px; color: #92400e;">
+                                        <strong>CUFE:</strong> {factura.cufe_factura}
+                                    </p>
+                                </div>
+                                
+                                <div class="footer">
+                                    <p><strong>EcoFact - Sistema de Facturación Electrónica</strong></p>
+                                    <p>Este es un correo automático, por favor no responder.</p>
+                                    <p>© 2025 EcoFact. Todos los derechos reservados.</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                        """
+                        
+                        subject = f"Factura Electrónica #{factura.id} - EcoFact"
+                        from_email = settings.EMAIL_HOST_USER
+                        to_email = [factura.correo_cliente]
+                        
+                        text_content = f"""
+                        ¡Gracias por su compra!
+                        
+                        Factura No: #{factura.id}
+                        Fecha: {factura.fecha_factura}
+                        Cliente: {factura.nombre_receptor}
+                        Total: ${factura.total_factura:,.2f}
+                        
+                        CUFE: {factura.cufe_factura}
+                        
+                        Puede descargar su factura en: http://127.0.0.1:8000/facturas/pdf/{factura.id}/
+                        
+                        EcoFact - Sistema de Facturación Electrónica
+                        """
+                        
+                        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+                        msg.attach_alternative(html_simple, "text/html")
+                        msg.send(fail_silently=False)
+                        print(f"  Correo enviado exitosamente (sin PDF adjunto) a {factura.correo_cliente}")
+                    except Exception as e2:
+                        print(f"  Error enviando correo sin PDF: {e2}")
+                        traceback.print_exc()
                     pass
+            else:
+                print(" ñ No se especificó correo del cliente, saltando envío de email")
 
             # === GENERAR URLs DE DESCARGA ===
             # Proporcionar enlaces para descargar la factura en PDF y XML
@@ -632,7 +804,21 @@ def factura_print(request, pk):
     factura = get_object_or_404(Factura, pk=pk)
     detalles = DetalleFactura.objects.filter(factura=factura)
 
-    qr_data = f"http://{request.get_host()}/facturas/pdf/{factura.id}/"
+    # Generar información detallada para el QR
+    qr_data = f"Factura No: {factura.id}\n"
+    qr_data += f"Fecha: {factura.fecha_factura}\n"
+    qr_data += f"Cliente: {factura.nombre_receptor}\n"
+    qr_data += f"NIT/CC: {factura.nit_receptor}\n"
+    qr_data += f"\nProductos:\n"
+    
+    for detalle in detalles:
+        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad_vendida_detalle} = ${detalle.total_detalle:,.0f}\n"
+    
+    qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
+    qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
+    qr_data += f"Total: ${factura.total_factura:,.0f}\n"
+    qr_data += f"\nCUFE: {factura.cufe_factura}"
+    
     qr_img = qrcode.make(qr_data)
 
     buffer = BytesIO()
@@ -765,8 +951,21 @@ def factura_pdf(request, pk):
     # --- QR Y CUFE JUNTOS ---
     y -= 50
     
-    # Generar QR
-    qr_data = f"CUFE: {factura.cufe_factura}\nTotal: ${factura.total_factura}\nFecha: {factura.fecha_factura}"
+    # Generar QR con información detallada
+    qr_data = f"Factura No: {factura.id}\n"
+    qr_data += f"Fecha: {factura.fecha_factura}\n"
+    qr_data += f"Cliente: {factura.nombre_receptor}\n"
+    qr_data += f"NIT/CC: {factura.nit_receptor}\n"
+    qr_data += f"\nProductos:\n"
+    
+    for detalle in detalles:
+        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad_vendida_detalle} = ${detalle.total_detalle:,.0f}\n"
+    
+    qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
+    qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
+    qr_data += f"Total: ${factura.total_factura:,.0f}\n"
+    qr_data += f"\nCUFE: {factura.cufe_factura}"
+    
     qr_img = qrcode.make(qr_data)
     qr_buffer = BytesIO()
     qr_img.save(qr_buffer, format="PNG")
@@ -857,5 +1056,37 @@ def buscar_producto(request):
     except Producto.DoesNotExist:
         print("Producto no encontrado en DB")
         return JsonResponse({"error": "Producto no encontrado"}, status=404)
+
+
+# BUSCAR USUARIO POR NÚMERO DE DOCUMENTO (para autocompletar formulario)
+def buscar_usuario(request):
+    documento = request.GET.get("documento", "").strip()
+
+    print("Documento recibido:", documento)
+
+    if not documento:
+        return JsonResponse({"error": "No se envió documento"}, status=400)
+
+    try:
+        usuario = Usuario.objects.get(numero_documento_usuario=documento)
+
+        print("Usuario encontrado:", {
+            "nombre": f"{usuario.nombre_usuario} {usuario.apellido_usuario}",
+            "correo": usuario.correo_electronico_usuario,
+            "telefono": usuario.telefono_usuario,
+            "direccion": usuario.direccion_usuario,
+        })
+
+        return JsonResponse({
+            "nombre": f"{usuario.nombre_usuario} {usuario.segundo_nombre_usuario or ''} {usuario.apellido_usuario} {usuario.segundo_apellido_usuario or ''}".strip(),
+            "tipo_documento": usuario.tipo_documento_usuario,
+            "correo": usuario.correo_electronico_usuario or "",
+            "telefono": usuario.telefono_usuario or "",
+            "direccion": usuario.direccion_usuario or "",
+        })
+
+    except Usuario.DoesNotExist:
+        print("Usuario no encontrado en DB")
+        return JsonResponse({"error": "Usuario no encontrado"}, status=404)
 
 

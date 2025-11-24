@@ -13,4 +13,7 @@ urlpatterns = [ # define las rutas para la aplicación de facturas
 
     # ruta para buscar productos
     path('buscar_producto/', views.buscar_producto, name='buscar_producto'),
+    
+    # ruta para buscar usuarios por documento
+    path('buscar_usuario/', views.buscar_usuario, name='buscar_usuario'),
 ]
