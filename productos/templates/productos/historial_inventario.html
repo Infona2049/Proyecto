@@ -1,0 +1,145 @@
+{% load static %}
+{% load tz %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Inventario</title>
+    <link rel="stylesheet" href="{% static 'facturas/css/historial_factura.css' %}">
+    <style>
+      /* Restaurar estilo original de los cuadros de historial (añadidos/eliminados/editados) */
+      .historial-grid {
+        display: flex;
+        gap: 20px;
+        align-items: stretch;
+        justify-content: space-between;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .historial-grid .cuadro-blanco {
+        flex: 1 1 30%;
+        min-width: 260px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      .cuadro-added { border-left: 6px solid #28a745; }
+      .cuadro-removed { border-left: 6px solid #dc3545; }
+      .cuadro-edited { border-left: 6px solid #0066cc; }
+      .historial-card-title { font-size: 18px; color: #003f87; font-weight: 700; margin-bottom: 10px; }
+      .historial-card-list { list-style: disc; margin-left: 18px; color: #333; }
+      @media (max-width: 900px) {
+        .historial-grid { flex-direction: column; }
+        .historial-grid .cuadro-blanco { width: 100%; }
+      }
+    </style>
+    </head>
+<body>
+  <div class="top-bar">
+    <div class="left-side">
+      <a href="{% url 'visualizacion_admin' %}">
+        <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+        <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
+      </a>
+    </div>
+    <div class="right-side">
+      <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
+      <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
+      <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
+      <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+    </div>
+  </div>
+
+  <header>
+    <nav class="menu">
+      <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+      <a href="{% url 'inventario' %}" style="margin-left:20px">Inventario</a>
+    </nav>
+  </header>
+
+  <main class="contenido">
+    <!-- Filtros (igual estructura que historial_factura) -->
+    <div class="filtros">
+      <h2 class="titulo-historial">Historial de inventario</h2>
+      <form class="filtros-linea" style="justify-content:center;align-items:center;" method="get">
+        <div class="campo-fecha">
+          <label for="fecha-inicial">Fecha Inicial:</label>
+          <input type="date" id="fecha-inicial" name="fecha_inicial" value="{{ fecha_inicial }}" />
+        </div>
+
+        <div class="campo-fecha">
+          <label for="fecha-final">Fecha Final:</label>
+          <input type="date" id="fecha-final" name="fecha_final" value="{{ fecha_final }}" />
+        </div>
+
+      </form>
+      <div class="campo-boton">
+        <button type="button" class="boton-buscar">BUSCAR</button>
+        <button type="button" class="boton-limpiar">LIMPIAR</button>
+      </div>
+    </div>
+
+    <!-- Caja inferior: tarjetas de historial (dentro de cuadro-tabla para estilo similar) -->
+    <div class="cuadro-tabla">
+      <div class="historial-grid">
+        <div class="cuadro-blanco cuadro-added">
+          <div class="historial-card-title">Productos añadidos</div>
+          <ul class="historial-card-list">
+            {% if añadidos %}
+              {% for r in añadidos %}
+                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+              {% endfor %}
+            {% else %}
+              <li>No se han añadido productos en este rango.</li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="cuadro-blanco cuadro-removed">
+          <div class="historial-card-title">Productos eliminados</div>
+          <ul class="historial-card-list">
+            {% if eliminados %}
+              {% for r in eliminados %}
+                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+              {% endfor %}
+            {% else %}
+              <li>No se han eliminado productos en este rango.</li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="cuadro-blanco cuadro-edited">
+          <div class="historial-card-title">Productos editados</div>
+          <ul class="historial-card-list">
+            {% if editados %}
+              {% for r in editados %}
+                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+              {% endfor %}
+            {% else %}
+              <li>No se han editado productos en este rango.</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-bar">
+      <div class="footer-item">
+        <img src="{% static 'img/mensaje.png' %}" alt="Correo">
+        Ecofactproyect@gmail.com
+      </div>
+      <div class="footer-item">
+        <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono">
+        333-333-333
+      </div>
+    </div>
+    <div class="footer-bottom">@2025-ECOFACT</div>
+  </footer>
+  
+  <script src="{% static 'productos/js/historial_inventario.js' %}"></script>
+</body>
+</html>

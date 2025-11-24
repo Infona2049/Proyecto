@@ -138,7 +138,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Configuración internacional
 LANGUAGE_CODE = 'en-us'  # Idioma por defecto
 
-TIME_ZONE = 'UTC'        # Zona horaria
+# Use Colombia timezone for display and localtime conversion
+TIME_ZONE = 'America/Bogota'        # Zona horaria
 
 USE_I18N = True          # Soporte para internacionalización
 

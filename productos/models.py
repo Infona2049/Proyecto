@@ -67,3 +67,23 @@ class Inventario(models.Model):
     def __str__(self):
         # Representación legible del inventario mostrando producto y stock actual
         return f"{self.producto.nombre_producto} - Stock: {self.stock_actual_inventario}"
+
+
+class HistorialInventario(models.Model):
+    ACTION_CHOICES = [
+        ('added', 'Añadido'),
+        ('edited', 'Editado'),
+        ('deleted', 'Eliminado'),
+    ]
+
+    producto_id = models.IntegerField(null=True, blank=True)
+    nombre_producto = models.CharField(max_length=200)
+    accion = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    detalles = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.get_accion_display()}: {self.nombre_producto} ({self.timestamp:%Y-%m-%d %H:%M})"

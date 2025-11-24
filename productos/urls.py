@@ -9,6 +9,9 @@ urlpatterns = [
     # Ruta para la vista que permite registrar un nuevo producto
     path('registro_producto/', views.registro_producto_view, name='registro_producto'),
 
+    # Historial inventario
+    path('historial_inventario/', views.historial_inventario_view, name='historial_inventario'),
+
     # Rutas para editar y eliminar inventario
     path('inventario/<int:pk>/editar/', views.editar_inventario_view, name='editar_inventario'),
     path('inventario/<int:pk>/eliminar/', views.eliminar_inventario_view, name='eliminar_inventario'),

@@ -28,21 +28,16 @@
   <header>
     <nav class="menu">
       <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+      <a href="{% url 'historial_inventario' %}" style="margin-left:20px">Historial inventario</a>
     </nav>
   </header>
 
   <main class="contenido">
-    <div class="cuadro-blanco">
-      <!--
-        Filtros de búsqueda (form GET)
-        - Envía parámetros: categoria, capacidad, color.
-        - La vista debe filtrar objetos basándose en estos params.
-        - Los select mantienen la opción seleccionada usando request.GET.
-      -->
-      <div class="filtros">
-        <h2 class="titulo-historial">Inventario</h2>
+    <!-- Filtros de búsqueda (form GET) - cuadro interior eliminado -->
+    <div class="filtros">
+      <h2 class="titulo-historial">Inventario</h2>
 
-        <form method="get" class="filtros-form">
+      <form method="get" class="filtros-form">
           <div class="filtros-centro">
             <div class="filtros-linea single-row">
               <div class="campo-fecha">
@@ -89,7 +84,6 @@
           </div>
         </form>
       </div>
-    </div>
 
     <div class="cuadro-blanco">
       <!--
@@ -101,6 +95,7 @@
         <table class="tabla-inventario">
           <thead>
             <tr>
+              <th>Num Producto</th>
               <th>Categoría</th>
               <th>Descripción</th>
               <th>Modelo</th>
@@ -119,6 +114,7 @@
             <!-- Bucle principal: renderiza cada fila de inventario -->
             {% for inventario in inventarios %}
               <tr>
+                <td>{{ inventario.producto.id_producto }}</td>
                 <td>{{ inventario.producto.categoria_producto }}</td>
                 <td>{{ inventario.producto.nombre_producto }}</td>
                 <td>{{ inventario.producto.modelo_producto }}</td>

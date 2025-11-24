@@ -6,12 +6,14 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db import transaction
 from django.db.models.deletion import ProtectedError
+from django.utils import timezone
+from datetime import datetime
 
 # importar modelo DetalleFactura para borrado forzado de referencias
 from facturas.models import DetalleFactura
 
 # Importar modelos y formularios del mismo app
-from .models import Inventario, Producto
+from .models import Inventario, Producto, HistorialInventario
 from .forms import ProductoForm
 
 # ---------------------------------------------------------------------
@@ -226,3 +228,93 @@ def buscar_producto(request):
     except Producto.DoesNotExist:
         print("Producto NO encontrado")
         return JsonResponse({"error": "Producto no encontrado"}, status=404)
+
+
+def historial_inventario_view(request):
+    """
+    Vista simple para mostrar el historial del inventario.
+    Por ahora renderiza una plantilla estática similar a `inventario.html`.
+    """
+    from django.utils import timezone
+    from .models import HistorialInventario
+
+    # Soportar filtro por rango de fechas: fecha_inicial y fecha_final (formato YYYY-MM-DD)
+    fecha_inicial = request.GET.get('fecha_inicial')
+    fecha_final = request.GET.get('fecha_final')
+
+    registros = HistorialInventario.objects.all()
+    # Si se proporcionan ambas fechas, filtramos por rango (incluye ambos días)
+    if fecha_inicial and fecha_final:
+        try:
+            # validación básica de formato
+            di = datetime.strptime(fecha_inicial, '%Y-%m-%d').date()
+            df = datetime.strptime(fecha_final, '%Y-%m-%d').date()
+            # Si df < di, invertir para evitar rango inválido
+            if df < di:
+                di, df = df, di
+            registros = registros.filter(timestamp__date__range=[di, df])
+        except Exception:
+            # en caso de parseo fallido, dejamos registros sin filtrar
+            pass
+    añadidos = registros.filter(accion='added')
+    eliminados = registros.filter(accion='deleted')
+    editados = registros.filter(accion='edited')
+
+    context = {
+        'añadidos': añadidos,
+        'eliminados': eliminados,
+        'editados': editados,
+        'fecha_inicial': fecha_inicial or '',
+        'fecha_final': fecha_final or '',
+    }
+
+    return render(request, 'productos/historial_inventario.html', context)
+
+
+def detalle_producto_historial(request, pk):
+    """
+    Devuelve JSON con información para mostrar en un modal respecto a un registro de historial.
+    Si el producto aún existe en la base, devuelve datos actuales del producto + inventario.
+    Si no existe (p. ej. fue eliminado), devuelve el nombre guardado y el campo `detalles`.
+    """
+    from django.shortcuts import get_object_or_404
+
+    historial = get_object_or_404(HistorialInventario, pk=pk)
+
+    data = {
+        'historial_id': historial.pk,
+        'accion': historial.accion,
+        'nombre_producto': historial.nombre_producto,
+        'detalles': historial.detalles or '',
+        'timestamp': historial.timestamp.isoformat(),
+    }
+
+    if historial.producto_id:
+        try:
+            producto = Producto.objects.get(id_producto=historial.producto_id)
+            data.update({
+                'producto_exists': True,
+                'producto_id': producto.id_producto,
+                'categoria_producto': producto.categoria_producto,
+                'modelo_producto': producto.modelo_producto,
+                'capacidad_producto': producto.capacidad_producto,
+                'color_producto': producto.color_producto,
+                'descripcion_producto': producto.descripcion_producto or '',
+                'precio_producto': str(producto.precio_producto),
+                'codigo_barras_producto': getattr(producto, 'codigo_barras_producto', ''),
+                'imagen_url': producto.imagen_producto.url if producto.imagen_producto else None,
+            })
+            try:
+                inventario = Inventario.objects.get(producto=producto)
+                data['stock_actual_inventario'] = inventario.stock_actual_inventario
+                data['stock_minimo_inventario'] = inventario.stock_minimo_inventario
+            except Inventario.DoesNotExist:
+                data['stock_actual_inventario'] = None
+                data['stock_minimo_inventario'] = None
+        except Producto.DoesNotExist:
+            data['producto_exists'] = False
+    else:
+        data['producto_exists'] = False
+
+    return JsonResponse(data)
+
