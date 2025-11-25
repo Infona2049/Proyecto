@@ -1039,22 +1039,10 @@ def factura_pdf(request, pk):
     p.setFont("Helvetica", 8)
     p.drawString(40, y - 90, f"CUFE: {factura.cufe_factura}")
 
-    # --- PIE DE PÁGINA CON LOGOS ---
+    # --- PIE DE PÁGINA ---
     p.setFont("Helvetica-Oblique", 8)
-    p.drawCentredString(width / 2, 70, "Gracias por confiar en EcoFact.")
-    p.drawCentredString(width / 2, 58, "Factura generada electrónicamente - No requiere firma.")
-    
-    # Logos en el footer (centrados)
-    try:
-        if os.path.exists(ecofact_logo):
-            # Logo EcoFact a la izquierda del centro
-            p.drawImage(ImageReader(ecofact_logo), (width / 2) - 70, 15, width=60, height=30, preserveAspectRatio=True, mask='auto')
-        
-        if os.path.exists(empresa_logo):
-            # Logo Empresa a la derecha del centro
-            p.drawImage(ImageReader(empresa_logo), (width / 2) + 10, 15, width=60, height=30, preserveAspectRatio=True, mask='auto')
-    except Exception as e:
-        print(f"Error cargando logos en footer: {e}")
+    p.drawCentredString(width / 2, 30, "Gracias por confiar en EcoFact.")
+    p.drawCentredString(width / 2, 18, "Factura generada electrónicamente - No requiere firma.")
 
     p.showPage()
     p.save()
