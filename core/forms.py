@@ -135,6 +135,32 @@ class RegistroUsuarioForm(UserCreationForm):
             raise forms.ValidationError('Este número de documento ya está registrado.')
         return documento
 
+    def clean_password1(self):
+        import re
+        password = self.cleaned_data.get('password1')
+        
+        # Validar longitud mínima
+        if len(password) < 8:
+            raise forms.ValidationError('La contraseña debe tener al menos 8 caracteres.')
+        
+        # Validar que contenga al menos una letra mayúscula
+        if not re.search(r'[A-Z]', password):
+            raise forms.ValidationError('La contraseña debe contener al menos una letra mayúscula.')
+        
+        # Validar que contenga al menos una letra minúscula
+        if not re.search(r'[a-z]', password):
+            raise forms.ValidationError('La contraseña debe contener al menos una letra minúscula.')
+        
+        # Validar que contenga al menos un número
+        if not re.search(r'\d', password):
+            raise forms.ValidationError('La contraseña debe contener al menos un número.')
+        
+        # Validar que contenga al menos un carácter especial
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/;`~]', password):
+            raise forms.ValidationError('La contraseña debe contener al menos un carácter especial (!@#$%^&*(),.?":{}|<>_-+=[]\\\/;`~).')
+        
+        return password
+
     def save(self, commit=True):
         user = super().save(commit=False)
         # Usar el email como username

@@ -859,7 +859,7 @@ def factura_print(request, pk):
     qr_data += f"\nProductos:\n"
     
     for detalle in detalles:
-        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad_vendida_detalle} = ${detalle.total_detalle:,.0f}\n"
+        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
     
     qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
     qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
@@ -894,18 +894,32 @@ def factura_pdf(request, pk):
     width, height = letter
 
     # --- ENCABEZADO CON LOGOS JUNTOS (sin fondo) ---
-    ecofact_logo = os.path.join(settings.STATIC_ROOT, "img/Logo azul sin fondo.png")
-    empresa_logo = os.path.join(settings.STATIC_ROOT, "img/logo empresa.png")
+    # Buscar logos en STATIC_ROOT o BASE_DIR/static
+    if settings.STATIC_ROOT and os.path.exists(settings.STATIC_ROOT):
+        ecofact_logo = os.path.join(settings.STATIC_ROOT, "img/Logo azul sin fondo.png")
+        empresa_logo = os.path.join(settings.STATIC_ROOT, "img/logo empresa.png")
+    else:
+        ecofact_logo = os.path.join(settings.BASE_DIR, "static/img/Logo azul sin fondo.png")
+        empresa_logo = os.path.join(settings.BASE_DIR, "static/img/logo empresa.png")
 
     y = height - 50
     try:
         # Logos juntos en la parte superior izquierda
         if os.path.exists(ecofact_logo):
             p.drawImage(ImageReader(ecofact_logo), 40, y - 30, width=60, height=30, preserveAspectRatio=True, mask='auto')
+            print(f"Logo EcoFact cargado: {ecofact_logo}")
+        else:
+            print(f"Logo EcoFact no encontrado: {ecofact_logo}")
+            
         if os.path.exists(empresa_logo):
             p.drawImage(ImageReader(empresa_logo), 110, y - 30, width=60, height=30, preserveAspectRatio=True, mask='auto')
+            print(f"Logo Empresa cargado: {empresa_logo}")
+        else:
+            print(f"Logo Empresa no encontrado: {empresa_logo}")
     except Exception as e:
         print(f"Error cargando logos: {e}")
+        import traceback
+        traceback.print_exc()
 
     # --- TÍTULO CENTRADO ---
     y -= 60
@@ -1006,7 +1020,7 @@ def factura_pdf(request, pk):
     qr_data += f"\nProductos:\n"
     
     for detalle in detalles:
-        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad_vendida_detalle} = ${detalle.total_detalle:,.0f}\n"
+        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
     
     qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
     qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
@@ -1025,10 +1039,22 @@ def factura_pdf(request, pk):
     p.setFont("Helvetica", 8)
     p.drawString(40, y - 90, f"CUFE: {factura.cufe_factura}")
 
-    # --- PIE DE PÁGINA ---
+    # --- PIE DE PÁGINA CON LOGOS ---
     p.setFont("Helvetica-Oblique", 8)
-    p.drawCentredString(width / 2, 30, "Gracias por confiar en EcoFact.")
-    p.drawCentredString(width / 2, 18, "Factura generada electrónicamente - No requiere firma.")
+    p.drawCentredString(width / 2, 70, "Gracias por confiar en EcoFact.")
+    p.drawCentredString(width / 2, 58, "Factura generada electrónicamente - No requiere firma.")
+    
+    # Logos en el footer (centrados)
+    try:
+        if os.path.exists(ecofact_logo):
+            # Logo EcoFact a la izquierda del centro
+            p.drawImage(ImageReader(ecofact_logo), (width / 2) - 70, 15, width=60, height=30, preserveAspectRatio=True, mask='auto')
+        
+        if os.path.exists(empresa_logo):
+            # Logo Empresa a la derecha del centro
+            p.drawImage(ImageReader(empresa_logo), (width / 2) + 10, 15, width=60, height=30, preserveAspectRatio=True, mask='auto')
+    except Exception as e:
+        print(f"Error cargando logos en footer: {e}")
 
     p.showPage()
     p.save()

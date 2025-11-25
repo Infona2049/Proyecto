@@ -240,26 +240,51 @@ def olvido_contraseña_view(request):
 
 def registro_view(request):
     if request.method == 'POST':
+        # Verificar si es una petición AJAX
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
             try:
                 # Guardar el usuario
                 user = form.save()
                 
-                # Mensaje de éxito
-                messages.success(request, 'Usuario registrado exitosamente. Ya puedes iniciar sesión.')
-                
-                # Redirigir al login
-                return redirect('login')
+                if is_ajax:
+                    # Responder con JSON para AJAX
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Usuario registrado exitosamente. Ya puedes iniciar sesión.'
+                    })
+                else:
+                    # Mensaje de éxito tradicional
+                    messages.success(request, 'Usuario registrado exitosamente. Ya puedes iniciar sesión.')
+                    return redirect('login')
                 
             except Exception as e:
-                messages.error(request, f'Error al registrar usuario: {str(e)}')
+                if is_ajax:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'Error al registrar usuario: {str(e)}'
+                    })
+                else:
+                    messages.error(request, f'Error al registrar usuario: {str(e)}')
         else:
-            # Si hay errores en el formulario, mostrarlos
-            for field, errors in form.errors.items():
-                field_label = form.fields[field].label or field
-                for error in errors:
-                    messages.error(request, f'{field_label}: {error}')
+            # Si hay errores en el formulario
+            if is_ajax:
+                error_messages = []
+                for field, errors in form.errors.items():
+                    field_label = form.fields[field].label or field
+                    for error in errors:
+                        error_messages.append(f'{field_label}: {error}')
+                return JsonResponse({
+                    'success': False,
+                    'message': '<br>'.join(error_messages)
+                })
+            else:
+                for field, errors in form.errors.items():
+                    field_label = form.fields[field].label or field
+                    for error in errors:
+                        messages.error(request, f'{field_label}: {error}')
     else:
         form = RegistroUsuarioForm()
     

@@ -362,62 +362,270 @@ a img {
   color: white;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .cuadro-tabla {
-    overflow-x: auto;
+/* ============================
+   RESPONSIVE DESIGN
+   ============================ */
+
+/* TABLETS (768px - 1024px) */
+@media (max-width: 1024px) {
+  .filtros-linea {
+    gap: 100px;
   }
 
-  .tabla-facturas {
-    width: max-content;
-    min-width: 100%;
+  .cuadro-tabla {
+    padding: 15px;
   }
 
   .tabla-facturas th,
   .tabla-facturas td {
-    font-size: 13px;
-    padding: 8px;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+}
+
+/* MÓVILES GRANDES (481px - 768px) */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 100px;
   }
 
-  .footer-bar {
+  .filtros {
+    margin-top: 100px;
+  }
+
+  .filtros-linea {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .campo-fecha {
     flex-direction: column;
     gap: 8px;
     text-align: center;
   }
-}
 
-@media (max-width: 480px) {
-  .filtros,
-  .cuadro-tabla {
-    width: 98%;
-    padding: 15px 10px;
+  .campo-fecha input[type="date"] {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
   }
 
-  .tabla-facturas {
-    display: block;
+  .campo-boton {
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .boton-buscar,
+  .boton-limpiar {
+    flex: 1;
+    max-width: 150px;
+  }
+
+  .cuadro-tabla {
+    width: 98%;
+    padding: 15px;
     overflow-x: auto;
-    white-space: nowrap;
     -webkit-overflow-scrolling: touch;
   }
 
-  .tabla-facturas::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  .tabla-facturas::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-
-  .tabla-facturas::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
+  .tabla-facturas {
+    min-width: 600px;
+    font-size: 13px;
   }
 
   .tabla-facturas th,
   .tabla-facturas td {
-    min-width: 100px;
-    padding:8px 4px;
+    padding: 10px 8px;
+  }
+
+  /* Scroll horizontal personalizado */
+  .cuadro-tabla::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .cuadro-tabla::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .cuadro-tabla::-webkit-scrollbar-thumb {
+    background: #003f87;
+    border-radius: 4px;
+  }
+
+  .cuadro-tabla::-webkit-scrollbar-thumb:hover {
+    background: #002f6c;
+  }
+
+  .footer-bar {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 12px 20px;
+  }
+
+  .paginacion span,
+  .paginacion a {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 0 3px;
   }
 }
 
+/* MÓVILES PEQUEÑOS (320px - 480px) */
+@media (max-width: 480px) {
+  .top-bar {
+    padding: 8px 10px;
+    height: 50px;
+  }
+
+  .logo1, .logo2 {
+    height: 25px;
+  }
+
+  .icono {
+    width: 20px;
+    height: 20px;
+  }
+
+  header {
+    top: 50px;
+  }
+
+  .menu {
+    padding: 10px 15px;
+  }
+
+  .menu a {
+    font-size: 14px;
+  }
+
+  .titulo-historial {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .filtros,
+  .cuadro-tabla {
+    width: 95%;
+    padding: 15px 10px;
+    margin-top: 90px;
+  }
+
+  .filtros {
+    margin-top: 90px;
+  }
+
+  .filtros-linea {
+    gap: 12px;
+  }
+
+  .campo-fecha label {
+    font-size: 13px;
+  }
+
+  .campo-fecha input[type="date"] {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .campo-boton {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .boton-buscar,
+  .boton-limpiar {
+    width: 100%;
+    max-width: 100%;
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .cuadro-tabla {
+    padding: 10px 5px;
+    margin-bottom: 120px;
+  }
+
+  .tabla-facturas {
+    min-width: 550px;
+    font-size: 12px;
+  }
+
+  .tabla-facturas thead th {
+    padding: 10px 6px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+
+  .tabla-facturas td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  /* Iconos de acciones más pequeños en móvil */
+  .tabla-facturas td a img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .paginacion {
+    margin: 10px 0;
+  }
+
+  .paginacion span,
+  .paginacion a {
+    padding: 4px 8px;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+
+  .footer-bar {
+    padding: 10px 15px;
+    gap: 8px;
+  }
+
+  .footer-item {
+    font-size: 11px;
+  }
+
+  .footer-item img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .footer-bottom {
+    font-size: 10px;
+    padding: 8px;
+  }
+}
+
+/* MÓVILES MUY PEQUEÑOS (< 360px) */
+@media (max-width: 360px) {
+  .tabla-facturas {
+    min-width: 500px;
+    font-size: 11px;
+  }
+
+  .tabla-facturas thead th {
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+
+  .tabla-facturas td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+
+  .tabla-facturas td a img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+  

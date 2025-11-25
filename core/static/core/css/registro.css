@@ -99,6 +99,34 @@ input::placeholder, select {
   color: #0353a4;
 }
 
+/* === REQUISITOS DE CONTRASEÑA === */
+.password-requirements {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.password-requirements ul {
+  list-style: none;
+}
+
+.password-requirements li {
+  margin: 3px 0;
+  transition: color 0.3s ease;
+}
+
+.password-requirements .req-valid {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.password-requirements .req-invalid {
+  color: #dc3545;
+}
+
 /* === BOTÓN === */
 .boton2 {
   background-color: #08a000;
@@ -229,4 +257,302 @@ input::placeholder, select {
   background-color: #fff3cd;
   color: #856404;
   border: 1px solid #ffeaa7;
+}
+
+/* === TÉRMINOS Y CONDICIONES === */
+.terminos-container {
+  margin: 1.5rem 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 20px;
+  min-width: 20px;
+  background-color: #fff;
+  border: 2px solid #003f87;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-top: 2px;
+}
+
+.checkbox-container:hover .checkmark {
+  background-color: #e6f0ff;
+}
+
+.checkbox-container input[type="checkbox"]:checked ~ .checkmark {
+  background-color: #003f87;
+  border-color: #003f87;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input[type="checkbox"]:checked ~ .checkmark:after {
+  display: block;
+}
+
+.terminos-texto {
+  font-size: 15px;
+  color: #333;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.link-terminos {
+  color: #003f87;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.link-terminos:hover {
+  color: #0056b3;
+}
+
+/* === MODALES === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 3% auto;
+  padding: 30px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.modal-content h2 {
+  color: #003f87;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+  border-bottom: 3px solid #38b6ff;
+  padding-bottom: 10px;
+}
+
+.modal-content h3 {
+  color: #003f87;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.modal-body {
+  color: #333;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.modal-body p {
+  margin-bottom: 12px;
+}
+
+.modal-body ul {
+  margin: 10px 0 15px 20px;
+  padding-left: 20px;
+}
+
+.modal-body li {
+  margin-bottom: 8px;
+}
+
+.modal-body strong {
+  color: #003f87;
+}
+
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+  color: #003f87;
+}
+
+.modal-btn {
+  background: linear-gradient(135deg, #003f87, #0056b3);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 63, 135, 0.3);
+}
+
+.modal-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #003f87);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 63, 135, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive para modales */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 5% auto;
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .modal-content h2 {
+    font-size: 20px;
+  }
+
+  .modal-content h3 {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    font-size: 14px;
+  }
+
+  .close {
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+  }
+}
+
+/* === ESTILOS PERSONALIZADOS PARA SWEETALERT === */
+.registro-exitoso-popup {
+  border-radius: 15px !important;
+  padding: 30px !important;
+  box-shadow: 0 10px 40px rgba(0, 63, 135, 0.3) !important;
+}
+
+.registro-exitoso-title {
+  color: #003f87 !important;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  margin-bottom: 15px !important;
+}
+
+.registro-exitoso-btn {
+  background: linear-gradient(135deg, #003f87, #0056b3) !important;
+  border: none !important;
+  padding: 12px 40px !important;
+  border-radius: 25px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 15px rgba(0, 63, 135, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.registro-exitoso-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #003f87) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 63, 135, 0.4) !important;
+}
+
+.registro-error-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  border: none !important;
+  padding: 12px 40px !important;
+  border-radius: 25px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.registro-error-btn:hover {
+  background: linear-gradient(135deg, #c82333, #bd2130) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
+
+/* Animaciones para SweetAlert */
+.swal2-icon.swal2-success {
+  border-color: #28a745 !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(40, 167, 69, 0.3) !important;
+}
+
+.swal2-timer-progress-bar {
+  background: linear-gradient(90deg, #003f87, #38b6ff) !important;
 }

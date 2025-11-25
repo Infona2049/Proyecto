@@ -15,11 +15,11 @@
   <link rel="icon" href="{% static 'img/Logo azul sin fondo.png' %}" type="image/png">
   <img class="logo" src="{% static 'img/Logo azul sin fondo.png' %}" alt="Logo EcoFact">
 
-  <!-- Mostrar mensajes de error/éxito -->
+  <!-- Contenedor oculto para mensajes de Django -->
   {% if messages %}
-    <div class="messages-container">
+    <div id="django-messages" style="display: none;">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        <div class="message-item" data-type="{{ message.tags }}" data-text="{{ message|escapejs }}"></div>
       {% endfor %}
     </div>
   {% endif %}
@@ -64,6 +64,18 @@
           </button>
         </div>
 
+        <!-- Requisitos de contraseña -->
+        <div class="password-requirements" id="passwordRequirements" style="display: none;">
+          <p style="font-size: 12px; margin: 5px 0; font-weight: bold; color: #003f87;">La contraseña debe contener:</p>
+          <ul style="font-size: 11px; margin: 5px 0; padding-left: 20px;">
+            <li id="req-length" class="req-invalid">✗ Mínimo 8 caracteres</li>
+            <li id="req-uppercase" class="req-invalid">✗ Una letra mayúscula (A-Z)</li>
+            <li id="req-lowercase" class="req-invalid">✗ Una letra minúscula (a-z)</li>
+            <li id="req-number" class="req-invalid">✗ Un número (0-9)</li>
+            <li id="req-special" class="req-invalid">✗ Un carácter especial (!@#$%^&*)</li>
+          </ul>
+        </div>
+
         <div class="password-container">
           {{ form.password2 }}
           <button type="button" id="toggleConfirmPassword" class="toggle-password">
@@ -77,6 +89,20 @@
     {{ form.username }}
     {{ form.rol_usuario }}
 
+    <!-- Términos y Condiciones -->
+    <div class="terminos-container">
+      <label class="checkbox-container">
+        <input type="checkbox" id="aceptarTerminos">
+        <span class="checkmark"></span>
+        <span class="terminos-texto">
+          Acepto los 
+          <a href="#" id="linkTerminos" class="link-terminos">Términos y Condiciones</a> 
+          y la 
+          <a href="#" id="linkPoliticas" class="link-terminos">Política de Privacidad</a>
+        </span>
+      </label>
+    </div>
+
     <!-- Botón centrado -->
     <button type="submit" class="boton2">Registrarse</button>
 
@@ -84,6 +110,181 @@
       <a href="{% url 'login' %}"><u>Inicia sesión aquí</u></a>
     </p>
   </form>
+</div>
+
+<!-- Modal de Términos y Condiciones -->
+<div id="modalTerminos" class="modal">
+  <div class="modal-content">
+    <span class="close" data-modal="modalTerminos">&times;</span>
+    <h2>Términos y Condiciones de Uso - EcoFact</h2>
+    <div class="modal-body">
+      <p><strong>Última actualización: 25 de noviembre de 2025</strong></p>
+      
+      <h3>1. Aceptación de los Términos</h3>
+      <p>Al registrarse y utilizar EcoFact, usted acepta estar sujeto a estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe usar nuestro servicio.</p>
+      
+      <h3>2. Descripción del Servicio</h3>
+      <p>EcoFact es un sistema de facturación electrónica que permite a los usuarios crear, gestionar y enviar facturas electrónicas de acuerdo con las normativas vigentes en Colombia.</p>
+      
+      <h3>3. Registro y Cuenta de Usuario</h3>
+      <p>Para utilizar EcoFact, debe registrarse proporcionando información precisa y completa. Usted es responsable de:</p>
+      <ul>
+        <li>Mantener la confidencialidad de su contraseña</li>
+        <li>Todas las actividades que ocurran bajo su cuenta</li>
+        <li>Notificar inmediatamente cualquier uso no autorizado de su cuenta</li>
+      </ul>
+      
+      <h3>4. Uso Permitido</h3>
+      <p>El usuario se compromete a utilizar EcoFact únicamente para:</p>
+      <ul>
+        <li>Generar facturas electrónicas legítimas y válidas</li>
+        <li>Gestionar su inventario de productos</li>
+        <li>Consultar el historial de facturas emitidas</li>
+      </ul>
+      
+      <h3>5. Uso Prohibido</h3>
+      <p>Está estrictamente prohibido:</p>
+      <ul>
+        <li>Generar facturas fraudulentas o con información falsa</li>
+        <li>Compartir credenciales de acceso con terceros</li>
+        <li>Intentar acceder al sistema de manera no autorizada</li>
+        <li>Usar el servicio para actividades ilegales</li>
+      </ul>
+      
+      <h3>6. Facturación Electrónica</h3>
+      <p>Las facturas generadas a través de EcoFact tienen validez legal conforme a la normativa colombiana de facturación electrónica. El usuario es responsable de la veracidad de la información contenida en cada factura.</p>
+      
+      <h3>7. Propiedad Intelectual</h3>
+      <p>Todo el contenido, diseño, logotipos y software de EcoFact son propiedad de Apple S.A.S y están protegidos por las leyes de propiedad intelectual.</p>
+      
+      <h3>8. Limitación de Responsabilidad</h3>
+      <p>EcoFact no será responsable por:</p>
+      <ul>
+        <li>Pérdida de datos debido a fallas técnicas</li>
+        <li>Interrupciones del servicio por mantenimiento</li>
+        <li>Errores en facturas generadas por información incorrecta del usuario</li>
+      </ul>
+      
+      <h3>9. Modificaciones del Servicio</h3>
+      <p>Nos reservamos el derecho de modificar o discontinuar el servicio en cualquier momento, con o sin previo aviso.</p>
+      
+      <h3>10. Terminación</h3>
+      <p>Podemos suspender o terminar su cuenta si se detecta violación de estos términos, uso fraudulento o actividad sospechosa.</p>
+      
+      <h3>11. Legislación Aplicable</h3>
+      <p>Estos términos se rigen por las leyes de la República de Colombia. Cualquier disputa se resolverá en los tribunales competentes de Colombia.</p>
+      
+      <h3>12. Contacto</h3>
+      <p>Para cualquier pregunta sobre estos términos, contacte a: <strong>ecofactproyect@gmail.com</strong></p>
+    </div>
+    <button class="modal-btn" onclick="cerrarModal('modalTerminos')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal de Política de Privacidad -->
+<div id="modalPoliticas" class="modal">
+  <div class="modal-content">
+    <span class="close" data-modal="modalPoliticas">&times;</span>
+    <h2>Política de Privacidad - EcoFact</h2>
+    <div class="modal-body">
+      <p><strong>Última actualización: 25 de noviembre de 2025</strong></p>
+      
+      <h3>1. Introducción</h3>
+      <p>En EcoFact, valoramos y respetamos su privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, almacenamos y protegemos su información personal de acuerdo con la Ley 1581 de 2012 de Protección de Datos Personales en Colombia.</p>
+      
+      <h3>2. Información que Recopilamos</h3>
+      <p>Recopilamos los siguientes tipos de información:</p>
+      <ul>
+        <li><strong>Información de Registro:</strong> Nombre completo, tipo y número de documento, correo electrónico, teléfono, dirección</li>
+        <li><strong>Información de Facturación:</strong> Datos de clientes, productos, precios, transacciones comerciales</li>
+        <li><strong>Información Técnica:</strong> Dirección IP, tipo de navegador, sistema operativo, páginas visitadas</li>
+      </ul>
+      
+      <h3>3. Uso de la Información</h3>
+      <p>Utilizamos su información para:</p>
+      <ul>
+        <li>Proporcionar y mantener el servicio de facturación electrónica</li>
+        <li>Procesar y enviar facturas electrónicas a sus clientes</li>
+        <li>Cumplir con obligaciones legales y tributarias</li>
+        <li>Mejorar nuestros servicios y experiencia de usuario</li>
+        <li>Comunicarnos con usted sobre actualizaciones del servicio</li>
+        <li>Prevenir fraude y garantizar la seguridad del sistema</li>
+      </ul>
+      
+      <h3>4. Base Legal del Tratamiento</h3>
+      <p>Procesamos sus datos personales con base en:</p>
+      <ul>
+        <li>Su consentimiento explícito al registrarse</li>
+        <li>La ejecución del contrato de servicios</li>
+        <li>El cumplimiento de obligaciones legales (normativa tributaria y de facturación electrónica)</li>
+      </ul>
+      
+      <h3>5. Compartir Información</h3>
+      <p>No vendemos ni alquilamos su información personal a terceros. Podemos compartir información solo con:</p>
+      <ul>
+        <li><strong>DIAN:</strong> Para cumplir con la normativa de facturación electrónica</li>
+        <li><strong>Proveedores de Servicios:</strong> Que nos ayudan a operar el sistema (hosting, correo electrónico)</li>
+        <li><strong>Autoridades Legales:</strong> Cuando sea requerido por ley</li>
+      </ul>
+      
+      <h3>6. Seguridad de los Datos</h3>
+      <p>Implementamos medidas de seguridad técnicas y organizativas para proteger su información:</p>
+      <ul>
+        <li>Encriptación de datos sensibles (contraseñas, información financiera)</li>
+        <li>Control de acceso basado en roles</li>
+        <li>Monitoreo de actividades sospechosas</li>
+        <li>Backups regulares de la base de datos</li>
+        <li>Conexiones seguras HTTPS</li>
+      </ul>
+      
+      <h3>7. Retención de Datos</h3>
+      <p>Conservamos su información personal durante el tiempo necesario para cumplir con:</p>
+      <ul>
+        <li>Los propósitos para los que fue recopilada</li>
+        <li>Obligaciones legales (5 años para facturas según normativa colombiana)</li>
+        <li>Resolución de disputas y cumplimiento de acuerdos</li>
+      </ul>
+      
+      <h3>8. Sus Derechos</h3>
+      <p>Como titular de datos personales, usted tiene derecho a:</p>
+      <ul>
+        <li><strong>Acceso:</strong> Conocer qué datos tenemos sobre usted</li>
+        <li><strong>Rectificación:</strong> Corregir datos inexactos o incompletos</li>
+        <li><strong>Supresión:</strong> Solicitar la eliminación de sus datos (sujeto a obligaciones legales)</li>
+        <li><strong>Oposición:</strong> Oponerse al tratamiento de sus datos</li>
+        <li><strong>Portabilidad:</strong> Recibir sus datos en formato estructurado</li>
+        <li><strong>Revocación:</strong> Retirar su consentimiento en cualquier momento</li>
+      </ul>
+      
+      <h3>9. Cookies y Tecnologías Similares</h3>
+      <p>Utilizamos cookies para mejorar su experiencia. Las cookies nos ayudan a:</p>
+      <ul>
+        <li>Mantener su sesión activa</li>
+        <li>Recordar sus preferencias</li>
+        <li>Analizar el uso del sistema</li>
+      </ul>
+      <p>Puede desactivar las cookies en su navegador, aunque esto puede afectar la funcionalidad del servicio.</p>
+      
+      <h3>10. Transferencias Internacionales</h3>
+      <p>Sus datos se almacenan en servidores ubicados en Colombia. No realizamos transferencias internacionales de datos sin garantías adecuadas de protección.</p>
+      
+      <h3>11. Menores de Edad</h3>
+      <p>EcoFact no está dirigido a menores de 18 años. No recopilamos intencionalmente información de menores de edad.</p>
+      
+      <h3>12. Cambios a esta Política</h3>
+      <p>Podemos actualizar esta política periódicamente. Le notificaremos sobre cambios significativos a través de su correo electrónico registrado.</p>
+      
+      <h3>13. Contacto y Ejercicio de Derechos</h3>
+      <p>Para ejercer sus derechos o consultas sobre privacidad, contacte a:</p>
+      <p><strong>Correo:</strong> ecofactproyect@gmail.com<br>
+      <strong>Teléfono:</strong> 333-333-333<br>
+      <strong>Responsable de Datos:</strong> Apple S.A.S</p>
+      
+      <h3>14. Autoridad de Control</h3>
+      <p>Si considera que sus derechos han sido vulnerados, puede presentar una queja ante la Superintendencia de Industria y Comercio de Colombia.</p>
+    </div>
+    <button class="modal-btn" onclick="cerrarModal('modalPoliticas')">Cerrar</button>
+  </div>
 </div>
 
 <script src="{% static 'core/js/registro.js' %}"></script>
