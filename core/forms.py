@@ -50,7 +50,11 @@ class RegistroUsuarioForm(UserCreationForm):
         max_length=15,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Número de documento'
+            'placeholder': 'Número de documento',
+            'inputmode': 'numeric',
+            'pattern': '\\d+',
+            'title': 'Solo dígitos',
+            'min': '0'
         })
     )
     
@@ -76,7 +80,11 @@ class RegistroUsuarioForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Teléfono (opcional)'
+            'placeholder': 'Teléfono (opcional)',
+            'inputmode': 'numeric',
+            'pattern': '\\d+',
+            'title': 'Solo dígitos',
+            'min': '0'
         })
     )
     
@@ -131,9 +139,38 @@ class RegistroUsuarioForm(UserCreationForm):
 
     def clean_numero_documento_usuario(self):
         documento = self.cleaned_data.get('numero_documento_usuario')
-        if Usuario.objects.filter(numero_documento_usuario=documento).exists():
+        # Validar solo dígitos y no negativos
+        if documento is None:
+            raise forms.ValidationError('Número de documento inválido.')
+
+        doc_str = str(documento).strip()
+        if not doc_str.isdigit():
+            raise forms.ValidationError('El número de documento debe contener solo dígitos.')
+
+        # Normalizar (quitar ceros a la izquierda si se desea) - aquí dejamos tal cual
+        if Usuario.objects.filter(numero_documento_usuario=doc_str).exists():
             raise forms.ValidationError('Este número de documento ya está registrado.')
-        return documento
+
+        return doc_str
+
+    def clean_telefono_usuario(self):
+        telefono = self.cleaned_data.get('telefono_usuario')
+        if telefono in (None, ''):
+            return telefono
+
+        tel = str(telefono).strip()
+        if not tel.isdigit():
+            raise forms.ValidationError('El teléfono solo debe contener números.')
+
+        if len(tel) < 7 or len(tel) > 15:
+            raise forms.ValidationError('El teléfono debe tener entre 7 y 15 dígitos.')
+
+        # Evitar números negativos ya que usamos isdigit()
+        # Validar unicidad
+        if Usuario.objects.filter(telefono_usuario=tel).exists():
+            raise forms.ValidationError('Este número de teléfono ya está registrado.')
+
+        return tel
 
     def clean_password1(self):
         import re
