@@ -183,15 +183,3 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!valid) e.preventDefault(); // evitar envío si hay errores
   });
 });
-
-/* ------------------------------
-   Confirmación de eliminación con SweetAlert2
-   ------------------------------ */
-/* Confirmación de eliminación (moved to inventario.js) */
-
-/* ------------------------------
-   Modal visualizador de imagen (moved from template)
-   - Abre el modal con la imagen cuando se hace click en el botón .btn-visualizar
-   - Limpia el src al cerrar
-   ------------------------------ */
-/* Modal visualizador de imagen (moved to inventario.js) */

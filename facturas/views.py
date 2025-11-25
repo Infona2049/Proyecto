@@ -21,7 +21,9 @@ from datetime import date                                # Manejo de fechas
 
 # === IMPORTS DE MODELOS ===
 from .models import Factura, DetalleFactura             # Modelos de factura
-from productos.models import Producto, Inventario        # Modelos de productos e inventario
+from productos.models import Producto, Inventario, HistorialInventario        # Modelos de productos, inventario y historial
+from django.db import transaction
+from django.db.models import F
 from core.models import Usuario                          # Modelo de usuarios para validar correos
 from .services import enviar_a_intermediario             # Servicio de generación de CUFE
 
@@ -185,20 +187,65 @@ def crear_factura(request):
                         }, status=400)
 
                     # === DESCONTAR STOCK ===
-                    # Restar la cantidad vendida del inventario disponible
-                    inventario.stock_actual_inventario -= cantidad_vendida
-                    inventario.save()
+                    # Operación atómica: bloquear fila, comprobar stock, decrementar con F(),
+                    # crear DetalleFactura y registrar en HistorialInventario.
+                    try:
+                        with transaction.atomic():
+                            # bloquear la fila de inventario para esta transacción
+                            Inventario.objects.select_for_update().get(pk=inventario.pk)
 
-                    # === CREAR DETALLE DE FACTURA ===
-                    # Registrar cada producto vendido como una línea en la factura
-                    DetalleFactura.objects.create(
-                        factura=factura,                      # Relación con la factura principal
-                        producto=inventario.producto,         # Instancia del modelo Producto
-                        cantidad=cantidad_vendida,            # Unidades vendidas
-                        precio=precio,                        # Precio unitario sin IVA
-                        iva=iva,                              # IVA unitario (19%)
-                        total=total                           # Total de la línea (precio+IVA)*cantidad
-                    )
+                            # refrescar y validar stock dentro del bloqueo
+                            inventario.refresh_from_db()
+                            if inventario.stock_actual_inventario < cantidad_vendida:
+                                factura.delete()
+                                return JsonResponse({
+                                    "status": "error",
+                                    "message": f"No hay suficiente stock para '{inventario.producto.nombre_producto}'. Disponible: {inventario.stock_actual_inventario}"
+                                }, status=400)
+
+                            stock_prev = inventario.stock_actual_inventario
+
+                            # decremento atómico en base de datos
+                            Inventario.objects.filter(pk=inventario.pk).update(
+                                stock_actual_inventario=F('stock_actual_inventario') - cantidad_vendida
+                            )
+
+                            # refrescar instancia con nuevo stock
+                            inventario.refresh_from_db()
+                            stock_after = inventario.stock_actual_inventario
+
+                            # === CREAR DETALLE DE FACTURA ===
+                            DetalleFactura.objects.create(
+                                factura=factura,
+                                producto=inventario.producto,
+                                cantidad=cantidad_vendida,
+                                precio=precio,
+                                iva=iva,
+                                total=total
+                            )
+
+                            # === REGISTRAR EN HISTORIAL DE INVENTARIO ===
+                            try:
+                                detalles = (
+                                    f"Venta factura {factura.id}: -{cantidad_vendida} unidades. "
+                                    f"Stock anterior: {stock_prev}, nuevo stock: {stock_after}."
+                                )
+                                HistorialInventario.objects.create(
+                                    producto_id=getattr(inventario.producto, 'id_producto', None),
+                                    nombre_producto=getattr(inventario.producto, 'nombre_producto', str(inventario.producto)),
+                                    accion='edited',
+                                    detalles=detalles,
+                                )
+                            except Exception:
+                                # No queremos que falle la factura si por alguna razón no se puede escribir el historial
+                                print("Advertencia: fallo al crear HistorialInventario para venta")
+                    except Exception as e:
+                        factura.delete()
+                        print("Error procesando producto (descuento):", e)
+                        return JsonResponse({
+                            "status": "error",
+                            "message": f"Error procesando producto: {e}"
+                        }, status=500)
 
                 except Exception as e:
                     # === MANEJO DE ERRORES POR PRODUCTO ===

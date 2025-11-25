@@ -1,0 +1,104 @@
+/* Styles for historial_inventario (moved from template inline) */
+.historial-grid {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  justify-content: space-between;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.historial-grid .cuadro-blanco {
+  flex: 1 1 30%;
+  min-width: 260px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.cuadro-added { border-left: 6px solid #28a745; }
+.cuadro-removed { border-left: 6px solid #dc3545; }
+.cuadro-edited { border-left: 6px solid #0066cc; }
+.historial-card-title { font-size: 18px; color: #003f87; font-weight: 700; margin-bottom: 10px; }
+.historial-card-list { list-style: disc; margin-left: 18px; color: #333; }
+
+@media (max-width: 900px) {
+  .historial-grid { flex-direction: column; }
+  .historial-grid .cuadro-blanco { width: 100%; }
+}
+
+/* --- Table styles for 'Productos vendidos' to match inventario --- */
+.tabla-container {
+  width: 100%;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  max-height: 460px;
+}
+
+.tabla-inventario {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  font-size: 14px;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.cuadro-tabla .tabla-container .tabla-inventario thead {
+  background: linear-gradient(135deg, #003f87, #0056b3) !important;
+  color: white !important;
+}
+
+.cuadro-tabla .tabla-container .tabla-inventario th {
+  padding: 10px 12px !important;
+  text-align: left !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 3px solid #38b6ff !important;
+}
+
+.tabla-inventario th:first-child { border-top-left-radius: 8px; }
+.tabla-inventario th:last-child { border-top-right-radius: 8px; }
+
+.cuadro-tabla .tabla-container .tabla-inventario td {
+  padding: 8px 10px !important;
+  text-align: left !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.tabla-inventario tbody tr:nth-child(even) { background-color: #fafafa; }
+.tabla-inventario tbody tr:hover { background-color: #f8f9ff; transform: none; }
+
+/* Sticky header when scrolling */
+.tabla-container thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+/* Custom scrollbar for horizontal area */
+.tabla-container::-webkit-scrollbar { height: 8px; width: 10px; }
+.tabla-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+.tabla-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+
+/* Improve scrollbar appearance in Firefox */
+.tabla-container { scrollbar-width: thin; scrollbar-color: #c1c1c1 #f1f1f1; }
+
+@media (max-width: 768px) {
+  .tabla-inventario { min-width: 700px; }
+  .tabla-inventario th, .tabla-inventario td { padding: 8px 6px; font-size: 12px; }
+}
+
+/* Empty state */
+.tabla-inventario tbody:empty::after {
+  content: "No hay ventas en el periodo seleccionado";
+  display: block;
+  text-align: center;
+  padding: 24px;
+  color: #666;
+}

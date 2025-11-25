@@ -242,28 +242,44 @@ def historial_inventario_view(request):
     fecha_inicial = request.GET.get('fecha_inicial')
     fecha_final = request.GET.get('fecha_final')
 
+    # Si no se proporcionan fechas en la query, por defecto usar el día actual
+    if not fecha_inicial or not fecha_final:
+        hoy = datetime.now().date()
+        fecha_inicial = fecha_inicial or hoy.strftime('%Y-%m-%d')
+        fecha_final = fecha_final or hoy.strftime('%Y-%m-%d')
+
     registros = HistorialInventario.objects.all()
-    # Si se proporcionan ambas fechas, filtramos por rango (incluye ambos días)
-    if fecha_inicial and fecha_final:
-        try:
-            # validación básica de formato
-            di = datetime.strptime(fecha_inicial, '%Y-%m-%d').date()
-            df = datetime.strptime(fecha_final, '%Y-%m-%d').date()
-            # Si df < di, invertir para evitar rango inválido
-            if df < di:
-                di, df = df, di
-            registros = registros.filter(timestamp__date__range=[di, df])
-        except Exception:
-            # en caso de parseo fallido, dejamos registros sin filtrar
-            pass
-    añadidos = registros.filter(accion='added')
-    eliminados = registros.filter(accion='deleted')
-    editados = registros.filter(accion='edited')
+    añadidos = registros.none()
+    eliminados = registros.none()
+    editados = registros.none()
+
+    ventas = DetalleFactura.objects.none()
+    # Intentar parsear las fechas (ahora siempre deberían existir) y filtrar
+    try:
+        di = datetime.strptime(fecha_inicial, '%Y-%m-%d').date()
+        df = datetime.strptime(fecha_final, '%Y-%m-%d').date()
+        if df < di:
+            di, df = df, di
+
+        # Filtrar registros del historial por rango
+        registros = registros.filter(timestamp__date__range=[di, df])
+        añadidos = registros.filter(accion='added')
+        eliminados = registros.filter(accion='deleted')
+        editados = registros.filter(accion='edited')
+
+        # Consultar ventas (DetalleFactura) dentro del rango de fechas solicitado
+        ventas = DetalleFactura.objects.select_related('producto', 'factura').filter(
+            factura__fecha_factura__range=[di, df]
+        ).order_by('-factura__fecha_factura', '-id')
+    except Exception:
+        # En caso de error de parseo, dejamos los QuerySets vacíos
+        ventas = DetalleFactura.objects.none()
 
     context = {
         'añadidos': añadidos,
         'eliminados': eliminados,
         'editados': editados,
+        'ventas': ventas,
         'fecha_inicial': fecha_inicial or '',
         'fecha_final': fecha_final or '',
     }
