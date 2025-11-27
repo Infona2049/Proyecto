@@ -702,7 +702,8 @@ a img {
 .filtros {
   background: white;
   padding: 20px;
-  width: 95%;
+  /* Match the main white card width so the filter box aligns with the table below */
+  width: 80%;
   max-width: 1200px;
   margin: 20px auto 15px;
   border-radius: 10px;
