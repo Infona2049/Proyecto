@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
-  <title>Olvido de Contraseña</title> 
+  <title>Cambio de contraseña</title> 
 
   <!-- Vincula la hoja de estilos CSS personalizada -->
   <link rel="stylesheet" href="{% static 'core/css/olvido_contraseña.css' %}">
@@ -14,34 +14,18 @@
 
 <body> <!-- Cuerpo visible de la página -->
 
-  <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
-  <!-- Barra superior (zona de logos e iconos) -->
-  <div class="top-bar">
-        <!-- Sección izquierda: logos de la empresa -->
+<!-- Barra superior -->
+    <div class="top-bar">
+    <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
         <div class="left-side">
-            <!-- Enlace que redirige a la página de visualización del cliente -->
-            <a href="{% url 'visualizacion_cliente' %}">
-                <!-- Logo de EcoFact -->
+            <a href="{% url 'visualizacion_admin' %}">
                 <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
-                <!-- Logo adicional de la empresa -->
-                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
             </a>
         </div>
-
-        <!-- Sección derecha: iconos de acceso rápido -->
-        <div class="right-side">
-            <!-- Ícono para ir a documentos -->
-            <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
-            <!-- Ícono para editar perfil -->
-            <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
-            <!-- Ícono para cambiar contraseña -->
-            <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
-            <!-- Ícono para cerrar sesión -->
-            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
-        </div> 
     </div>
- 
-  <!-- Barra de navegación principal -->
+
+<!-- Barra de navegación principal -->
   <header>
     <nav class="menu">
       <!-- Enlace que lleva al inicio (login) -->
@@ -58,7 +42,7 @@
       <p class="small">Ingresa el correo asociado a tu cuenta.</p> <!-- Instrucción -->
       <input id="correo-input" type="email" placeholder="Ingresa tu correo"> <!-- Campo de entrada de correo -->
       <div id="correo-error" class="message-error hidden"></div> <!-- Mensaje de error oculto -->
-      <button onclick="enviarCodigo()">Enviar código</button> <!-- Botón para enviar código de verificación -->
+      <button onclick="enviarCodigo(this)">Enviar código</button> <!-- Botón para enviar código de verificación -->
     </div>
 
     <!-- PANTALLA 2: Verificación del código -->
@@ -67,7 +51,7 @@
       <p class="small">Introduce el código que llegó a tu correo.</p>
       <input id="codigo-input" type="text" placeholder="Ingresa el código de 6 dígitos" maxlength="6"> <!-- Campo para código -->
       <div id="codigo-error" class="message-error hidden"></div> <!-- Mensaje de error -->
-      <button onclick="verificarCodigo()">Verificar código</button> <!-- Botón de validación -->
+      <button onclick="verificarCodigo(this)">Verificar código</button> <!-- Botón de validación -->
       <a id="reenviar-codigo" class="resend-link" onclick="reenviarCodigo()">Reenviar código</a>
       <button class="secondary" onclick="mostrarPantalla('correo')">Volver</button> <!-- Botón para regresar -->
     </div>
@@ -79,7 +63,7 @@
       <input id="newpass" type="password" placeholder="Nueva contraseña"> <!-- Nueva contraseña -->
       <input id="confpass" type="password" placeholder="Confirmar contraseña"> <!-- Confirmación -->
       <div id="reset-error" class="message-error hidden"></div> <!-- Mensaje de error -->
-      <button onclick="guardarNueva()">Guardar nueva contraseña</button> <!-- Botón para guardar -->
+      <button onclick="guardarNueva(this)">Guardar nueva contraseña</button> <!-- Botón para guardar -->
       <button class="secondary" onclick="mostrarPantalla('codigo')">Volver</button> <!-- Volver a la pantalla anterior -->
     </div>
 
@@ -114,6 +98,7 @@
   </footer>
 
   <!-- Vinculo al archivo JavaScript que maneja las funciones de recuperación -->
+  <script src="{% static 'core/js/validacion_common.js' %}"></script>
   <script src="{% static 'core/js/olvido_contraseña.js' %}"></script>
 
 </body>

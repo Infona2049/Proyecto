@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/verificar-codigo-recuperacion/', views.verificar_codigo_recuperacion, name='verificar_codigo_recuperacion'),
     path('api/restablecer-contrasena/', views.restablecer_contrasena, name='restablecer_contrasena'),
     path('registro/', views.registro_view, name='registro'),
+    path('validacion_correo/', views.validacion_correo_view, name='validacion_correo'),
     path('visualizacion_admin/', views.visualizacion_admin_view, name='visualizacion_admin'),
     path('visualizacion_cliente/', views.visualizacion_cliente_view, name='visualizacion_cliente'),
     path('visualizacion_vendedor/', views.visualizacion_vendedor_view, name='visualizacion_vendedor'),

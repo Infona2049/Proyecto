@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Validación de Correo</title>
+  <link rel="stylesheet" href="{% static 'core/css/olvido_contraseña.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
+  <div class="top-bar">
+    <div class="left-side">
+      <a href="{% url 'visualizacion_cliente' %}">
+        <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+        <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
+      </a>
+    </div>
+  </div>
+
+  <header>
+    <nav class="menu">
+      <a href="{% url 'login' %}">Inicio</a>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- Sección correo (oculta por defecto) -->
+    <div id="correo" class="hidden">
+      <h2>Recuperar contraseña</h2>
+      <p class="small">Ingresa el correo asociado a tu cuenta.</p>
+      <input id="correo-input" type="email" placeholder="Ingresa tu correo">
+      <div id="correo-error" class="message-error hidden"></div>
+      <button onclick="enviarCodigo(this)">Enviar código</button>
+    </div>
+
+    <!-- Sección código (visible por defecto para coincidir con olvido_contraseña) -->
+    <div id="codigo">
+      <h2>Verifica tu correo</h2>
+      <p class="small">Introduce el código que llegó a tu correo.</p>
+      <input id="codigo-input" type="text" placeholder="Ingresa el código de 6 dígitos" maxlength="6">
+      <div id="codigo-error" class="message-error hidden"></div>
+      <button onclick="verificarCodigo(this)">Verificar código</button>
+      <a id="reenviar-codigo" class="resend-link" onclick="reenviarCodigo()">Reenviar código</a>
+      <button class="secondary" onclick="mostrarPantalla('correo')">Volver</button>
+    </div>
+
+
+    <!-- Sección de éxito para verificación de correo -->
+    <div id="success_email" class="hidden">
+      <h2>Correo verificado</h2>
+      <p class="small">Tu correo ha sido verificado correctamente.</p>
+      <div class="message-success">
+        <span class="check">✓</span>
+        <span>Gracias. Ya puedes iniciar sesión.</span>
+      </div>
+      <button onclick="irLogin()">Ir al inicio de sesión</button>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-bar">
+      <div class="footer-item">
+        <img src="{% static 'img/mensaje.png' %}" alt="Correo">
+        Ecofactproyect@gmail.com
+      </div>
+      <div class="footer-item">
+        <img src="{% static 'img/llamada-telefonica.png' %}" alt="Teléfono">
+        333-333-333
+      </div>
+    </div>
+    <div class="footer-bottom">@2025-ECOFACT</div>
+  </footer>
+
+  <script src="{% static 'core/js/validacion_common.js' %}"></script>
+  <script src="{% static 'core/js/validacion_correo.js' %}"></script>
+  <script>
+    // Si llegamos con #foto, mostrar esa pantalla al cargar.
+    // Además, si el servidor indicó envío automático (auto_send), arrancar el temporizador y asignar el email.
+    document.addEventListener('DOMContentLoaded', function(){
+      // Si el servidor indicó `auto_email`, mostrar la pantalla de verificación y arrancar temporizador.
+      {% if auto_email %}
+        try {
+          emailGlobal = "{{ auto_email|escapejs }}";
+          // Indicar al JS que venimos del flujo de registro
+          is_registration_flow = true;
+          mostrarPantalla('codigo');
+          iniciarTemporizadorReenvio();
+        } catch (e) {
+          console.error('No se pudo iniciar temporizador automático:', e);
+          is_registration_flow = true;
+          mostrarPantalla('codigo');
+        }
+      {% else %}
+        // Mostrar la sección indicada por el hash o 'correo' por defecto
+        const target = (location.hash || '').replace('#','');
+        if(target && document.getElementById(target)){
+          mostrarPantalla(target);
+        } else {
+          mostrarPantalla('correo');
+        }
+      {% endif %}
+    });
+  </script>
+</body>
+</html>

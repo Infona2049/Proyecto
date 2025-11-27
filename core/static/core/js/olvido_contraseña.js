@@ -3,76 +3,28 @@ let emailGlobal = '';
 let codigoGlobal = '';
 let tiempoRestante = 0;
 let intervaloReenvio = null;
-
-function mostrarPantalla(id) {
-  document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-
-  ['correo-error','codigo-error','reset-error'].forEach(idErr => {
-    const el = document.getElementById(idErr);
-    if(el){ el.classList.add('hidden'); el.textContent = ''; }
-  });
-}
-
-function iniciarTemporizadorReenvio() {
-  tiempoRestante = 60; // 60 segundos de espera
-  const linkReenviar = document.getElementById('reenviar-codigo');
-  
-  if (linkReenviar) {
-    linkReenviar.classList.add('disabled');
-    linkReenviar.textContent = `Reenviar código (${tiempoRestante}s)`;
-    
-    if (intervaloReenvio) clearInterval(intervaloReenvio);
-    
-    intervaloReenvio = setInterval(() => {
-      tiempoRestante--;
-      linkReenviar.textContent = `Reenviar código (${tiempoRestante}s)`;
-      
-      if (tiempoRestante <= 0) {
-        clearInterval(intervaloReenvio);
-        linkReenviar.classList.remove('disabled');
-        linkReenviar.textContent = 'Reenviar código';
-      }
-    }, 1000);
-  }
-}
-
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+// Indica si llegamos desde el flujo de registro (para mostrar alerta de exito y redirigir)
+let is_registration_flow = false;
 
 async function reenviarCodigo() {
   const linkReenviar = document.getElementById('reenviar-codigo');
-  
-  if (linkReenviar.classList.contains('disabled')) {
-    return;
-  }
-  
+  if (!linkReenviar || linkReenviar.classList.contains('disabled')) return;
+
   // Reutilizar la función de enviar código
   const correoInput = document.getElementById('correo-input');
-  const correoAnterior = correoInput.value;
-  correoInput.value = emailGlobal;
-  
+  const correoAnterior = correoInput ? correoInput.value : '';
+  if(correoInput) correoInput.value = emailGlobal;
+
   await enviarCodigo();
-  
-  correoInput.value = correoAnterior;
+
+  if(correoInput) correoInput.value = correoAnterior;
 }
 
-async function enviarCodigo(){
-  const correo = document.getElementById('correo-input').value.trim();
+async function enviarCodigo(btn = null){
+  const correoEl = document.getElementById('correo-input');
+  const correo = correoEl ? correoEl.value.trim() : '';
   const err = document.getElementById('correo-error');
-  const btn = event.target;
+  const btnEl = btn || (correoEl ? correoEl.closest('div').querySelector('button') : null);
   
   if(!correo){
     err.textContent = 'El correo es obligatorio.';
@@ -89,8 +41,7 @@ async function enviarCodigo(){
   }
 
   // Deshabilitar botón mientras se procesa
-  btn.disabled = true;
-  btn.textContent = 'Enviando...';
+  if(btnEl){ btnEl.disabled = true; btnEl.textContent = 'Enviando...'; }
 
   try {
     const response = await fetch('/api/enviar-codigo-recuperacion/', {
@@ -118,30 +69,27 @@ async function enviarCodigo(){
     err.textContent = 'Error de conexión. Inténtalo de nuevo.';
     err.classList.remove('hidden');
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Enviar código';
+    if(btnEl){ btnEl.disabled = false; btnEl.textContent = 'Enviar código'; }
   }
 }
 
-async function verificarCodigo(){
-  const codigo = document.getElementById('codigo-input').value.trim();
+async function verificarCodigo(btn = null){
+  const codigoEl = document.getElementById('codigo-input');
+  const codigo = codigoEl ? codigoEl.value.trim() : '';
   const err = document.getElementById('codigo-error');
-  const btn = event.target;
-  
+  const btnEl = btn || (codigoEl ? codigoEl.closest('div').querySelector('button') : null);
+
   if(!codigo){
-    err.textContent = 'Debes ingresar el código.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'Debes ingresar el código.'; err.classList.remove('hidden'); }
     return;
   }
 
   if(codigo.length !== 6){
-    err.textContent = 'El código debe tener 6 dígitos.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'El código debe tener 6 dígitos.'; err.classList.remove('hidden'); }
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Verificando...';
+  if(btnEl){ btnEl.disabled = true; btnEl.textContent = 'Verificando...'; }
 
   try {
     const response = await fetch('/api/verificar-codigo-recuperacion/', {
@@ -161,47 +109,63 @@ async function verificarCodigo(){
     if(data.status === 'ok'){
       codigoGlobal = codigo;
       console.log('✅ Código verificado');
-      mostrarPantalla('reset');
+      // Si venimos del registro, mostrar SweetAlert2 de usuario registrado y redirigir al login
+      if(is_registration_flow && typeof Swal !== 'undefined'){
+        try{
+          Swal.fire({
+            icon: 'success',
+            title: 'Usuario registrado con éxito',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+          });
+          // Redirigir al login después de 2 segundos
+          setTimeout(() => { window.location.href = '/login/'; }, 2000);
+        }catch(e){
+          // Fallback: ir al login
+          window.location.href = '/login/';
+        }
+      } else if(is_registration_flow){
+        // Si Swal no está disponible, redirigir inmediatamente
+        window.location.href = '/login/';
+      } else {
+        mostrarPantalla('reset');
+      }
     } else {
-      err.textContent = data.message || 'Código incorrecto.';
-      err.classList.remove('hidden');
+      if(err){ err.textContent = data.message || 'Código incorrecto.'; err.classList.remove('hidden'); }
     }
   } catch(error) {
     console.error('Error:', error);
-    err.textContent = 'Error de conexión. Inténtalo de nuevo.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'Error de conexión. Inténtalo de nuevo.'; err.classList.remove('hidden'); }
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Verificar código';
+    if(btnEl){ btnEl.disabled = false; btnEl.textContent = 'Verificar código'; }
   }
 }
 
-async function guardarNueva(){
-  const p1 = document.getElementById('newpass').value;
-  const p2 = document.getElementById('confpass').value;
+async function guardarNueva(btn = null){
+  const p1El = document.getElementById('newpass');
+  const p2El = document.getElementById('confpass');
+  const p1 = p1El ? p1El.value : '';
+  const p2 = p2El ? p2El.value : '';
   const err = document.getElementById('reset-error');
-  const btn = event.target;
+  const btnEl = btn || ((document.activeElement && document.activeElement.tagName === 'BUTTON') ? document.activeElement : null);
 
   if(!p1 || !p2){
-    err.textContent = 'Ambos campos son obligatorios.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'Ambos campos son obligatorios.'; err.classList.remove('hidden'); }
     return;
   }
   
   if(p1 !== p2){
-    err.textContent = 'Las contraseñas no coinciden.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'Las contraseñas no coinciden.'; err.classList.remove('hidden'); }
     return;
   }
 
   if(p1.length < 8){
-    err.textContent = 'La contraseña debe tener al menos 8 caracteres.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'La contraseña debe tener al menos 8 caracteres.'; err.classList.remove('hidden'); }
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Guardando...';
+  if(btnEl){ btnEl.disabled = true; btnEl.textContent = 'Guardando...'; }
 
   try {
     const response = await fetch('/api/restablecer-contrasena/', {
@@ -223,16 +187,13 @@ async function guardarNueva(){
       console.log('✅ Contraseña restablecida');
       mostrarPantalla('success');
     } else {
-      err.textContent = data.message || 'Error al restablecer la contraseña.';
-      err.classList.remove('hidden');
+      if(err){ err.textContent = data.message || 'Error al restablecer la contraseña.'; err.classList.remove('hidden'); }
     }
   } catch(error) {
     console.error('Error:', error);
-    err.textContent = 'Error de conexión. Inténtalo de nuevo.';
-    err.classList.remove('hidden');
+    if(err){ err.textContent = 'Error de conexión. Inténtalo de nuevo.'; err.classList.remove('hidden'); }
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Guardar nueva contraseña';
+    if(btnEl){ btnEl.disabled = false; btnEl.textContent = 'Guardar nueva contraseña'; }
   }
 }
 
@@ -240,5 +201,5 @@ function irLogin(){
   window.location.href = "/login/"; 
 }
 
-// mostrar inicio (pantalla correo)
-mostrarPantalla('correo');
+// La inicialización (mostrar pantalla por hash) se realiza en la plantilla
+// y las utilidades compartidas se han movido a `validacion_common.js`.

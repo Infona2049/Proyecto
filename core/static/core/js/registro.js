@@ -1,51 +1,76 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // === MOSTRAR MENSAJES DE DJANGO CON SWEETALERT ===
+  const hasSwal = typeof Swal !== "undefined";
+
+  function showAlert(options = {}, callback) {
+    const {
+      icon = "info",
+      title = "",
+      html = "",
+      text = "",
+      confirmButtonText = "OK",
+      confirmButtonColor = "#003f87",
+      timer = null,
+      allowOutsideClick = true,
+      allowEscapeKey = true,
+      customClass = {},
+      showClass = {},
+      hideClass = {},
+      didOpen = null
+    } = options;
+
+    if (hasSwal) {
+      Swal.fire({
+        icon,
+        title,
+        html: html || text,
+        confirmButtonText,
+        confirmButtonColor,
+        timer,
+        timerProgressBar: !!timer,
+        allowOutsideClick,
+        allowEscapeKey,
+        customClass,
+        showClass,
+        hideClass,
+        didOpen
+      }).then(() => {
+        if (typeof callback === "function") callback();
+      });
+    } else {
+      // Fallback simple: mostrar alert y ejecutar callback
+      try {
+        const plain = (html || text).replace(/<[^>]+>/g, "\n");
+        window.alert((title ? title + "\n\n" : "") + plain);
+      } catch (e) {
+        window.alert(title || text || html || "");
+      }
+      if (typeof callback === "function") callback();
+    }
+  }
+
+  // === MOSTRAR MENSAJES DE DJANGO (con fallback) ===
   const messagesContainer = document.getElementById("django-messages");
   if (messagesContainer) {
     const messages = messagesContainer.querySelectorAll(".message-item");
-    
+
     messages.forEach((msgElement) => {
       const type = msgElement.getAttribute("data-type");
       const text = msgElement.getAttribute("data-text");
-      
+
       if (type === "success") {
-        Swal.fire({
-          icon: "success",
-          title: "¡Registro Exitoso!",
-          html: `<p style="font-size: 16px; color: #333;">${text}</p>`,
-          confirmButtonText: "Ir al Login",
-          confirmButtonColor: "#003f87",
-          timer: 5000,
-          timerProgressBar: true,
-          showClass: {
-            popup: "animate__animated animate__fadeInDown"
-          },
-          hideClass: {
-            popup: "animate__animated animate__fadeOutUp"
-          },
-          customClass: {
-            popup: "registro-exitoso-popup",
-            title: "registro-exitoso-title",
-            confirmButton: "registro-exitoso-btn"
-          }
-        }).then((result) => {
-          if (result.isConfirmed || result.isDismissed) {
-            window.location.href = "/login/";
-          }
-        });
+        // No mostrar la alerta de éxito en este caso; redirigir al apartado de foto
+          window.location.href = "/validacion_correo/";
+        return;
       } else if (type === "error") {
-        Swal.fire({
+        showAlert({
           icon: "error",
           title: "Error",
           text: text,
           confirmButtonText: "Entendido",
-          confirmButtonColor: "#dc3545",
-          customClass: {
-            confirmButton: "registro-error-btn"
-          }
+          confirmButtonColor: "#dc3545"
         });
       } else {
-        Swal.fire({
+        showAlert({
           icon: "warning",
           title: "Atención",
           text: text,
@@ -172,13 +197,13 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (checkboxTerminos && !checkboxTerminos.checked) {
         console.log("Mostrando alerta de términos...");
-        
-        Swal.fire({
+
+        showAlert({
           icon: "error",
           title: "Términos y Condiciones Requeridos",
           html: "Debes <strong>aceptar los Términos y Condiciones</strong> y la <strong>Política de Privacidad</strong> para poder registrarte.",
           confirmButtonText: "Entendido",
-          confirmButtonColor: "#003f87",
+          confirmButtonColor: "#003f87"
         });
         
         // Resaltar el checkbox
@@ -220,12 +245,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         if (errorMessage) {
-          Swal.fire({
+          showAlert({
             icon: "error",
             title: "Contraseña no válida",
             html: errorMessage,
             confirmButtonText: "Entendido",
-            confirmButtonColor: "#003f87",
+            confirmButtonColor: "#003f87"
           });
           return;
         }
@@ -233,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Validar que las contraseñas coincidan (si existen ambos campos)
       if (password && confirmPassword && password.value !== confirmPassword.value) {
-        Swal.fire({
+        showAlert({
           icon: "error",
           title: "Contraseñas no coinciden",
           text: "Debes asegurarte de que ambas contraseñas sean iguales.",
@@ -246,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (email && email.value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email.value)) {
-          Swal.fire({
+          showAlert({
             icon: "warning",
             title: "Correo inválido",
             text: "Por favor ingresa un correo electrónico válido.",
@@ -270,52 +295,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = await response.json();
         
         if (result.success) {
-          // Mostrar alerta de éxito inmediatamente EN LA MISMA PÁGINA
-          Swal.fire({
-            icon: "success",
-            title: "¡Registro Exitoso!",
-            html: `<p style="font-size: 16px; color: #333;">${result.message}</p>`,
-            confirmButtonText: "Ir al Login",
-            confirmButtonColor: "#003f87",
-            timer: 5000,
-            timerProgressBar: true,
-            allowOutsideClick: false, // No cerrar al hacer clic fuera
-            allowEscapeKey: false, // No cerrar con ESC
-            showClass: {
-              popup: "animate__animated animate__fadeInDown"
-            },
-            hideClass: {
-              popup: "animate__animated animate__fadeOutUp"
-            },
-            customClass: {
-              popup: "registro-exitoso-popup",
-              title: "registro-exitoso-title",
-              confirmButton: "registro-exitoso-btn"
-            },
-            didOpen: () => {
-              console.log("Alerta de registro exitoso mostrada");
-            }
-          }).then((result) => {
-            // Redirigir solo después de que el usuario cierre la alerta o el timer termine
-            console.log("Redirigiendo al login...");
-            window.location.href = "/login/";
-          });
+          // No mostrar la alerta de éxito aquí (se utilizará después).
+          // Redirigir directamente a la validación de correo y al apartado de foto.
+            window.location.href = "/validacion_correo/";
         } else {
           // Mostrar errores
-          Swal.fire({
+          showAlert({
             icon: "error",
             title: "Error en el registro",
             html: result.message || "Ocurrió un error al registrar el usuario.",
             confirmButtonText: "Entendido",
-            confirmButtonColor: "#dc3545",
-            customClass: {
-              confirmButton: "registro-error-btn"
-            }
+            confirmButtonColor: "#dc3545"
           });
         }
       } catch (error) {
         console.error("Error al enviar formulario:", error);
-        Swal.fire({
+        showAlert({
           icon: "error",
           title: "Error de conexión",
           text: "No se pudo conectar con el servidor. Intenta de nuevo.",

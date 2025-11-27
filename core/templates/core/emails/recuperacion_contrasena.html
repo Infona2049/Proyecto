@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; line-height: 1.6; }
+    .email-wrapper { max-width: 650px; margin: 0 auto; background-color: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .header { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 40px 30px; text-align: center; border-bottom: 5px solid #fbbf24; }
+    .logo-container { display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 20px; border: none; }
+    .logo { max-width: 80px; height: auto; }
+    .header h1 { color: #1e3a8a; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+    .header p { color: #475569; font-size: 14px; margin-top: 8px; }
+    .content { padding: 50px 40px; background-color: #ffffff; }
+    .greeting { font-size: 18px; color: #1f2937; margin-bottom: 20px; }
+    .greeting strong { color: #1e40af; font-size: 20px; }
+    .message { color: #4b5563; font-size: 16px; margin-bottom: 30px; line-height: 1.8; }
+    .code-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 40px; text-align: center; margin: 35px 0; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); position: relative; overflow: hidden; }
+    .code-label { color: #e0e7ff; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+    .code { font-size: 56px; font-weight: 900; color: #ffffff; letter-spacing: 18px; margin: 20px 0; text-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; z-index: 1; font-family: 'Courier New', monospace; }
+    .code-validity { color: #fbbf24; font-size: 13px; font-weight: 600; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .warning-box { background: linear-gradient(to right, #fef3c7, #fde68a); border-left: 6px solid #f59e0b; border-radius: 12px; padding: 25px; margin: 30px 0; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); }
+    .warning-box h3 { color: #92400e; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .warning-box h3::before { content: '⚠️'; font-size: 20px; }
+    .warning-box ul { list-style: none; margin: 0; padding: 0; }
+    .warning-box li { color: #92400e; font-size: 14px; margin: 8px 0; padding-left: 20px; position: relative; }
+    .warning-box li::before { content: '•'; position: absolute; left: 0; color: #f59e0b; font-size: 20px; line-height: 1; }
+    .help-section { background-color: #f0f9ff; border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center; border: 2px solid #bfdbfe; }
+    .help-section p { color: #1e40af; font-size: 14px; margin: 0; }
+    .footer { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 35px 30px; text-align: center; }
+    .footer-logos { display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 20px; border: none; }
+    .footer-logo { max-width: 70px; height: auto; opacity: 0.9; }
+    .footer h3 { color: #1e3a8a; font-size: 18px; margin-bottom: 10px; font-weight: 700; }
+    .footer p { color: #000000; font-size: 13px; margin: 8px 0; }
+    .footer .contact { color: #1e40af; font-size: 14px; margin: 15px 0 10px; font-weight: 600; }
+    .divider { height: 1px; background: linear-gradient(to right, transparent, #374151, transparent); margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <div class="logo-container">
+        <img src="cid:logo_ecofact" alt="EcoFact Logo" class="logo">
+        <img src="cid:logo_apple" alt="Apple Pereira Logo" class="logo">
+      </div>
+      <h1>{{ heading }}</h1>
+      <p>{{ subtitle }}</p>
+    </div>
+    <div class="content">
+      <div class="greeting">Hola <strong>{{ usuario_nombre }}</strong>,</div>
+      <p class="message">{{ main_message }}</p>
+      <div class="code-section">
+        <div class="code-label">{{ code_label }}</div>
+        <div class="code">{{ codigo }}</div>
+        <div class="code-validity">Válido por 10 minutos</div>
+      </div>
+      <div class="warning-box">
+        <h3>Información Importante</h3>
+        <ul>
+          {% for item in warnings %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-logos">
+        <img src="cid:logo_ecofact" alt="EcoFact" class="footer-logo">
+        <img src="cid:logo_apple" alt="Apple Pereira" class="footer-logo">
+      </div>
+      <h3>EcoFact</h3>
+      <p>Sistema de Facturación Electrónica</p>
+      <p style="margin: 15px 0; font-size: 14px;">¿Tienes problemas? Contáctanos:</p>
+      <p class="contact">📧 ecofactproyect@gmail.com | 📞 333-333-333</p>
+      <p>Este es un correo automático, por favor no responder directamente.</p>
+      <p>© 2025 EcoFact. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
