@@ -111,8 +111,16 @@ function activarEventosFila(fila) { // Activar eventos para inputs y botones en 
 
     if (cantidadInput) {
         cantidadInput.addEventListener("input", () => {
+            // === VALIDAR NÚMEROS NEGATIVOS ===
+            let cantidadSolicitada = parseInt(cantidadInput.value);
+            
+            // Si es negativo o no es un número válido, establecer en 1
+            if (isNaN(cantidadSolicitada) || cantidadSolicitada < 1) {
+                cantidadInput.value = 1;
+                cantidadSolicitada = 1;
+            }
+            
             // === VALIDAR STOCK AL CAMBIAR CANTIDAD ===
-            const cantidadSolicitada = parseInt(cantidadInput.value) || 1;
             const stockDisponible = parseInt(fila.dataset.stock) || 0;
             const nombreProducto = fila.dataset.nombre || "Producto";
             
@@ -262,6 +270,74 @@ document.addEventListener("DOMContentLoaded", () => { // Esperar a que el DOM es
     } else {
         console.log("No se encontró el botón con id 'btnGenerarFactura'");
     }
+
+    // === VALIDACIÓN EN TIEMPO REAL PARA TELÉFONO Y DOCUMENTO ===
+    const telefonoInput = document.getElementById("telefono");
+    const documentoInput = document.getElementById("cedulaCliente");
+
+    // Evitar números negativos y caracteres no numéricos en teléfono
+    if (telefonoInput) {
+        // Validar en tiempo real
+        telefonoInput.addEventListener("input", function(e) {
+            // Remover todo lo que no sea dígito (incluyendo signo negativo)
+            let valor = this.value.replace(/[^0-9]/g, '');
+            
+            // Si después de limpiar queda vacío y había un valor, mostrar 0
+            if (valor === '' && this.value !== '') {
+                valor = '';
+            }
+            
+            this.value = valor;
+        });
+
+        // Prevenir teclas no permitidas
+        telefonoInput.addEventListener("keydown", function(e) {
+            // Prevenir teclas de signo negativo, más, menos, punto, e
+            if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.' || e.key === ',') {
+                e.preventDefault();
+            }
+        });
+
+        // Validar al pegar
+        telefonoInput.addEventListener("paste", function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numbersOnly = pastedText.replace(/[^0-9]/g, '');
+            this.value = numbersOnly;
+        });
+    }
+
+    // Evitar números negativos y caracteres no numéricos en documento
+    if (documentoInput) {
+        // Validar en tiempo real
+        documentoInput.addEventListener("input", function(e) {
+            // Remover todo lo que no sea dígito (incluyendo signo negativo)
+            let valor = this.value.replace(/[^0-9]/g, '');
+            
+            // Si después de limpiar queda vacío y había un valor, mostrar 0
+            if (valor === '' && this.value !== '') {
+                valor = '';
+            }
+            
+            this.value = valor;
+        });
+
+        // Prevenir teclas no permitidas
+        documentoInput.addEventListener("keydown", function(e) {
+            // Prevenir teclas de signo negativo, más, menos, punto, e
+            if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.' || e.key === ',') {
+                e.preventDefault();
+            }
+        });
+
+        // Validar al pegar
+        documentoInput.addEventListener("paste", function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numbersOnly = pastedText.replace(/[^0-9]/g, '');
+            this.value = numbersOnly;
+        });
+    }
 });
 
 // --- AUTOCOMPLETAR DATOS DEL CLIENTE POR DOCUMENTO ---
@@ -369,10 +445,71 @@ function generarFactura() { // Función para generar la factura al hacer click e
   const correoCliente = document.getElementById("correoCliente")?.value?.trim();// Obtener y limpiar correo del cliente
   const telefonoCliente = document.getElementById("telefono")?.value?.trim(); // Obtener y limpiar teléfono del cliente
   const direccionCliente = document.getElementById("direccion")?.value?.trim(); // Obtener y limpiar dirección del cliente
+  const cedulaCliente = document.getElementById("cedulaCliente")?.value?.trim(); // Obtener número de documento
   const metodoPago = document.getElementById("medioPago")?.value; // Obtener método de pago
 
   if (!nombreCliente || !correoCliente || !telefonoCliente || !direccionCliente) { // Validar datos del cliente
     alert("Debe llenar todos los datos del cliente.");
+    return;
+  }
+
+  // === LIMPIAR Y VALIDAR TELÉFONO ===
+  // Primero limpiar cualquier caracter no numérico
+  const telefonoLimpio = telefonoCliente.replace(/[^0-9]/g, '');
+  const cedulaLimpia = cedulaCliente.replace(/[^0-9]/g, '');
+
+  // Actualizar los campos con valores limpios
+  document.getElementById("telefono").value = telefonoLimpio;
+  document.getElementById("cedulaCliente").value = cedulaLimpia;
+
+  // === VALIDAR QUE TELÉFONO NO ESTÉ VACÍO DESPUÉS DE LIMPIAR ===
+  if (!telefonoLimpio || telefonoLimpio === '') {
+    Swal.fire({
+      icon: "error",
+      title: "Teléfono inválido",
+      text: "El teléfono no puede estar vacío y solo debe contener números positivos.",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#d33"
+    });
+    return;
+  }
+
+  // === VALIDAR QUE DOCUMENTO NO ESTÉ VACÍO DESPUÉS DE LIMPIAR ===
+  if (!cedulaLimpia || cedulaLimpia === '') {
+    Swal.fire({
+      icon: "error",
+      title: "Documento inválido",
+      text: "El número de documento no puede estar vacío y solo debe contener números positivos.",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#d33"
+    });
+    return;
+  }
+
+  // === VALIDAR QUE NO CONTENGAN SIGNO NEGATIVO O CARACTERES ESPECIALES ===
+  if (telefonoCliente.includes("-") || /[^0-9]/.test(telefonoCliente)) {
+    Swal.fire({
+      icon: "error",
+      title: "Teléfono inválido",
+      text: "No se aceptan números negativos ni caracteres especiales en el teléfono. Por favor ingrese solo números positivos.",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#d33"
+    });
+    // Limpiar el campo
+    document.getElementById("telefono").value = telefonoLimpio;
+    return;
+  }
+
+  if (cedulaCliente.includes("-") || /[^0-9]/.test(cedulaCliente)) {
+    Swal.fire({
+      icon: "error",
+      title: "Documento inválido",
+      text: "No se aceptan números negativos ni caracteres especiales en el número de documento. Por favor ingrese solo números positivos.",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#d33"
+    });
+    // Limpiar el campo
+    document.getElementById("cedulaCliente").value = cedulaLimpia;
     return;
   }
 
@@ -391,9 +528,9 @@ function generarFactura() { // Función para generar la factura al hacer click e
 
   const data = { // Construir objeto de datos para enviar al backend
     nombre_receptor: nombreCliente,
-    nit_receptor: document.getElementById("cedulaCliente")?.value || "",
+    nit_receptor: cedulaLimpia, // Usar valor limpio
     correo_cliente: correoCliente,
-    telefono: telefonoCliente,
+    telefono: telefonoLimpio, // Usar valor limpio
     direccion: direccionCliente,
     metodo_pago_factura: metodoPago,
     fecha_factura: new Date().toLocaleDateString("en-CA"),
