@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-#esto se usa para simular el envio de la factura a la empresa intermediaria como prueba , 
+#esto se usa para simular el envio de la factura a la empresa intermediaria como prueba 
 def enviar_a_intermediario(factura):
     """
     Simula el envío a una empresa intermediaria .

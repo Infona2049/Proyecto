@@ -53,7 +53,7 @@ def _send_email_using_template(template_name, context, subject, to_email_list):
                 logo_ecofact.add_header('Content-Disposition', 'inline', filename='logo_ecofact.png')
                 msg.attach(logo_ecofact)
         except Exception as e:
-            print(f"⚠️ No se pudo adjuntar logo EcoFact: {e}")
+            print(f" No se pudo adjuntar logo EcoFact: {e}")
 
         try:
             with open(logo_apple_path, 'rb') as img:
@@ -62,13 +62,13 @@ def _send_email_using_template(template_name, context, subject, to_email_list):
                 logo_apple.add_header('Content-Disposition', 'inline', filename='logo_apple.png')
                 msg.attach(logo_apple)
         except Exception as e:
-            print(f"⚠️ No se pudo adjuntar logo Apple: {e}")
+            print(f" No se pudo adjuntar logo Apple: {e}")
 
         resultado = msg.send(fail_silently=False)
-        print(f"✅ Email enviado a {to_email_list} (resultado: {resultado})")
+        print(f"Email enviado a {to_email_list} (resultado: {resultado})")
         return True
     except Exception as e:
-        print(f"❌ Error enviando email desde plantilla: {e}")
+        print(f"Error enviando email desde plantilla: {e}")
         traceback.print_exc()
         return False
 
@@ -79,7 +79,7 @@ def _enviar_email_codigo_formateado(email, codigo, nombre_usuario=None):
     context = {
         'usuario_nombre': nombre_usuario or '',
         'codigo': codigo,
-        'heading': '🔐 Validación de Correo',
+        'heading': ' Validación de Correo',
         'subtitle': 'Sistema de Seguridad EcoFact',
         'main_message': 'Hemos recibido una solicitud de creación de cuenta. Introduce el código a continuación para verificar tu correo y activar tu cuenta.',
         'code_label': 'Código de verificación:',
@@ -251,22 +251,22 @@ def actualizar_perfil_view(request):
 
             # VALIDACION CORREO
             if new_email and "@" not in new_email:
-                messages.error(request, "❌ El correo debe contener '@'.")
+                messages.error(request, " El correo debe contener '@'.")
                 return render(request, "core/actualizar_perfil.html", {"form": form})
 
             # VALIDACION TELÉFONO
             if new_telefono:
                 if not new_telefono.isdigit():
-                    messages.error(request, "❌ El telefono solo debe contener numeros.")
+                    messages.error(request, " El telefono solo debe contener numeros.")
                     return render(request, "core/actualizar_perfil.html", {"form": form})
                 if len(new_telefono) < 7 or len(new_telefono) > 10:
-                    messages.error(request, "❌ El telefono debe tener entre 7 y 10 digitos.")
+                    messages.error(request, " El telefono debe tener entre 7 y 10 digitos.")
                     return render(request, "core/actualizar_perfil.html", {"form": form})
 
             # COMPARACION CAMPO A CAMPO
             if new_email.lower() != (original_user.correo_electronico_usuario or "").lower():
                 if Usuario.objects.filter(correo_electronico_usuario=new_email).exclude(pk=user.pk).exists():
-                    messages.error(request, "❌ Este correo ya esta registrado.")
+                    messages.error(request, " Este correo ya esta registrado.")
                     return redirect("actualizar_perfil")
 
                 user.correo_electronico_usuario = new_email
@@ -285,9 +285,9 @@ def actualizar_perfil_view(request):
             if cambios:
                 user.save()
                 login(request, user)
-                messages.success(request, f"✅ Perfil actualizado correctamente ({', '.join(cambios)})")
+                messages.success(request, f" Perfil actualizado correctamente ({', '.join(cambios)})")
             else:
-                messages.info(request, "ℹ️ No realizaste ningun cambio.")
+                messages.info(request, " No realizaste ningun cambio.")
 
             return render(request, "core/actualizar_perfil.html", {"form": PerfilForm(instance=user)})
 
@@ -436,19 +436,19 @@ def enviar_codigo_recuperacion(request):
         data = json.loads(request.body)
         email = data.get('email', '').strip().lower()
         
-        print(f"\n🔍 DEBUG: Email recibido del frontend: '{email}'")
+        print(f"\n DEBUG: Email recibido del frontend: '{email}'")
         
         if not email:
-            print("❌ Email vacío")
+            print(" Email vacío")
             return JsonResponse({'status': 'error', 'message': 'El correo es obligatorio'}, status=400)
         
         # Verificar que el usuario existe
         try:
             usuario = Usuario.objects.get(correo_electronico_usuario=email)
-            print(f"✅ Usuario encontrado: {usuario.nombre_usuario} (PK: {usuario.pk})")
+            print(f" Usuario encontrado: {usuario.nombre_usuario} (PK: {usuario.pk})")
         except Usuario.DoesNotExist:
-            print(f"❌ Usuario NO encontrado con email: '{email}'")
-            print("📋 Verificando todos los emails en la BD...")
+            print(f" Usuario NO encontrado con email: '{email}'")
+            print(" Verificando todos los emails en la BD...")
             todos_emails = Usuario.objects.values_list('correo_electronico_usuario', 'nombre_usuario')
             for db_email, nombre in todos_emails:
                 print(f"   - '{db_email}' ({nombre})")
@@ -466,7 +466,7 @@ def enviar_codigo_recuperacion(request):
         )
         
         # Enviar correo con el código usando la plantilla
-        print(f"\n🔍 INICIANDO ENVÍO DE EMAIL (plantilla)")
+        print(f"\n INICIANDO ENVÍO DE EMAIL (plantilla)")
         print(f"Email destino: {email}")
         print(f"Código: {codigo}")
         print(f"Usuario encontrado: {usuario.nombre_usuario}")
@@ -475,7 +475,7 @@ def enviar_codigo_recuperacion(request):
         context = {
             'usuario_nombre': usuario.nombre_usuario,
             'codigo': codigo,
-            'heading': '🔐 Recuperación de Contraseña',
+            'heading': ' Recuperación de Contraseña',
             'subtitle': 'Sistema de Seguridad EcoFact',
             'main_message': 'Recibimos una solicitud para restablecer la contraseña de tu cuenta en EcoFact. Usa el código único a continuación para continuar con la recuperación.',
             'code_label': 'Tu código de verificación es:',
@@ -490,7 +490,7 @@ def enviar_codigo_recuperacion(request):
             return JsonResponse({'status': 'error', 'message': 'Error al enviar el código. Inténtalo de nuevo.'}, status=500)
         
     except Exception as e:
-        print(f"❌ Error al enviar código: {e}")
+        print(f" Error al enviar código: {e}")
         import traceback
         traceback.print_exc()
         return JsonResponse({
@@ -543,7 +543,7 @@ def verificar_codigo_recuperacion(request):
             }, status=500)
             
     except Exception as e:
-        print(f"❌ Error general: {e}")
+        print(f" Error general: {e}")
         return JsonResponse({
             'status': 'error',
             'message': 'Error al procesar la solicitud'
@@ -584,7 +584,7 @@ def restablecer_contrasena(request):
             codigo_obj.usado = True
             codigo_obj.save()
             
-            print(f"✅ Contraseña restablecida para {email}")
+            print(f" Contraseña restablecida para {email}")
             
             return JsonResponse({
                 'status': 'ok',
@@ -598,7 +598,7 @@ def restablecer_contrasena(request):
             }, status=404)
             
     except Exception as e:
-        print(f"❌ Error al restablecer contraseña: {e}")
+        print(f" Error al restablecer contraseña: {e}")
         import traceback
         traceback.print_exc()
         return JsonResponse({

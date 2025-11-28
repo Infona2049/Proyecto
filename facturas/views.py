@@ -99,9 +99,9 @@ def crear_factura(request):
             correo_cliente = data.get("correo_cliente", "").strip()
             try:
                 usuario = Usuario.objects.get(correo_electronico_usuario=correo_cliente)
-                print(f"  Correo validado: {correo_cliente} pertenece a {usuario.nombre_usuario} {usuario.apellido_usuario}")
+                print(f"Correo validado: {correo_cliente} pertenece a {usuario.nombre_usuario} {usuario.apellido_usuario}")
             except Usuario.DoesNotExist:
-                print(f"   Correo no registrado: {correo_cliente}")
+                print(f"Correo no registrado: {correo_cliente}")
                 return JsonResponse({
                     "status": "error",
                     "message": f"El correo '{correo_cliente}' no está registrado en el sistema. Solo se pueden enviar facturas a correos registrados."
@@ -144,7 +144,7 @@ def crear_factura(request):
                     iva = float(prod.get("iva", 0))                    # IVA unitario (19%)
                     total = float(prod.get("total", 0))                # Total por producto
 
-                    print(f"🔍 Procesando producto: {prod.get('nombre')}")
+                    print(f"Procesando producto: {prod.get('nombre')}")
                     print(f"   Código de barras: '{codigo}'")
                     print(f"   Cantidad: {cantidad_vendida}")
 
@@ -295,7 +295,7 @@ def crear_factura(request):
                         logo_path = base_path / "Logo azul sin fondo.png"
                         if os.path.exists(logo_path):
                             ecofact_logo = str(logo_path)
-                            print(f"✅ Logo EcoFact encontrado en: {ecofact_logo}")
+                            print(f"Logo EcoFact encontrado en: {ecofact_logo}")
                             break
                     
                     # Buscar logo Apple Pereira
@@ -303,13 +303,13 @@ def crear_factura(request):
                         logo_path = base_path / "logo empresa.png"
                         if os.path.exists(logo_path):
                             empresa_logo = str(logo_path)
-                            print(f" Logo Apple Pereira encontrado en: {empresa_logo}")
+                            print(f"Logo Apple Pereira encontrado en: {empresa_logo}")
                             break
                     
                     if not ecofact_logo:
-                        print(f" Logo EcoFact NO encontrado. Rutas buscadas: {[str(p / 'Logo azul sin fondo.png') for p in base_paths]}")
+                        print(f"Logo EcoFact NO encontrado. Rutas buscadas: {[str(p / 'Logo azul sin fondo.png') for p in base_paths]}")
                     if not empresa_logo:
-                        print(f" Logo Apple Pereira NO encontrado. Rutas buscadas: {[str(p / 'logo empresa.png') for p in base_paths]}")
+                        print(f"Logo Apple Pereira NO encontrado. Rutas buscadas: {[str(p / 'logo empresa.png') for p in base_paths]}")
 
                     y = height - 50
                     try:
@@ -569,11 +569,11 @@ def crear_factura(request):
                     # Enviar
                     print("  Enviando correo electrónico...")
                     msg.send(fail_silently=False)
-                    print(f" Correo enviado exitosamente a {factura.correo_cliente}")
+                    print(f"Correo enviado exitosamente a {factura.correo_cliente}")
                     
                 except Exception as e:
-                    print(f"❌ Error enviando correo con PDF: {e}")
-                    print(f"❌ Tipo de error: {type(e).__name__}")
+                    print(f"Error enviando correo con PDF: {e}")
+                    print(f"Tipo de error: {type(e).__name__}")
                     import traceback
                     traceback.print_exc()
                     
@@ -617,7 +617,7 @@ def crear_factura(request):
                         <body>
                             <div class="container">
                                 <div class="header">
-                                    <h1>📄 Factura Electrónica</h1>
+                                    <h1>Factura Electrónica</h1>
                                     <p style="margin: 10px 0 0 0; font-size: 18px;">Gracias por su compra</p>
                                 </div>
                                 
@@ -666,7 +666,7 @@ def crear_factura(request):
                                 
                                 <div style="text-align: center;">
                                     <a href="http://127.0.0.1:8000/facturas/pdf/{factura.id}/" class="download-btn">
-                                         Descargar Factura PDF
+                                        Descargar Factura PDF
                                     </a>
                                 </div>
                                 
@@ -714,7 +714,7 @@ def crear_factura(request):
                         traceback.print_exc()
                     pass
             else:
-                print(" ñ No se especificó correo del cliente, saltando envío de email")
+                print("No se especificó correo del cliente, saltando envío de email")
 
             # === GENERAR URLs DE DESCARGA ===
             # Proporcionar enlaces para descargar la factura en PDF y XML
