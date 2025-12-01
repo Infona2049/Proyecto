@@ -21,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuraciones básicas de seguridad y despliegue
 
+CSRF_TRUSTED_ORIGINS = ["https://ecofact-xlszh.ondigitalocean.app",]
+
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-b%oh&@$)n5f89ef_#8%l96#tu+0)ujp%@l_wow)8ulgf2etj7+')
 # Clave secreta para criptografía, debe mantenerse privada en producción
 
