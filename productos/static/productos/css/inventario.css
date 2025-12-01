@@ -146,218 +146,257 @@ h2::after {
 }
 
 .filtros {
-  /* keep the section compact inside the existing cuadro-blanco */
-  background: transparent;
-  padding: 0 10px 10px 10px;
-  width: 100%;
+  background: white;
+  padding: clamp(15px, 3vw, 25px);
+  width: 90%;
   max-width: 1200px;
-  margin: 0 auto 0;
+  margin: 20px auto 15px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  align-items: center; /* center child rows */
+  align-items: center;
+}
+
+/* Contenedor centrado de filtros */
+.filtros-centro {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .filtros-linea {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(18px, 6vw, 120px); /* separación responsiva entre los campos */
-}
-
-/* Cuando queremos los 3 campos en una sola fila */
-.filtros-linea.single-row { gap: clamp(20px, 6vw, 60px); width: 100%; max-width: 980px; justify-content: center; }
-.filtros-linea.single-row > .campo-fecha { flex: 1 1 220px; max-width: 320px; min-width: 140px; box-sizing: border-box; }
-
-/* Contenedor centrado con ancho similar al de historial_factura */
-.filtros-centro {
+  gap: clamp(15px, 3vw, 25px);
+  flex-wrap: wrap;
   width: 100%;
-  margin: 0 auto 0;
-  display: flex;
+}
+
+/* Fila única para los 3 campos */
+.filtros-linea.single-row {
+  max-width: 100%;
   justify-content: center;
-  align-items: center;
 }
 
-
-/* Force the inner row to a fixed width and center it: keep a predictable group width */
-.filtros-centro .filtros-linea.single-row {
-  width: 760px;
-  max-width: 92%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between; /* distribute the three fixed-width campos evenly */
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap; /* permitir que los campos salten de línea en pantallas estrechas */
-}
-.filtros-centro .filtros-linea.single-row > .campo-fecha {
-  flex: 1 1 220px; /* permitir que cada campo crezca o encoja según el espacio */
-  min-width: 160px;
-  box-sizing: border-box;
-}
-
-/* Labels: keep them compact so they no longer push fields apart */
-.filtros-centro .filtros-linea.single-row > .campo-fecha label {
-  min-width: 90px;
-  text-align: right;
-  margin-right: 8px;
-  font-size: 14px;
-  font-weight: 500;
+.filtros-linea.single-row > .campo-fecha {
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 300px;
 }
 
 /* Dentro de cada campo: la etiqueta y el select/input */
-.campo-fecha { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
-.campo-fecha select, .campo-fecha input[type="date"] { flex: 1 1 auto; min-width: 0; }
-
-/* versión de dos columnas (izq / der) en la primera fila */
-.filtros-linea-dos { width: 100%; justify-content: space-between; }
-.filtros-linea-dos { width: 100%; justify-content: space-between; align-items: center; box-sizing: border-box; }
-.filtros-linea-dos .campo-izquierda { margin-left: 40px; }
-.filtros-linea-dos .campo-derecha { margin-right: 40px; }
-
-/* Cada campo en la fila superior ocupa una columna flexible */
-.filtros-linea-dos > .campo-fecha { flex: 0 0 45%; display: flex; align-items: center; }
-
-
-/* fila centrada para el campo de almacenamiento */
-.filtros-linea-centro { justify-content: center; margin-top: 8px; }
-.campo-centro { justify-content: center; }
-
 .campo-fecha {
   display: flex;
   align-items: center;
-  gap: 20px; /* espacio entre texto e input/select */
+  gap: 10px;
   white-space: nowrap;
 }
 
 .campo-fecha label {
-  font-size: 14px;
+  font-size: clamp(13px, 2vw, 14px);
   font-weight: 500;
-  display: inline-block;
-  min-width: 110px; /* ancho reducido para evitar empujar los selects fuera del contenedor */
-  text-align: right; /* etiqueta a la izquierda del select, alineada a la derecha */
-  margin-right: 12px;
+  min-width: 100px;
+  text-align: right;
+  color: #003f87;
 }
 
+.campo-fecha select,
+.campo-fecha input[type="date"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Estilos para los inputs/selects de los filtros */
 .campo-fecha input[type="date"],
 .campo-fecha select {
   background-color: #c0cee9;
   border: none;
   padding: clamp(8px, 1.5vw, 10px);
   border-radius: 12px;
-  font-size: clamp(14px, 2.5vw, 16px);
-  min-width: 120px;
+  font-size: clamp(13px, 2vw, 15px);
+  min-width: 140px;
   box-sizing: border-box;
 }
 
-/* Ajustes para que los selects se vean más anchos y tipo "pill" en pantallas grandes */
-@media (min-width: 992px) {
-  .campo-fecha select { width: 100%; }
-  /* Mantener los tres filtros en una sola línea en pantallas de escritorio */
-  .filtros-centro .filtros-linea.single-row {
-    flex-wrap: nowrap; /* evitar salto de línea */
-    gap: clamp(20px, 6vw, 60px);
-    justify-content: center;
-  }
-  .filtros-centro .filtros-linea.single-row > .campo-fecha {
-    flex: 0 0 260px; /* ancho fijo para que quepan 3 en línea */
-    min-width: 200px;
-  }
-}
-
-@media (max-width: 768px) {
-  .filtros-linea-dos { flex-direction: column; gap: 12px; align-items: center; }
-  .filtros-linea-dos .campo-izquierda, .filtros-linea-dos .campo-derecha { margin: 0; }
-  .campo-fecha label { text-align: left; min-width: 0; margin-right: 8px; }
-  .campo-fecha select { width: 90%; }
-}
-
-/* small adjustment to keep form-select consistent with the look */
+/* Ajuste para form-select de Bootstrap */
 .filtros-form .form-select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  background-color: #c0cee9;
+  border: none;
+  padding: clamp(8px, 1.5vw, 10px);
+  border-radius: 12px;
+  font-size: clamp(13px, 2vw, 15px);
 }
 
-/* Ensure buttons keep spacing when placed inside filtros */
-.filtros .campo-boton { margin-top: clamp(20px, 2vw, 40px); }
+/* Responsive para filtros */
+@media (min-width: 992px) {
+  .filtros-linea.single-row {
+    flex-wrap: nowrap;
+    gap: 30px;
+  }
+  
+  .filtros-linea.single-row > .campo-fecha {
+    flex: 0 1 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtros {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .campo-fecha {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .campo-fecha label {
+    text-align: left;
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .campo-fecha select,
+  .campo-fecha input[type="date"] {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .filtros-linea.single-row > .campo-fecha {
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .campo-fecha label {
+    font-size: 13px;
+  }
+}
+
+/* Espaciado para botones dentro de filtros */
+.filtros .campo-boton {
+  margin-top: clamp(20px, 3vw, 30px);
+}
 
 /* --- end filtros styles --- */
 
 .cuadro-blanco {
-  background-color: white;          /* Fondo blanco */
-  border-radius: 15px;              /* Bordes redondeados */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Sombra suave */
-  padding: 30px;                    /* Espacio interno */
-  width: 80%;                       /* Ancho ajustable */
-  margin: 20px auto;                /* Centrado */
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: clamp(20px, 3vw, 30px);
+  width: 90%;
+  max-width: 1400px;
+  margin: 20px auto;
+  overflow: hidden;
 }
 
-.cuadro-blanco { overflow:hidden; }
+/* Responsive para cuadro blanco */
+@media (max-width: 768px) {
+  .cuadro-blanco {
+    width: 95%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cuadro-blanco {
+    width: 98%;
+    padding: 10px;
+  }
+}
 
 /* ------------------------------------------------------------------------------------------*/
-/* BOTONES BUSCAR Y FILTRAR*/
+/* BOTONES BUSCAR Y LIMPIAR */
 
 .campo-boton {
-  margin-top: clamp(20px, 2vw, 40px);
+  margin-top: clamp(20px, 3vw, 30px);
   text-align: center;
-  display: flex;              /* activa el gap */
-  justify-content: center;    /* centra los botones */
-  align-items: center;        /* los alinea verticalmente */
-  gap: 25px; /*Separa los botones entre si*/
-}
-
-
-.boton-limpiar {
-  background-color: #d9d9d9; /* gris más suave */
-  color: #003f87; /* azul oscuro */
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  font-size: clamp(11px, 2.3vw, 13px);
-  transition: all 0.3s ease;
-  min-height: 35px;
-}
-
-.boton-limpiar:hover {
-  background-color: #bfbfbf; /* gris más oscuro al pasar el mouse */
-  color: #002f6c; /* azul más intenso */
-}
-
-
-.boton-buscar { 
-  background-color: green;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: clamp(12px, 2.5vw, 14px);
-  transition: background-color 0.3s;
-  min-height: 40px;
- 
-}
-
-.boton-buscar:hover {
-  background-color: darkgreen; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(15px, 3vw, 25px);
+  flex-wrap: wrap;
 }
 
 .boton-buscar,
 .boton-limpiar {
-  width: 110px;
-  height: 40px;
+  width: clamp(100px, 20vw, 120px);
+  height: clamp(38px, 8vw, 42px);
   font-weight: bold;
   border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(12px, 2.5vw, 14px);
+  transition: all 0.3s ease;
+}
+
+.boton-buscar {
+  background-color: #28a745;
+  color: white;
+}
+
+.boton-buscar:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.boton-limpiar {
+  background-color: #d9d9d9;
+  color: #003f87;
+}
+
+.boton-limpiar:hover {
+  background-color: #bfbfbf;
+  color: #002f6c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 480px) {
+  .campo-boton {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .boton-buscar,
+  .boton-limpiar {
+    width: 100%;
+    max-width: 200px;
+  }
 }
 
 /* CONTENEDOR DE TABLA */
-
-
+.tabla-container {
+  width: 100%;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  max-height: 500px;
+  border-radius: 12px;
+}
 
 /* TABLA DE INVENTARIO */
 .tabla-inventario {
-  width: max-content; /* size to content so horizontal scroll can show columns */
+  width: 100%;
+  min-width: 1200px;
   border-collapse: collapse;
   border-radius: 15px;
-  font-size: clamp(11px, 5vw, 15px);
-  table-layout: auto; /* allow natural column widths */
+  font-size: clamp(12px, 2vw, 14px);
+  table-layout: auto;
 }
 
 
@@ -430,39 +469,62 @@ h2::after {
 }
 
 /* RESPONSIVE PARA TABLA */
-@media (max-width: 768px) {
-  .tabla-container {
-    overflow-x: visible;
-    -webkit-overflow-scrolling: touch;
-  }
-  
+@media (max-width: 1024px) {
   .tabla-inventario {
     min-width: 1100px;
   }
   
   .tabla-inventario th,
   .tabla-inventario td {
-    padding: 8px 6px;
+    padding: clamp(8px, 1.5vw, 10px) clamp(6px, 1vw, 8px);
+    font-size: clamp(11px, 2vw, 13px);
+  }
+}
+
+@media (max-width: 768px) {
+  .tabla-container {
+    max-height: 400px;
+  }
+  
+  .tabla-inventario {
+    min-width: 1000px;
     font-size: 12px;
+  }
+  
+  .tabla-inventario th,
+  .tabla-inventario td {
+    padding: 8px 6px;
+    font-size: 11px;
   }
   
   .tabla-inventario th {
     white-space: nowrap;
+    font-size: 12px;
+  }
+  
+  .icono-accion {
+    width: 20px !important;
+    height: 20px !important;
   }
 }
 
 @media (max-width: 480px) {
   .contenido {
-    padding: 15px 10px;
+    padding: 15px 8px;
+  }
+  
+  .tabla-container {
+    max-height: 350px;
   }
   
   .tabla-inventario {
-    min-width: 500px;
+    min-width: 900px;
   }
   
-  .tabla-inventario th:nth-child(n+4),
-  .tabla-inventario td:nth-child(n+4) {
-    display: none;
+  .tabla-inventario th,
+  .tabla-inventario td {
+    padding: 6px 4px;
+    font-size: 10px;
   }
 }
 
@@ -485,37 +547,13 @@ h2::after {
   background: linear-gradient(90deg, #002a5c, #2196f3);
 }
 
-/* Make the table scrollable inside the white card so it doesn't overflow the layout */
-.tabla-container {
-  width: 100%;
-  position: relative;
-  overflow-x: auto; /* horizontal scroll to see all columns */
-  overflow-y: auto; /* vertical scroll when many rows */
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 8px; /* space for custom scrollbar */
-  max-height: 460px; /* keep the table inside the white card, adjust as needed */
-}
-
-/* Let the table size to its content and allow horizontal scrolling when needed */
-.tabla-container > .tabla-inventario {
-  width: max-content; /* keep table sized by its content so horizontal scroll can appear */
-  max-width: none;
-}
-
-/* Sticky header so column titles remain visible when scrolling vertically */
+/* Sticky header para que los títulos de columnas permanezcan visibles al hacer scroll */
 .tabla-container thead th {
   position: sticky;
   top: 0;
   z-index: 5;
   background: linear-gradient(135deg, #003f87, #0056b3);
   color: white;
-}
-
-/* small visual hint removed: no inline 'Desliza' helper */
-
-/* Ensure the white card clips visual overflow (keeps rounded corners tidy) */
-.cuadro-blanco {
-  overflow: hidden;
 }
 
 /* FOOTER */
@@ -679,59 +717,33 @@ a img {
   .historial-grid .cuadro-blanco { width: 100%; }
 }
 
-/* --- Estilos de filtro (adaptados desde historial_factura.css) --- */
-.titulo-historial {
-  font-size: 20px;
-  text-align: center;
-  margin-bottom: 20px;
-  color: #003f87;
-  font-weight: bold;
-  position: relative;
+/* RESPONSIVE ADICIONAL PARA FOOTER Y NAVEGACIÓN */
+@media (max-width: 768px) {
+  .menu a {
+    font-size: 13px;
+  }
+  
+  .footer-bar {
+    font-size: 11px;
+    padding: 8px 15px;
+  }
 }
-.titulo-historial::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #003f87, #38b6ff);
-  border-radius: 2px;
+
+@media (max-width: 480px) {
+  body {
+    padding: 90px 5px 70px;
+  }
+  
+  .top-bar {
+    padding: 8px 10px;
+  }
+  
+  .menu {
+    padding: 10px 15px;
+  }
+  
+  .menu a {
+    font-size: 12px;
+  }
 }
-.filtros {
-  background: white;
-  padding: 20px;
-  /* Match the main white card width so the filter box aligns with the table below */
-  width: 80%;
-  max-width: 1200px;
-  margin: 20px auto 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.filtros-linea {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: nowrap;
-}
-.campo-fecha {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  white-space: nowrap;
-}
-.campo-fecha label { font-size: 14px; font-weight: 500; }
-.campo-fecha input[type="date"] {
-  background-color: #c0cee9;
-  border: none;
-  padding: 8px;
-  border-radius: 12px;
-  font-size: 14px;
-  min-width: 160px;
-}
-.campo-boton { margin-top: 20px; text-align:center; display:flex; justify-content:center; gap:20px; }
-.boton-limpiar { background-color: #d9d9d9; color: #003f87; font-weight: bold; border:none; cursor:pointer; padding:8px 12px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; width:120px; }
-.boton-buscar { background-color: green; color:white; border:none; cursor:pointer; padding:10px 14px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; width:120px; }
 
