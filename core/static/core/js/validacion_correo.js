@@ -8,6 +8,8 @@ let tiempoRestante = 0;
 let intervaloReenvio = null;
 // Indica si venimos del flujo de registro (para mostrar alerta y redirigir)
 let is_registration_flow = false;
+// Indica si venimos del flujo de cambio de correo (para mostrar éxito y redirigir al login)
+let is_email_change_flow = false;
 
 async function reenviarCodigo() {
   const linkReenviar = document.getElementById('reenviar-codigo');
@@ -88,8 +90,19 @@ async function verificarCodigo(){
     const data = await response.json();
     if(data.status === 'ok'){
       codigoGlobal = codigo;
+      // Si el backend indica que el correo fue cambiado (flujo de cambio), o que el registro se completó,
+      // mostrar éxito y redirigir al login
+      if((data.email_changed || data.registration_complete || is_email_change_flow) && typeof Swal !== 'undefined'){
+        try{
+          const text = data.registration_complete ? 'Registro completado. Inicia sesión con tu nuevo correo.' : 'Tu correo fue validado y actualizado. Inicia sesión con tu nuevo correo.';
+          Swal.fire({ icon: 'success', title: 'Operación exitosa', text: text, showConfirmButton: false, timer: 2200, timerProgressBar: true });
+          setTimeout(() => { window.location.href = '/login/'; }, 2200);
+        } catch(e){ window.location.href = '/login/'; }
+      } else if((data.email_changed || data.registration_complete || is_email_change_flow)){
+        window.location.href = '/login/';
+      }
       // Si venimos del registro, mostrar SweetAlert2 de usuario registrado y redirigir al login
-      if(is_registration_flow && typeof Swal !== 'undefined'){
+      else if(is_registration_flow && typeof Swal !== 'undefined'){
         try{
           Swal.fire({ icon: 'success', title: 'Usuario registrado con éxito', showConfirmButton: false, timer: 2000, timerProgressBar: true });
           setTimeout(() => { window.location.href = '/login/'; }, 2000);

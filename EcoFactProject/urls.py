@@ -26,6 +26,7 @@ urlpatterns = [
     path('olvido_contraseña/', views.olvido_contraseña_view, name='olvido_contraseña'),
     path('api/enviar-codigo-recuperacion/', views.enviar_codigo_recuperacion, name='enviar_codigo_recuperacion'),
     path('api/verificar-codigo-recuperacion/', views.verificar_codigo_recuperacion, name='verificar_codigo_recuperacion'),
+    path('api/cancelar-pending-registration/', views.cancelar_pending_registration, name='cancelar_pending_registration'),
     path('api/restablecer-contrasena/', views.restablecer_contrasena, name='restablecer_contrasena'),
     path('registro/', views.registro_view, name='registro'),
     path('validacion_correo/', views.validacion_correo_view, name='validacion_correo'),

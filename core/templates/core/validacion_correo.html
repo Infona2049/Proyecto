@@ -23,7 +23,6 @@
 
   <header>
     <nav class="menu">
-      <a href="{% url 'login' %}">Inicio</a>
     </nav>
   </header>
 
@@ -46,7 +45,7 @@
       <div id="codigo-error" class="message-error hidden"></div>
       <button onclick="verificarCodigo(this)">Verificar código</button>
       <a id="reenviar-codigo" class="resend-link" onclick="reenviarCodigo()">Reenviar código</a>
-      <button class="secondary" onclick="mostrarPantalla('correo')">Volver</button>
+      <button class="secondary" type="button" onclick="irDashboard()">Volver</button>
     </div>
 
 
@@ -80,6 +79,46 @@
   <script src="{% static 'core/js/validacion_common.js' %}"></script>
   <script src="{% static 'core/js/validacion_correo.js' %}"></script>
   <script>
+    function irDashboard(){
+      // Intentar cancelar cualquier registro pendiente creado en esta sesión antes de redirigir.
+      try {
+        fetch("{% url 'cancelar_pending_registration' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({})
+        }).catch(e => console.warn('No se pudo cancelar registro pendiente:', e)).finally(() => {
+          // Redirigir según si está autenticado y su rol
+          {% if is_authenticated %}
+            {% if user_role == 'admin' %}
+              window.location.href = "{% url 'visualizacion_admin' %}";
+            {% elif user_role == 'vendedor' %}
+              window.location.href = "{% url 'visualizacion_vendedor' %}";
+            {% else %}
+              window.location.href = "{% url 'visualizacion_cliente' %}";
+            {% endif %}
+          {% else %}
+            window.location.href = "{% url 'login' %}";
+          {% endif %}
+        });
+      } catch (e) {
+        {% if is_authenticated %}
+          {% if user_role == 'admin' %}
+            window.location.href = "{% url 'visualizacion_admin' %}";
+          {% elif user_role == 'vendedor' %}
+            window.location.href = "{% url 'visualizacion_vendedor' %}";
+          {% else %}
+            window.location.href = "{% url 'visualizacion_cliente' %}";
+          {% endif %}
+        {% else %}
+          window.location.href = "{% url 'login' %}";
+        {% endif %}
+      }
+    }
+  </script>
+  <script>
     // Si llegamos con #foto, mostrar esa pantalla al cargar.
     // Además, si el servidor indicó envío automático (auto_send), arrancar el temporizador y asignar el email.
     document.addEventListener('DOMContentLoaded', function(){
@@ -87,13 +126,21 @@
       {% if auto_email %}
         try {
           emailGlobal = "{{ auto_email|escapejs }}";
-          // Indicar al JS que venimos del flujo de registro
-          is_registration_flow = true;
+          // Indicar si venimos del flujo de cambio de correo o de registro
+          {% if is_email_change %}
+            is_email_change_flow = true;
+          {% else %}
+            is_registration_flow = true;
+          {% endif %}
           mostrarPantalla('codigo');
           iniciarTemporizadorReenvio();
         } catch (e) {
           console.error('No se pudo iniciar temporizador automático:', e);
-          is_registration_flow = true;
+          {% if is_email_change %}
+            is_email_change_flow = true;
+          {% else %}
+            is_registration_flow = true;
+          {% endif %}
           mostrarPantalla('codigo');
         }
       {% else %}

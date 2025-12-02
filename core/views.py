@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -17,6 +17,8 @@ import os
 from django.template.loader import render_to_string
 import traceback
 from email.mime.image import MIMEImage
+from django.views.decorators.csrf import csrf_exempt
+import uuid
 
 
 
@@ -238,7 +240,7 @@ def actualizar_perfil_view(request):
     user = request.user
 
     if request.method == 'POST':
-        original_user = Usuario.objects.get(pk=user.pk)
+        original_user = Usuario.objects.get(pk=user.pk)  # Get the original user for comparison
         form = PerfilForm(request.POST, instance=user)
 
         if form.is_valid():
@@ -250,7 +252,8 @@ def actualizar_perfil_view(request):
             cambios = []
 
             # VALIDACION CORREO
-            if new_email and "@" not in new_email:
+            # VALIDACION CORREO
+            if new_email and "@" not in new_email:  # Check if email contains '@'
                 messages.error(request, " El correo debe contener '@'.")
                 return render(request, "core/actualizar_perfil.html", {"form": form})
 
@@ -264,13 +267,14 @@ def actualizar_perfil_view(request):
                     return render(request, "core/actualizar_perfil.html", {"form": form})
 
             # COMPARACION CAMPO A CAMPO
-            if new_email.lower() != (original_user.correo_electronico_usuario or "").lower():
-                if Usuario.objects.filter(correo_electronico_usuario=new_email).exclude(pk=user.pk).exists():
-                    messages.error(request, " Este correo ya esta registrado.")
-                    return redirect("actualizar_perfil")
+            email_changed = False
+            if new_email and new_email.lower() != (original_user.correo_electronico_usuario or "").lower():
+                # Comprobar unicidad de correo de forma case-insensitive
+                if Usuario.objects.filter(correo_electronico_usuario__iexact=new_email).exclude(pk=user.pk).exists():
+                    messages.error(request, "Este correo ya está registrado.")
+                    return render(request, "core/actualizar_perfil.html", {"form": form})
 
-                user.correo_electronico_usuario = new_email
-                user.username = new_email
+                email_changed = True
                 cambios.append("correo electronico")
 
             if new_direccion != (original_user.direccion_usuario or ""):
@@ -283,13 +287,59 @@ def actualizar_perfil_view(request):
 
             # GUARDAR CAMBIOS
             if cambios:
-                user.save()
-                login(request, user)
-                messages.success(request, f" Perfil actualizado correctamente ({', '.join(cambios)})")
+                # Guardar los cambios no relacionados con el correo (dirección/telefono)
+                try:
+                    user.save()
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+                    messages.error(request, f"Error al guardar los cambios: {str(e)}")
+                    return render(request, "core/actualizar_perfil.html", {"form": form})
+
+                # Si el email fue modificado, iniciar el flujo de verificación en lugar de aplicarlo inmediatamente
+                if email_changed:
+                    try:
+                        import random
+                        codigo = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+                        new_email_normalized = new_email.lower()
+                        CodigoRecuperacion.objects.create(email=new_email_normalized, codigo=codigo)
+                        try:
+                            _enviar_email_codigo_formateado(new_email_normalized, codigo, user.nombre_usuario)
+                        except Exception as e:
+                            print('Error enviando código formateado para cambio de correo:', e)
+
+                        # Guardar en sesión los datos del cambio pendiente
+                        request.session['pending_email_change'] = {
+                            'new_email': new_email_normalized,
+                            'user_id': user.pk
+                        }
+                        request.session['auto_validation_email'] = new_email_normalized
+
+                        messages.info(request, 'Se ha enviado un código al nuevo correo. Verifícalo para completar el cambio.')
+                        return redirect('validacion_correo')
+                    except Exception as e:
+                        print('Error iniciando flujo de validación para cambio de correo:', e)
+                        messages.error(request, 'Error al iniciar la verificación del correo. Inténtalo de nuevo.')
+                        return render(request, "core/actualizar_perfil.html", {"form": form})
+
+                # Si no hubo cambio de email, simplemente refrescar sesión y mostrar éxito
+                try:
+                    if not hasattr(user, 'backend'):
+                        user.backend = settings.AUTHENTICATION_BACKENDS[0]
+                    login(request, user)
+                    try:
+                        update_session_auth_hash(request, user)
+                    except Exception:
+                        pass
+                except Exception as e:
+                    print(f"Advertencia: no se pudo re-iniciar sesión tras actualizar perfil: {e}")
+
+                messages.success(request, f"Perfil actualizado correctamente ({', '.join([c for c in cambios if c != 'correo electronico'])})")
+                return render(request, "core/actualizar_perfil.html", {"form": PerfilForm(instance=user)})
+
             else:
                 messages.info(request, " No realizaste ningun cambio.")
-
-            return render(request, "core/actualizar_perfil.html", {"form": PerfilForm(instance=user)})
+                return render(request, "core/actualizar_perfil.html", {"form": PerfilForm(instance=user)})
 
     else:
         form = PerfilForm(instance=user)
@@ -315,9 +365,21 @@ def olvido_contraseña_view(request):
 
 def validacion_correo_view(request):
     """Renderiza la pantalla de validación de correo tras registro."""
-    # Pasar contexto si hay un email en sesión (colocado por registro_view)
+    # Pasar contexto si hay un email en sesión (colocado por registro_view o actualizar_perfil_view)
     auto_email = request.session.pop('auto_validation_email', None)
-    return render(request, 'core/validacion_correo.html', {'auto_email': auto_email})
+    pending = request.session.get('pending_email_change')
+    is_email_change = bool(pending)
+    user_role = ''
+    is_auth = False
+    if request.user and request.user.is_authenticated:
+        is_auth = True
+        user_role = getattr(request.user, 'rol_usuario', '')
+    return render(request, 'core/validacion_correo.html', {
+        'auto_email': auto_email,
+        'is_email_change': is_email_change,
+        'user_role': user_role,
+        'is_authenticated': is_auth
+    })
 
 def registro_view(request):
     if request.method == 'POST':
@@ -327,66 +389,60 @@ def registro_view(request):
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
             try:
-                # Guardar el usuario
-                user = form.save()
-                
+                # En lugar de guardar el correo real inmediatamente, creamos el usuario con un email temporal
+                # y guardamos la intención de registro en sesión para aplicar el email una vez verificado.
+                cleaned = form.cleaned_data
+                real_email = cleaned.get('correo_electronico_usuario').strip().lower()
+
+                # Generar identificadores temporales únicos
+                temp_uuid = uuid.uuid4().hex
+                temp_email = f"pending-{temp_uuid}@pending.local"
+                temp_username = f"pending_{temp_uuid}"
+
+                # Crear el usuario con email temporal
+                user = Usuario(
+                    username=temp_username,
+                    nombre_usuario=cleaned.get('nombre_usuario'),
+                    segundo_nombre_usuario=cleaned.get('segundo_nombre_usuario'),
+                    apellido_usuario=cleaned.get('apellido_usuario'),
+                    segundo_apellido_usuario=cleaned.get('segundo_apellido_usuario'),
+                    tipo_documento_usuario=cleaned.get('tipo_documento_usuario'),
+                    numero_documento_usuario=cleaned.get('numero_documento_usuario'),
+                    correo_electronico_usuario=temp_email,
+                    direccion_usuario=cleaned.get('direccion_usuario'),
+                    telefono_usuario=cleaned.get('telefono_usuario'),
+                    rol_usuario='cliente'
+                )
+                # Establecer contraseña correctamente
+                user.set_password(cleaned.get('password1'))
+                user.save()
+
+                # Crear código y enviar al correo real
+                import random
+                codigo = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+                CodigoRecuperacion.objects.create(email=real_email, codigo=codigo)
+                try:
+                    _enviar_email_codigo_formateado(real_email, codigo, user.nombre_usuario)
+                except Exception as e:
+                    print('Error enviando código formateado (registro):', e)
+
+                # Guardar en sesión la pendiente de registro
+                request.session['pending_registration'] = {
+                    'new_email': real_email,
+                    'user_id': user.pk
+                }
+                request.session['auto_validation_email'] = real_email
+
+                # Si es AJAX, responder indicando que la verificación debe completarse
                 if is_ajax:
-                    # Envío automático del código para peticiones AJAX también
-                    try:
-                        import random
-                        codigo = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-                        email_destino = user.correo_electronico_usuario
-                        CodigoRecuperacion.objects.create(email=email_destino, codigo=codigo)
-                        # Enviar email con formato profesional (mismo template que olvido_contraseña)
-                        try:
-                            _enviar_email_codigo_formateado(email_destino, codigo, user.nombre_usuario)
-                        except Exception as e:
-                            print('Error enviando código formateado (AJAX):', e)
+                    return JsonResponse({'success': True, 'message': 'Registro iniciado. Verifica tu correo para completar.'})
 
-                        request.session['auto_validation_email'] = email_destino
-                    except Exception as e:
-                        print('Error enviando código automático (AJAX):', e)
+                messages.success(request, 'Registro iniciado. Verifica tu correo para completar el registro.')
+                return redirect('validacion_correo')
 
-                    # Responder con JSON para AJAX
-                    return JsonResponse({
-                        'success': True,
-                        'message': 'Usuario registrado exitosamente. Ya puedes iniciar sesión.'
-                    })
-                else:
-                    # Envío automático del código de verificación al correo recién registrado
-                    try:
-                        import random
-                        codigo = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-                        email_destino = user.correo_electronico_usuario
-                        # Guardar código en la base de datos
-                        CodigoRecuperacion.objects.create(
-                            email=email_destino,
-                            codigo=codigo
-                        )
-
-                        # Enviar email con formato profesional (mismo template que olvido_contraseña)
-                        try:
-                            _enviar_email_codigo_formateado(email_destino, codigo, user.nombre_usuario)
-                        except Exception as e:
-                            print('Error enviando código formateado:', e)
-
-                        # Guardar el email en sesión para que la página de validación lo use y arranque el temporizador
-                        request.session['auto_validation_email'] = email_destino
-
-                    except Exception as e:
-                        # Si hay algún error en el envío, simplemente continuar y redirigir (no bloquear registro)
-                        print('Error enviando código automático:', e)
-
-                    messages.success(request, 'Usuario registrado exitosamente. Por favor valida tu correo.')
-                    # Redirigir a la pantalla de validación
-                    return redirect('validacion_correo')
-                
             except Exception as e:
                 if is_ajax:
-                    return JsonResponse({
-                        'success': False,
-                        'message': f'Error al registrar usuario: {str(e)}'
-                    })
+                    return JsonResponse({'success': False, 'message': f'Error al registrar usuario: {str(e)}'})
                 else:
                     messages.error(request, f'Error al registrar usuario: {str(e)}')
         else:
@@ -397,10 +453,7 @@ def registro_view(request):
                     field_label = form.fields[field].label or field
                     for error in errors:
                         error_messages.append(f'{field_label}: {error}')
-                return JsonResponse({
-                    'success': False,
-                    'message': '<br>'.join(error_messages)
-                })
+                return JsonResponse({'success': False, 'message': '<br>'.join(error_messages)})
             else:
                 for field, errors in form.errors.items():
                     field_label = form.fields[field].label or field
@@ -410,6 +463,37 @@ def registro_view(request):
         form = RegistroUsuarioForm()
     
     return render(request, 'core/registro.html', {'form': form})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def cancelar_pending_registration(request):
+    """Cancela un registro pendiente (el usuario temporal creado durante el registro) y limpia la sesión."""
+    try:
+        pending = request.session.get('pending_registration')
+        if not pending:
+            return JsonResponse({'status': 'ok', 'message': 'No hay registro pendiente'})
+
+        user_id = pending.get('user_id')
+        try:
+            usuario = Usuario.objects.get(pk=user_id)
+            # Sólo eliminar si parece ser un usuario temporal creado por el flujo (prevenir borrados accidentales)
+            if str(usuario.correo_electronico_usuario).startswith('pending-') or str(usuario.username).startswith('pending_'):
+                usuario.delete()
+        except Usuario.DoesNotExist:
+            pass
+
+        # Limpiar sesión (pending_registration y pending_email_change si existen)
+        for key in ('pending_registration', 'pending_email_change', 'auto_validation_email'):
+            try:
+                del request.session[key]
+            except Exception:
+                pass
+
+        return JsonResponse({'status': 'ok', 'message': 'Registro pendiente cancelado'})
+    except Exception as e:
+        print(f"Error cancelando registro pendiente: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Error al cancelar el registro pendiente'}, status=500)
 
 @role_required(['admin'])
 def visualizacion_admin_view(request):
@@ -530,6 +614,90 @@ def verificar_codigo_recuperacion(request):
                 }, status=400)
             
             # Código válido
+            # Revisar si hay un registro pendiente en sesión (nuevo usuario que aún no tiene el email real)
+            pending_reg = request.session.get('pending_registration')
+            if pending_reg and pending_reg.get('new_email') == email:
+                try:
+                    user_id = pending_reg.get('user_id')
+                    usuario = Usuario.objects.get(pk=user_id)
+                    # Verificar unicidad por si cambió en el ínterin
+                    if Usuario.objects.filter(correo_electronico_usuario__iexact=email).exclude(pk=usuario.pk).exists():
+                        return JsonResponse({'status': 'error', 'message': 'El correo ya está en uso'}, status=400)
+
+                    usuario.correo_electronico_usuario = email
+                    usuario.username = email
+                    usuario.save()
+
+                    # Marcar código como usado
+                    codigo_obj.usado = True
+                    codigo_obj.save()
+
+                    # Limpiar sesión pendiente
+                    try:
+                        del request.session['pending_registration']
+                    except Exception:
+                        pass
+                    try:
+                        del request.session['auto_validation_email']
+                    except Exception:
+                        pass
+
+                    # No iniciar sesión automáticamente; pedir que inicie sesión con el nuevo correo
+                    return JsonResponse({'status': 'ok', 'message': 'Registro completado. Por favor inicia sesión.', 'registration_complete': True})
+                except Exception as e:
+                    print(f"Error aplicando registro pendiente: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return JsonResponse({'status': 'error', 'message': 'Error al completar el registro'}, status=500)
+
+            # Revisar si hay un cambio de correo pendiente en sesión
+            pending = request.session.get('pending_email_change')
+            if pending and pending.get('new_email') == email:
+                try:
+                    user_id = pending.get('user_id')
+                    usuario = Usuario.objects.get(pk=user_id)
+                    # Verificar nuevamente unicidad
+                    if Usuario.objects.filter(correo_electronico_usuario__iexact=email).exclude(pk=usuario.pk).exists():
+                        return JsonResponse({'status': 'error', 'message': 'El correo ya está en uso'}, status=400)
+
+                    usuario.correo_electronico_usuario = email
+                    usuario.username = email
+                    usuario.save()
+
+                    # Marcar código como usado
+                    codigo_obj.usado = True
+                    codigo_obj.save()
+
+                    # Limpiar sesión pendiente
+                    try:
+                        del request.session['pending_email_change']
+                    except Exception:
+                        pass
+                    try:
+                        del request.session['auto_validation_email']
+                    except Exception:
+                        pass
+
+                    # Cerrar sesión actual para forzar re-login
+                    try:
+                        logout(request)
+                    except Exception:
+                        pass
+
+                    return JsonResponse({'status': 'ok', 'message': 'Correo actualizado correctamente', 'email_changed': True})
+                except Exception as e:
+                    print(f"Error aplicando cambio de correo: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return JsonResponse({'status': 'error', 'message': 'Error al actualizar el correo'}, status=500)
+
+            # Si no hay cambio de correo pendiente, sólo marcar el código como verificado
+            try:
+                codigo_obj.usado = True
+                codigo_obj.save()
+            except Exception:
+                pass
+
             return JsonResponse({
                 'status': 'ok',
                 'message': 'Código verificado correctamente'
