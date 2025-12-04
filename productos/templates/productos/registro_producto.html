@@ -8,6 +8,7 @@
     <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
 
     <link rel="stylesheet" href="{% static 'productos/css/registro_producto.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/logout_alert.css' %}">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -23,7 +24,7 @@
             <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
             <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
             <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
-            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}" onclick="showLogoutConfirmation(event, '{% url 'login' %}'); return false;"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
         </div>
     </div>
 
@@ -132,6 +133,7 @@
         });
     </script>
     {% endif %}
+    <script src="{% static 'core/js/logout_confirmation.js' %}"></script>
     <script src="{% static 'productos/js/registro_producto.js' %}"></script>
 </body>
 </html>
