@@ -91,6 +91,18 @@ def editar_inventario_view(request, pk):
 
     producto = inventario.producto
 
+    # Guardar estado previo del producto para comparar y consolidar historial
+    prev_product = {
+        'nombre_producto': producto.nombre_producto,
+        'categoria_producto': producto.categoria_producto,
+        'modelo_producto': producto.modelo_producto,
+        'color_producto': producto.color_producto,
+        'capacidad_producto': producto.capacidad_producto,
+        'descripcion_producto': producto.descripcion_producto,
+        'precio_producto': str(producto.precio_producto) if producto.precio_producto is not None else None,
+        'codigo_barras_producto': producto.codigo_barras_producto,
+    }
+
     # Actualizar campos de producto si vienen en POST (mantener valores por defecto si faltan)
     producto.categoria_producto = request.POST.get('categoria_producto', producto.categoria_producto)
     producto.nombre_producto = request.POST.get('nombre_producto', producto.nombre_producto)
@@ -106,6 +118,13 @@ def editar_inventario_view(request, pk):
         except (ValueError, TypeError):
             # Ignorar si la conversión falla
             pass
+
+    # Marcar para suprimir la creación de historial desde la señal
+    # porque nosotros vamos a crear un registro consolidado más abajo.
+    try:
+        setattr(producto, '_suppress_historial', True)
+    except Exception:
+        pass
 
     producto.save()
 
@@ -127,21 +146,82 @@ def editar_inventario_view(request, pk):
             pass
 
     # Actualizar campos de inventario (intentar convertir a int si procede)
-    stock_actual = request.POST.get('stock_actual_inventario')
-    if stock_actual is not None and stock_actual != '':
+    stock_actual_post = request.POST.get('stock_actual_inventario')
+    stock_minimo_post = request.POST.get('stock_minimo_inventario')
+
+    # Guardar valores previos para historial
+    prev_stock_actual = inventario.stock_actual_inventario
+    prev_stock_minimo = inventario.stock_minimo_inventario
+
+    if stock_actual_post is not None and stock_actual_post != '':
         try:
-            inventario.stock_actual_inventario = int(stock_actual)
+            inventario.stock_actual_inventario = int(stock_actual_post)
         except (ValueError, TypeError):
             inventario.stock_actual_inventario = inventario.stock_actual_inventario
 
-    stock_minimo = request.POST.get('stock_minimo_inventario')
-    if stock_minimo is not None and stock_minimo != '':
+    if stock_minimo_post is not None and stock_minimo_post != '':
         try:
-            inventario.stock_minimo_inventario = int(stock_minimo)
+            inventario.stock_minimo_inventario = int(stock_minimo_post)
         except (ValueError, TypeError):
             inventario.stock_minimo_inventario = inventario.stock_minimo_inventario
 
     inventario.save()
+
+    # Consolidar cambios de producto e inventario en un único HistorialInventario
+    try:
+        cambios = {}
+        # stock
+        if prev_stock_actual != inventario.stock_actual_inventario:
+            cambios['stock_actual_inventario'] = [str(prev_stock_actual), str(inventario.stock_actual_inventario)]
+        if prev_stock_minimo != inventario.stock_minimo_inventario:
+            cambios['stock_minimo_inventario'] = [str(prev_stock_minimo), str(inventario.stock_minimo_inventario)]
+
+        # producto: comparar con prev_product
+        try:
+            from decimal import Decimal, InvalidOperation
+            campos_producto = ['nombre_producto', 'categoria_producto', 'modelo_producto', 'color_producto',
+                               'capacidad_producto', 'descripcion_producto', 'precio_producto', 'codigo_barras_producto']
+            for campo in campos_producto:
+                antes = prev_product.get(campo)
+                despues = getattr(producto, campo)
+
+                if antes is None and despues is None:
+                    continue
+
+                if campo == 'precio_producto':
+                    try:
+                        antes_dec = Decimal(str(antes)) if antes is not None else None
+                    except (InvalidOperation, TypeError):
+                        antes_dec = None
+                    try:
+                        despues_dec = Decimal(str(despues)) if despues is not None else None
+                    except (InvalidOperation, TypeError):
+                        despues_dec = None
+
+                    if antes_dec != despues_dec:
+                        cambios[campo] = [format(antes_dec, 'f') if antes_dec is not None else None,
+                                          format(despues_dec, 'f') if despues_dec is not None else None]
+                    continue
+
+                antes_s = str(antes) if antes is not None else None
+                despues_s = str(despues) if despues is not None else None
+                if antes_s != despues_s:
+                    cambios[campo] = [antes_s, despues_s]
+        except Exception:
+            # No bloquear el flujo por errores en la comparación
+            pass
+
+        if cambios:
+            import json
+            HistorialInventario.objects.create(
+                producto_id=producto.pk,
+                nombre_producto=producto.nombre_producto or '',
+                accion='edited',
+                detalles=json.dumps(cambios, ensure_ascii=False),
+            )
+    except Exception:
+        pass
+
     return redirect('inventario')
 
 # ---------------------------------------------------------------------
@@ -275,10 +355,32 @@ def historial_inventario_view(request):
         # En caso de error de parseo, dejamos los QuerySets vacíos
         ventas = DetalleFactura.objects.none()
 
+    # Convertir los detalles JSON de los registros editados a estructuras Python
+    import json
+    editados_lista = []
+    try:
+        for r in editados:
+            modificaciones = {}
+            if r.detalles:
+                try:
+                    modificaciones = json.loads(r.detalles)
+                except Exception:
+                    modificaciones = {}
+
+            editados_lista.append({
+                'producto_id': r.producto_id,
+                'nombre_producto': r.nombre_producto,
+                'timestamp': r.timestamp,
+                'modificaciones': modificaciones,
+                'historial_pk': r.pk,
+            })
+    except Exception:
+        editados_lista = []
+
     context = {
         'añadidos': añadidos,
         'eliminados': eliminados,
-        'editados': editados,
+        'editados': editados_lista,
         'ventas': ventas,
         'fecha_inicial': fecha_inicial or '',
         'fecha_final': fecha_final or '',

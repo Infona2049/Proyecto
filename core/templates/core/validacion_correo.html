@@ -90,17 +90,22 @@
           },
           body: JSON.stringify({})
         }).catch(e => console.warn('No se pudo cancelar registro pendiente:', e)).finally(() => {
-          // Redirigir según si está autenticado y su rol
-          {% if is_authenticated %}
-            {% if user_role == 'admin' %}
-              window.location.href = "{% url 'visualizacion_admin' %}";
-            {% elif user_role == 'vendedor' %}
-              window.location.href = "{% url 'visualizacion_vendedor' %}";
-            {% else %}
-              window.location.href = "{% url 'visualizacion_cliente' %}";
-            {% endif %}
-          {% else %}
+          // Si estamos en el flujo de registro, siempre ir a login después de cancelar
+          {% if is_registration %}
             window.location.href = "{% url 'login' %}";
+          {% else %}
+            // Redirigir según si está autenticado y su rol
+            {% if is_authenticated %}
+              {% if user_role == 'admin' %}
+                window.location.href = "{% url 'visualizacion_admin' %}";
+              {% elif user_role == 'vendedor' %}
+                window.location.href = "{% url 'visualizacion_vendedor' %}";
+              {% else %}
+                window.location.href = "{% url 'visualizacion_cliente' %}";
+              {% endif %}
+            {% else %}
+              window.location.href = "{% url 'login' %}";
+            {% endif %}
           {% endif %}
         });
       } catch (e) {
@@ -129,7 +134,7 @@
           // Indicar si venimos del flujo de cambio de correo o de registro
           {% if is_email_change %}
             is_email_change_flow = true;
-          {% else %}
+          {% elif is_registration %}
             is_registration_flow = true;
           {% endif %}
           mostrarPantalla('codigo');
@@ -138,7 +143,7 @@
           console.error('No se pudo iniciar temporizador automático:', e);
           {% if is_email_change %}
             is_email_change_flow = true;
-          {% else %}
+          {% elif is_registration %}
             is_registration_flow = true;
           {% endif %}
           mostrarPantalla('codigo');

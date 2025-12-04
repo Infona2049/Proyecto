@@ -89,7 +89,30 @@
           <ul class="historial-card-list">
             {% if editados %}
               {% for r in editados %}
-                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+                <li class="historial-edicion-item">
+                  <div class="historial-edicion-header">
+                    <strong>Producto ({{ r.producto_id }})</strong>
+                    {% if r.nombre_producto %}&nbsp;{{ r.nombre_producto }}{% endif %}
+                    &nbsp;-&nbsp;<span class="historial-fecha">{{ r.timestamp|localtime|date:"H:i" }}</span>
+                  </div>
+
+                  {% if r.modificaciones %}
+                    <ul class="modificaciones-list">
+                      {% for field, vals in r.modificaciones.items %}
+                        <li>
+                          {# Mostrar etiquetas más amigables para campos de stock #}
+                          {% if field == 'stock_actual_inventario' %}
+                            stock &nbsp;"<span class="valor-anterior">{{ vals.0|default:"" }}</span>" &nbsp;-&nbsp; "<span class="valor-nuevo">{{ vals.1|default:"" }}</span>"
+                          {% elif field == 'stock_minimo_inventario' %}
+                            stock_minimo &nbsp;"<span class="valor-anterior">{{ vals.0|default:"" }}</span>" &nbsp;-&nbsp; "<span class="valor-nuevo">{{ vals.1|default:"" }}</span>"
+                          {% else %}
+                            {{ field }} &nbsp;"<span class="valor-anterior">{{ vals.0|default:"" }}</span>" &nbsp;-&nbsp; "<span class="valor-nuevo">{{ vals.1|default:"" }}</span>"
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </li>
               {% endfor %}
             {% else %}
               <li>No se han editado productos en este rango.</li>

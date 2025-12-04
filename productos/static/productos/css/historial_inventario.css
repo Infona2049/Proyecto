@@ -102,3 +102,15 @@
   padding: 24px;
   color: #666;
 }
+
+/* --- Modificaciones visuales (historial) --- */
+.modificaciones-list { margin: 8px 0 0 18px; padding: 0; list-style: none; }
+.modificaciones-list li { margin: 6px 0; color: #1f2937; font-size: 14px; }
+.historial-edicion-header { margin-bottom: 6px; color:#003f87; font-weight:600; }
+.historial-fecha { color: #6b7280; font-size: 13px; }
+.valor-anterior { color: #6b7280; font-style:normal; }
+.valor-nuevo { color: #065f46; font-weight:700; }
+
+@media (max-width: 600px) {
+  .modificaciones-list li { font-size: 13px; }
+}

@@ -369,6 +369,8 @@ def validacion_correo_view(request):
     auto_email = request.session.pop('auto_validation_email', None)
     pending = request.session.get('pending_email_change')
     is_email_change = bool(pending)
+    # Indicar si hay un registro pendiente (flujo de registro)
+    is_registration = bool(request.session.get('pending_registration'))
     user_role = ''
     is_auth = False
     if request.user and request.user.is_authenticated:
@@ -377,6 +379,7 @@ def validacion_correo_view(request):
     return render(request, 'core/validacion_correo.html', {
         'auto_email': auto_email,
         'is_email_change': is_email_change,
+        'is_registration': is_registration,
         'user_role': user_role,
         'is_authenticated': is_auth
     })
@@ -691,13 +694,8 @@ def verificar_codigo_recuperacion(request):
                     traceback.print_exc()
                     return JsonResponse({'status': 'error', 'message': 'Error al actualizar el correo'}, status=500)
 
-            # Si no hay cambio de correo pendiente, sólo marcar el código como verificado
-            try:
-                codigo_obj.usado = True
-                codigo_obj.save()
-            except Exception:
-                pass
-
+            # Si no hay cambio de correo pendiente ni registro pendiente, no marcar el código como usado
+            # Dejar que el endpoint `restablecer_contrasena` sea el responsable de marcar el código como usado
             return JsonResponse({
                 'status': 'ok',
                 'message': 'Código verificado correctamente'
