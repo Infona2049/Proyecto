@@ -60,8 +60,29 @@
     <div id="reset" class="hidden">
       <h2>Restablecer contraseña</h2>
       <p class="small">Escribe una nueva contraseña y confírmala.</p>
-      <input id="newpass" type="password" placeholder="Nueva contraseña"> <!-- Nueva contraseña -->
-      <input id="confpass" type="password" placeholder="Confirmar contraseña"> <!-- Confirmación -->
+      
+      <!-- Campo de nueva contraseña con ícono de ojo -->
+      <div class="password-container">
+        <input id="newpass" type="password" placeholder="Nueva contraseña">
+        <span class="toggle-password" onclick="togglePasswordVisibility('newpass', this)">
+          <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div>
+      
+      <!-- Campo de confirmar contraseña con ícono de ojo -->
+      <div class="password-container">
+        <input id="confpass" type="password" placeholder="Confirmar contraseña">
+        <span class="toggle-password" onclick="togglePasswordVisibility('confpass', this)">
+          <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div>
+      
       <div id="reset-error" class="message-error hidden"></div> <!-- Mensaje de error -->
       <button onclick="guardarNueva(this)">Guardar nueva contraseña</button> <!-- Botón para guardar -->
       <button class="secondary" onclick="mostrarPantalla('codigo')">Volver</button> <!-- Volver a la pantalla anterior -->

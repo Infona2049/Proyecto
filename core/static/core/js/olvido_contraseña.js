@@ -6,6 +6,20 @@ let intervaloReenvio = null;
 // Indica si llegamos desde el flujo de registro (para mostrar alerta de exito y redirigir)
 let is_registration_flow = false;
 
+// Función para mostrar/ocultar contraseñas
+function togglePasswordVisibility(inputId, toggleIcon) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    toggleIcon.classList.add('active');
+  } else {
+    input.type = 'password';
+    toggleIcon.classList.remove('active');
+  }
+}
+
 async function reenviarCodigo() {
   const linkReenviar = document.getElementById('reenviar-codigo');
   if (!linkReenviar || linkReenviar.classList.contains('disabled')) return;
