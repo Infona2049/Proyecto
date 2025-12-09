@@ -129,10 +129,10 @@ python manage.py runserver 8000
 - **Vendedor:** Gestión de productos y ventas
 - **Cliente:** Visualización de productos y facturas
 
-##  Estructura del Proyecto
 
 
-##  Estructura del Proyecto
+
+##  Arquitectura de Proyecto
 
 ```
 Proyecto/
