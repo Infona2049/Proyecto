@@ -244,4 +244,4 @@ Si tienes problemas con la instalación o ejecución, contacta al equipo de desa
 
 ---
 **Desarrollado por:** Equipo de Desarrollo EcoFact  
-**Última actualización:**Diciembre
+**Última actualización:  **Diciembre
