@@ -131,21 +131,85 @@ python manage.py runserver 8000
 
 ##  Estructura del Proyecto
 
+
+##  Estructura del Proyecto
+
 ```
-front-ecofact/
-├── core/                   # App principal
-│   ├── models.py          # Modelos de usuario y facturación
-│   ├── views.py           # Vistas de login, registro, dashboards
-│   ├── forms.py           # Formularios de registro
-│   ├── templates/         # Templates HTML
-│   └── static/            # CSS y JS
-├── productos/             # App de productos
-├── static/                # Archivos estáticos globales
-├── EcoFactProject/        # Configuración del proyecto
-├── manage.py
-├── requirements.txt       # Dependencias
-└── README.md             # Este archivo
+Proyecto/
+├── core/                           # Módulo de autenticación y usuarios
+│   ├── models.py                  # Modelos: Usuario, CodigoRecuperacion, Empresa
+│   ├── views.py                   # Vistas: login, registro, perfil, recuperación
+│   ├── forms.py                   # Formularios: RegistroUsuarioForm, PerfilForm
+│   ├── urls.py                    # Rutas de core
+│   ├── middleware.py              # Middleware personalizado
+│   ├── static/
+│   │   └── core/
+│   │       ├── css/               # Estilos CSS
+│   │       └── js/                # Scripts JavaScript
+│   └── templates/
+│       └── core/
+│           ├── login.html
+│           ├── registro.html
+│           ├── olvido_contraseña.html
+│           ├── validacion_correo.html
+│           ├── actualizar_perfil.html
+│           └── emails/            # Plantillas de email
+│               ├── recuperacion_contrasena.html
+│               └── validacion_correo.html
+│
+├── productos/                      # Módulo de gestión de productos
+│   ├── models.py                  # Modelos: Producto, Inventario, HistorialInventario
+│   ├── views.py                   # Vistas CRUD de productos e inventario
+│   ├── forms.py                   # Formularios de productos
+│   ├── signals.py                 # Señales para historial automático
+│   ├── urls.py                    # Rutas de productos
+│   ├── static/
+│   │   └── productos/
+│   │       ├── css/               # Estilos
+│   │       └── js/                # Scripts
+│   └── templates/
+│       └── productos/
+│           ├── inventario.html
+│           ├── registro_producto.html
+│           └── historial_inventario.html
+│
+├── facturas/                       # Módulo de gestión de facturas
+│   ├── models.py                  # Modelos: Factura, DetalleFactura, HistorialFactura
+│   ├── views.py                   # Vistas CRUD de facturas
+│   ├── urls.py                    # Rutas de facturas
+│   ├── services.py                # Lógica de negocio de facturas
+│   ├── static/
+│   │   └── facturas/
+│   │       ├── css/               # Estilos
+│   │       ├── js/                # Scripts
+│   │       └── img/               # Imágenes
+│   └── templates/
+│       └── facturas/
+│           ├── crear_factura.html
+│           ├── historial_factura.html
+│           ├── factura_print.html
+│           └── factura_exitosa.html
+│
+├── EcoFactProject/                # Configuración de Django
+│   ├── settings.py                # Configuración principal
+│   ├── urls.py                    # Rutas globales
+│   ├── wsgi.py                    # WSGI para producción
+│   └── asgi.py                    # ASGI para Websockets
+│
+├── static/                        # Archivos estáticos globales
+│   └── img/                       # Imágenes compartidas (logos, iconos)
+│
+├── media/                         # Archivos subidos por usuarios
+│   └── productos/                 # Imágenes de productos
+│
+├── manage.py                      # Script de gestión de Django
+├── requirements.txt               # Dependencias del proyecto
+├── db.sqlite3                     # Base de datos (desarrollo)
+└── README.md                      # Información del proyecto
 ```
+
+
+
 
 ##  Solución de Problemas
 
