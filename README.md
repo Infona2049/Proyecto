@@ -40,7 +40,7 @@ pip install -r requirements.txt
 copy .env.example .env
 ```
 
-**✅ CONFIGURACIÓN ACTUAL: Base de datos Neon (La cual se encuentra en la nube)**
+** CONFIGURACIÓN ACTUAL: Base de datos Neon (La cual se encuentra en la nube)**
 El proyecto  está configurado para usar Neon. El archivo `.env.example` 
 contiene las credenciales correctas de la base de datos compartida.
 
@@ -65,13 +65,13 @@ python manage.py runserver 8000
 - **Panel de administración:** http://localhost:8000/admin/
 
 
-### ✅ **Configuración Actual: Base de Datos en la Nube (Neon)**
+###  **Configuración Actual: Base de Datos en la Nube (Neon)**
 
 **¡El proyecto ya está configurado para trabajo en equipo!**
 
-- 🌐 **Base de datos compartida:** Todos acceden a la misma BD en Neon
-- 🔄 **Datos sincronizados:** Cambios en tiempo real para todo el equipo  
-- 🚀 **Sin configuración adicional:** Solo hacer `git pull` y usar
+-  **Base de datos compartida:** Todos acceden a la misma BD en Neon
+-  **Datos sincronizados:** Cambios en tiempo real para todo el equipo  
+-  **Sin configuración adicional:** Solo hacer `git pull` y usar
 
 ### 🔧 **Configuración para nuevos miembros:**
 
@@ -94,7 +94,7 @@ copy .env.example .env
 python manage.py runserver 8000
 ```
 
-### 👥 **Usuarios disponibles pre creados:**
+###  **Usuarios disponibles pre creados:**
 - **Admin:** admin@ecofact.com / admin123
 - **Vendedor:** vendedor@ecofact.com / vendedor123  
 - **Cliente:** cliente@ecofact.com / cliente123
@@ -124,12 +124,12 @@ python manage.py runserver 8000
 
 
 
-### 🔄 Sistema de Roles
+###  Sistema de Roles
 - **Admin:** Acceso completo al sistema
 - **Vendedor:** Gestión de productos y ventas
 - **Cliente:** Visualización de productos y facturas
 
-## 🛠️ Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 front-ecofact/
@@ -147,7 +147,7 @@ front-ecofact/
 └── README.md             # Este archivo
 ```
 
-## 🐛 Solución de Problemas
+##  Solución de Problemas
 
 ### Error de puerto ocupado
 Si el puerto 8000 está ocupado, usa otro puerto:
@@ -173,10 +173,10 @@ Si las imágenes no cargan, verifica que el servidor esté ejecutándose y que l
 - **Registro:** Solo permite crear usuarios con rol "Cliente"
 
 
-## 📞 Contacto
+##  Contacto
 
 Si tienes problemas con la instalación o ejecución, contacta al equipo de desarrollo.
 
 ---
 **Desarrollado por:** Equipo de Desarrollo EcoFact  
-**Última actualización:** Septiembre Noviembre
+**Última actualización:**Diciembre
