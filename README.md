@@ -11,7 +11,8 @@ Sistema de facturación con autenticación por roles desarrollado en Django.
 
 ### Requisitos previos
 - Python 3.11 o superior
-- Git
+- Dependencias
+- Django 5.2.4
 
 ### 1. Clonar el repositorio
 ```bash
@@ -100,11 +101,11 @@ python manage.py runserver 8000
 - **Cliente:** cliente@ecofact.com / cliente123
 
 ###  **Ventajas de la configuración actual:**
-- ✅ **Base de datos compartida en la nube**
-- ✅ **Sin conflictos entre miembros del equipo**
-- ✅ **Acceso desde cualquier ubicación**
-- ✅ **Backup automático en Neon**
-- ✅ **512MB Espacio **
+-  **Base de datos compartida en la nube**
+-  **Sin conflictos entre miembros del equipo**
+-  **Acceso desde cualquier ubicación**
+-  **Backup automático en Neon**
+- 
 
 ##  Usuarios de Prueba
 
