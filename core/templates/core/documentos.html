@@ -7,6 +7,7 @@
     <title>Documentos</title>
     <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'core/css/documentos.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/logout_alert.css' %}">
 </head>
 <body>
     <!-- Barra superior -->
@@ -30,7 +31,7 @@
             <a href="{% url 'documentos' %}"><img src="{% static 'img/documento.png' %}" class="icono"></a>
             <a href="{% url 'actualizar_perfil' %}"><img src="{% static 'img/editar.png' %}" class="icono"></a>
             <a href="{% url 'cambiocontraseña' %}"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
-            <a href="{% url 'login' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+            <a href="{% url 'login' %}" onclick="showLogoutConfirmation(event, '{% url 'login' %}'); return false;"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
         </div>
     </div>
 
@@ -50,12 +51,36 @@
   <!-- Contenedor de documentos -->
   <section class="documentos">
     <h3>Documentos</h3>
+<<<<<<< HEAD
     {% if documentos %}
       {% for doc in documentos %}
         <a href="{{ MEDIA_URL }}{{ doc.url }}" class="doc-item" download="{{ doc.filename }}">{{ doc.titulo }}</a>
       {% endfor %}
     {% else %}
       <p style="text-align: center; color: #666; padding: 20px;">No hay documentos disponibles para tu rol.</p>
+=======
+    
+    <!-- Documentos para Administrador -->
+    {% if user.rol_usuario == 'admin' %}
+      <a href="{% static 'media/documents/Manual Usuario Administrador.pdf' %}" class="doc-item" download>Manual de Usuario Administrador</a>
+      <a href="{% static 'media/documents/Manual Tecnico.pdf' %}" class="doc-item" download>Manual Técnico</a>
+      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
+    {% endif %}
+    
+    <!-- Documentos para Vendedor -->
+    {% if user.rol_usuario == 'vendedor' %}
+      <a href="{% static 'media/documents/Manual Usuario Vendedor.pdf' %}" class="doc-item" download>Manual de Usuario Vendedor</a>
+      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
+    {% endif %}
+    
+    <!-- Documentos para Cliente -->
+    {% if user.rol_usuario == 'cliente' %}
+      <a href="{% static 'media/documents/Manual Usuario Cliente.pdf' %}" class="doc-item" download>Manual de Usuario Cliente</a>
+      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
+>>>>>>> 66f553e6a70989fdef22b067b4bff2793715cce3
     {% endif %}
   </section>
 
@@ -73,5 +98,7 @@
         </div>
         <div class="footer-bottom">@2025-ECOFACT</div> 
     </footer>
+
+  <script src="{% static 'core/js/logout_confirmation.js' %}"></script>
 </body>
 </html>

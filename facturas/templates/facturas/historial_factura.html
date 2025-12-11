@@ -7,6 +7,7 @@
   <title>Historial factura</title>
   <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
   <link rel="stylesheet" href="{% static 'facturas/css/historial_factura.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/logout_alert.css' %}">
 </head> 
 <body>
   <!-- Barra superior -->
@@ -21,7 +22,7 @@
       <a href="#"><img src="{% static 'img/documento.png' %}" class="icono"></a>
       <a href="#"><img src="{% static 'img/editar.png' %}" class="icono"></a>
       <a href="#"><img src="{% static 'img/contrasena.png' %}" class="icono"></a>
-      <a href="{% url 'logout' %}"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
+      <a href="{% url 'logout' %}" onclick="showLogoutConfirmation(event, '{% url 'logout' %}'); return false;"><img src="{% static 'img/cerrar-sesion.png' %}" class="icono"></a>
     </div>
   </div>
 
@@ -128,6 +129,7 @@
     <div class="footer-bottom">@2025-ECOFACT</div> 
   </footer>
 
+  <script src="{% static 'core/js/logout_confirmation.js' %}"></script>
   <script src="{% static 'facturas/js/historial_factura.js' %}"></script>
 </body>
 </html>

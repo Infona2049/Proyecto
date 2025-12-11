@@ -193,8 +193,8 @@ class RegistroUsuarioForm(UserCreationForm):
             raise forms.ValidationError('La contraseña debe contener al menos un número.')
         
         # Validar que contenga al menos un carácter especial
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/;`~]', password):
-            raise forms.ValidationError('La contraseña debe contener al menos un carácter especial (!@#$%^&*(),.?":{}|<>_-+=[]\\\/;`~).')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\\/;`~]', password):
+            raise forms.ValidationError(r'La contraseña debe contener al menos un carácter especial (!@#$%^&*(),.?":{}|<>_-+=[]\/;`~).')
         
         return password
 
