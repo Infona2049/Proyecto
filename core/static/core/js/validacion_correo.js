@@ -44,6 +44,7 @@ async function enviarCodigo(btn = null){
   try {
     const response = await fetch('/api/enviar-codigo-recuperacion/', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')
@@ -81,6 +82,7 @@ async function verificarCodigo(){
   try{
     const response = await fetch('/api/verificar-codigo-recuperacion/', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')

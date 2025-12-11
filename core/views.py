@@ -90,18 +90,55 @@ def _enviar_email_codigo_formateado(email, codigo, nombre_usuario=None):
     return _send_email_using_template('core/emails/validacion_correo.html', context, subject, [email])
 
 def role_required(allowed_roles):
-    """Decorador para restringir acceso por roles"""
+    """
+    Decorador personalizado para restringir el acceso a vistas según el rol del usuario.
+    
+    Este decorador verifica que:
+    1. El usuario esté autenticado (tenga sesión activa)
+    2. El rol del usuario esté dentro de la lista de roles permitidos
+    
+    Parámetros:
+    -----------
+    allowed_roles : list
+        Lista de roles permitidos para acceder a la vista.
+        Valores posibles: 'admin', 'vendedor', 'cliente'
+        Ejemplo: ['admin', 'vendedor'] permite acceso solo a admins y vendedores
+    
+    Comportamiento:
+    ---------------
+    - Si el usuario NO está autenticado: redirige al login
+    - Si el usuario está autenticado pero su rol NO está en allowed_roles:
+        * Muestra un mensaje de error
+        * Redirige al dashboard correspondiente según su rol actual:
+            - 'admin' → /admin-dashboard/
+            - 'vendedor' → /vendedor-dashboard/
+            - 'cliente' → /cliente-dashboard/
+            - otro → /login/
+    - Si el usuario tiene el rol permitido: ejecuta la vista normalmente
+    
+    Uso:
+    ----
+    @role_required(['admin'])
+    def vista_solo_admin(request):
+        return render(request, 'admin_page.html')
+    
+    @role_required(['admin', 'vendedor'])
+    def vista_admin_vendedor(request):
+        return render(request, 'shared_page.html')
+    """
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
+            # Verificar si el usuario tiene sesión activa
             if not request.user.is_authenticated:
                 return redirect('login')
             
-            # Redirigir a dashboard correspondiente si no tiene permisos
+            # Verificar si el rol del usuario está en la lista de roles permitidos
             if request.user.rol_usuario not in allowed_roles:
+                # Mostrar mensaje de error indicando falta de permisos
                 messages.error(request, 'No tienes permisos para acceder a esta página')
                 
-                # Redirigir al dashboard correcto según el rol
+                # Redirigir al dashboard correspondiente según el rol del usuario actual
                 if request.user.rol_usuario == 'admin':
                     return redirect('admin_dashboard')
                 elif request.user.rol_usuario == 'vendedor':
@@ -109,8 +146,10 @@ def role_required(allowed_roles):
                 elif request.user.rol_usuario == 'cliente':
                     return redirect('cliente_dashboard')
                 else:
+                    # Si el rol no es reconocido, enviar al login
                     return redirect('login')
             
+            # Si el usuario tiene el rol correcto, ejecutar la vista original
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
@@ -214,8 +253,43 @@ def cliente_dashboard_view(request):
     return render(request, 'core/visualizacion_Cliente.html')
 
 @login_required
+@login_required
 def documentos_view(request):
-    return render(request, 'core/documentos.html')
+    # Obtener el rol del usuario autenticado (el campo se llama rol_usuario)
+    user_role = request.user.rol_usuario if hasattr(request.user, 'rol_usuario') else None
+    
+    # Definir documentos según el rol
+    documentos = []
+    
+    # Documentos comunes (políticas)
+    docs_comunes = [
+        {'titulo': 'Términos y condiciones', 'url': 'documents/Politica de proteccion de datos.pdf', 'filename': 'Terminos_y_Condiciones.pdf'},
+        {'titulo': 'Políticas de privacidad', 'url': 'documents/POLÍTICAS DE PRIVACIDAD.docx.pdf', 'filename': 'Politicas_de_Privacidad.pdf'},
+    ]
+    
+    if user_role == 'admin':
+        # Admin ve todos los manuales
+        documentos = [
+            {'titulo': 'Manual Técnico', 'url': 'documents/Manual Tecnico.pdf', 'filename': 'Manual_Tecnico.pdf'},
+            {'titulo': 'Manual de Administrador', 'url': 'documents/MANUAL ADMINISTRADOR.pdf', 'filename': 'Manual_Administrador.pdf'},
+            {'titulo': 'Manual de Vendedor', 'url': 'documents/MANUAL VENDEDOR .pdf', 'filename': 'Manual_Vendedor.pdf'},
+            {'titulo': 'Manual de Cliente', 'url': 'documents/MANUAL DE USUARIO CLIENTE .pdf', 'filename': 'Manual_Cliente.pdf'},
+        ] + docs_comunes
+    elif user_role == 'vendedor':
+        # Vendedor ve su manual + políticas
+        documentos = [
+            {'titulo': 'Manual de Vendedor', 'url': 'documents/MANUAL VENDEDOR .pdf', 'filename': 'Manual_Vendedor.pdf'},
+        ] + docs_comunes
+    elif user_role == 'cliente':
+        # Cliente ve su manual + políticas
+        documentos = [
+            {'titulo': 'Manual de Cliente', 'url': 'documents/MANUAL DE USUARIO CLIENTE .pdf', 'filename': 'Manual_Cliente.pdf'},
+        ] + docs_comunes
+    else:
+        # Si no tiene rol, mostrar solo políticas
+        documentos = docs_comunes
+    
+    return render(request, 'core/documentos.html', {'documentos': documentos})
 
 @login_required
 def actualizar_perfil_view(request):
@@ -278,25 +352,14 @@ def actualizar_perfil_view(request):
                 cambios.append("correo electronico")
 
             if new_direccion != (original_user.direccion_usuario or ""):
-                user.direccion_usuario = new_direccion
                 cambios.append("direccion")
 
             if new_telefono != (original_user.telefono_usuario or ""):
-                user.telefono_usuario = new_telefono
                 cambios.append("telefono")
 
             # GUARDAR CAMBIOS
             if cambios:
-                # Guardar los cambios no relacionados con el correo (dirección/telefono)
-                try:
-                    user.save()
-                except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-                    messages.error(request, f"Error al guardar los cambios: {str(e)}")
-                    return render(request, "core/actualizar_perfil.html", {"form": form})
-
-                # Si el email fue modificado, iniciar el flujo de verificación en lugar de aplicarlo inmediatamente
+                # Si el email fue modificado, NO aplicar cambios aún: guardar la intención en sesión
                 if email_changed:
                     try:
                         import random
@@ -307,11 +370,12 @@ def actualizar_perfil_view(request):
                             _enviar_email_codigo_formateado(new_email_normalized, codigo, user.nombre_usuario)
                         except Exception as e:
                             print('Error enviando código formateado para cambio de correo:', e)
-
-                        # Guardar en sesión los datos del cambio pendiente
+                        # Guardar en sesión los datos del cambio pendiente (no aplicar nada todavía)
                         request.session['pending_email_change'] = {
                             'new_email': new_email_normalized,
-                            'user_id': user.pk
+                            'user_id': user.pk,
+                            'direccion': new_direccion,
+                            'telefono': new_telefono
                         }
                         request.session['auto_validation_email'] = new_email_normalized
 
@@ -321,8 +385,21 @@ def actualizar_perfil_view(request):
                         print('Error iniciando flujo de validación para cambio de correo:', e)
                         messages.error(request, 'Error al iniciar la verificación del correo. Inténtalo de nuevo.')
                         return render(request, "core/actualizar_perfil.html", {"form": form})
+                # Si no hubo cambio de email, aplicar los cambios (dirección/telefono) de inmediato
+                try:
+                    # aplicar campos si están presentes
+                    if new_direccion != (original_user.direccion_usuario or ""):
+                        user.direccion_usuario = new_direccion
+                    if new_telefono != (original_user.telefono_usuario or ""):
+                        user.telefono_usuario = new_telefono
 
-                # Si no hubo cambio de email, simplemente refrescar sesión y mostrar éxito
+                    user.save()
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+                    messages.error(request, f"Error al guardar los cambios: {str(e)}")
+                    return render(request, "core/actualizar_perfil.html", {"form": form})
+
                 try:
                     if not hasattr(user, 'backend'):
                         user.backend = settings.AUTHENTICATION_BACKENDS[0]
@@ -617,11 +694,16 @@ def verificar_codigo_recuperacion(request):
                 }, status=400)
             
             # Código válido
-            # Revisar si hay un registro pendiente en sesión (nuevo usuario que aún no tiene el email real)
+            # Debug: mostrar info de sesión relacionada para diagnosticar fallos
             pending_reg = request.session.get('pending_registration')
+            pending_email_change = request.session.get('pending_email_change')
+            print(f"DEBUG verificar_codigo - email={email}, codigo={codigo}, codigo_obj_id={getattr(codigo_obj, 'id', None)}, creado_en={getattr(codigo_obj, 'creado_en', None)}, usado={getattr(codigo_obj, 'usado', None)}")
+            print(f"DEBUG verificar_codigo - pending_registration={pending_reg}, pending_email_change={pending_email_change}")
+            # Revisar si hay un registro pendiente en sesión (nuevo usuario que aún no tiene el email real)
             if pending_reg and pending_reg.get('new_email') == email:
                 try:
                     user_id = pending_reg.get('user_id')
+                    print(f"DEBUG verificar_codigo - aplicando pending_registration user_id={user_id}")
                     usuario = Usuario.objects.get(pk=user_id)
                     # Verificar unicidad por si cambió en el ínterin
                     if Usuario.objects.filter(correo_electronico_usuario__iexact=email).exclude(pk=usuario.pk).exists():
@@ -647,6 +729,43 @@ def verificar_codigo_recuperacion(request):
 
                     # No iniciar sesión automáticamente; pedir que inicie sesión con el nuevo correo
                     return JsonResponse({'status': 'ok', 'message': 'Registro completado. Por favor inicia sesión.', 'registration_complete': True})
+                except Usuario.DoesNotExist:
+                    # Intentar fallback: buscar un usuario temporal creado por el flujo de registro
+                    print(f"Warning: pending_registration refería a un usuario inexistente (id={user_id}). Intentando fallback por usuario 'pending_' o correo 'pending-'.")
+                    candidato = None
+                    try:
+                        candidato = Usuario.objects.filter(username__startswith='pending_').order_by('-fecha_creacion_usuario').first()
+                        if not candidato:
+                            candidato = Usuario.objects.filter(correo_electronico_usuario__startswith='pending-').order_by('-fecha_creacion_usuario').first()
+                        if candidato:
+                            print(f"DEBUG verificar_codigo - candidato temporal encontrado pk={candidato.pk}, username={candidato.username}, email={candidato.correo_electronico_usuario}")
+                            usuario = candidato
+                            # continuar con la asignación del correo y guardado (se hace más abajo en el flujo)
+                        else:
+                            # No hay candidato: limpiar sesión y devolver error amigable
+                            try:
+                                del request.session['pending_registration']
+                            except Exception:
+                                pass
+                            try:
+                                del request.session['auto_validation_email']
+                            except Exception:
+                                pass
+                            print(f"Warning: no se encontró usuario temporal para pending_registration (id={user_id}). Sesión limpiada.")
+                            return JsonResponse({'status': 'error', 'message': 'Registro pendiente inválido. Por favor vuelve a registrarte.'}, status=400)
+                    except Exception as e:
+                        print(f"Error buscando candidato temporal para pending_registration: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        try:
+                            del request.session['pending_registration']
+                        except Exception:
+                            pass
+                        try:
+                            del request.session['auto_validation_email']
+                        except Exception:
+                            pass
+                        return JsonResponse({'status': 'error', 'message': 'Registro pendiente inválido. Por favor vuelve a intentarlo.'}, status=400)
                 except Exception as e:
                     print(f"Error aplicando registro pendiente: {e}")
                     import traceback
@@ -663,8 +782,22 @@ def verificar_codigo_recuperacion(request):
                     if Usuario.objects.filter(correo_electronico_usuario__iexact=email).exclude(pk=usuario.pk).exists():
                         return JsonResponse({'status': 'error', 'message': 'El correo ya está en uso'}, status=400)
 
+                    # Aplicar nuevo correo y username
                     usuario.correo_electronico_usuario = email
                     usuario.username = email
+
+                    # Aplicar otros cambios pendientes (dirección, teléfono) si vienen en la sesión
+                    try:
+                        pending_direccion = pending.get('direccion')
+                        pending_telefono = pending.get('telefono')
+                        if pending_direccion is not None and pending_direccion != (usuario.direccion_usuario or ""):
+                            usuario.direccion_usuario = pending_direccion
+                        if pending_telefono is not None and pending_telefono != (usuario.telefono_usuario or ""):
+                            usuario.telefono_usuario = pending_telefono
+                    except Exception:
+                        # Si algo falla leyendo pending, seguir con el cambio de correo al menos
+                        pass
+
                     usuario.save()
 
                     # Marcar código como usado
@@ -688,6 +821,41 @@ def verificar_codigo_recuperacion(request):
                         pass
 
                     return JsonResponse({'status': 'ok', 'message': 'Correo actualizado correctamente', 'email_changed': True})
+                except Usuario.DoesNotExist:
+                    # Intentar fallback para pending_email_change (buscar usuario temporal)
+                    print(f"Warning: pending_email_change refería a un usuario inexistente (id={user_id}). Intentando fallback por usuario temporal.")
+                    candidato = None
+                    try:
+                        candidato = Usuario.objects.filter(username__startswith='pending_').order_by('-fecha_creacion_usuario').first()
+                        if not candidato:
+                            candidato = Usuario.objects.filter(correo_electronico_usuario__startswith='pending-').order_by('-fecha_creacion_usuario').first()
+                        if candidato:
+                            print(f"DEBUG verificar_codigo - candidato temporal para email_change pk={candidato.pk}, username={candidato.username}")
+                            usuario = candidato
+                        else:
+                            try:
+                                del request.session['pending_email_change']
+                            except Exception:
+                                pass
+                            try:
+                                del request.session['auto_validation_email']
+                            except Exception:
+                                pass
+                            print(f"Warning: no se encontró usuario temporal para pending_email_change (id={user_id}). Sesión limpiada.")
+                            return JsonResponse({'status': 'error', 'message': 'Cambio de correo inválido. Intenta de nuevo.'}, status=400)
+                    except Exception as e:
+                        print(f"Error buscando candidato temporal para pending_email_change: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        try:
+                            del request.session['pending_email_change']
+                        except Exception:
+                            pass
+                        try:
+                            del request.session['auto_validation_email']
+                        except Exception:
+                            pass
+                        return JsonResponse({'status': 'error', 'message': 'Cambio de correo inválido. Intenta de nuevo.'}, status=400)
                 except Exception as e:
                     print(f"Error aplicando cambio de correo: {e}")
                     import traceback

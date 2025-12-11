@@ -12,7 +12,15 @@
     <!-- Barra superior -->
     <div class="top-bar">
         <div class="left-side">
-            <a href="{% url 'visualizacion_admin' %}">
+            {% if user.rol_usuario == 'admin' %}
+                <a href="{% url 'visualizacion_admin' %}">
+            {% elif user.rol_usuario == 'vendedor' %}
+                <a href="{% url 'visualizacion_vendedor' %}">
+            {% elif user.rol_usuario == 'cliente' %}
+                <a href="{% url 'visualizacion_cliente' %}">
+            {% else %}
+                <a href="{% url 'login' %}">
+            {% endif %}
                 <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
                 <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo " class="logo2" />
             </a>
@@ -29,17 +37,26 @@
   <!-- Barra de navegación -->
   <header>
     <nav class="menu">
-      <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+      {% if user.rol_usuario == 'admin' %}
+        <a href="{% url 'visualizacion_admin' %}">Inicio</a>
+      {% elif user.rol_usuario == 'vendedor' %}
+        <a href="{% url 'visualizacion_vendedor' %}">Inicio</a>
+      {% elif user.rol_usuario == 'cliente' %}
+        <a href="{% url 'visualizacion_cliente' %}">Inicio</a>
+      {% endif %}
     </nav>
   </header>  
 
   <!-- Contenedor de documentos -->
   <section class="documentos">
     <h3>Documentos</h3>
-    <a href="{% static 'media/documents/Manual Tecnico.pdf' %}" class="doc-item" download>Manual Técnico</a>
-    <a href="{% static 'core/doc/manual_usuario.pdf' %}" class="doc-item" download>Manual de usuario</a>
-    <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Términos y condiciones</a>
-    <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de privacidad</a>
+    {% if documentos %}
+      {% for doc in documentos %}
+        <a href="{{ MEDIA_URL }}{{ doc.url }}" class="doc-item" download="{{ doc.filename }}">{{ doc.titulo }}</a>
+      {% endfor %}
+    {% else %}
+      <p style="text-align: center; color: #666; padding: 20px;">No hay documentos disponibles para tu rol.</p>
+    {% endif %}
   </section>
 
   <!-- Pie de página -->

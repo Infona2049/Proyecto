@@ -79,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',  # Añade objeto request al contexto
                 'django.contrib.auth.context_processors.auth',  # Añade info de usuario autenticado
                 'django.contrib.messages.context_processors.messages',  # Añade mensajes flash
+                'django.template.context_processors.media',  # Añade MEDIA_URL al contexto
             ],
         },
     },

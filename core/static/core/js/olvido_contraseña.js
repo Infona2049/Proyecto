@@ -6,6 +6,9 @@ let intervaloReenvio = null;
 // Indica si llegamos desde el flujo de registro (para mostrar alerta de exito y redirigir)
 let is_registration_flow = false;
 
+// Inicializar ojitos para los campos newpass/confpass (igual que login.js)
+// No password visibility toggles - removed per UX request
+
 async function reenviarCodigo() {
   const linkReenviar = document.getElementById('reenviar-codigo');
   if (!linkReenviar || linkReenviar.classList.contains('disabled')) return;
@@ -46,6 +49,7 @@ async function enviarCodigo(btn = null){
   try {
     const response = await fetch('/api/enviar-codigo-recuperacion/', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')
@@ -73,6 +77,8 @@ async function enviarCodigo(btn = null){
   }
 }
 
+// (No password visibility toggles initialized here)
+
 async function verificarCodigo(btn = null){
   const codigoEl = document.getElementById('codigo-input');
   const codigo = codigoEl ? codigoEl.value.trim() : '';
@@ -94,6 +100,7 @@ async function verificarCodigo(btn = null){
   try {
     const response = await fetch('/api/verificar-codigo-recuperacion/', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')
@@ -170,6 +177,7 @@ async function guardarNueva(btn = null){
   try {
     const response = await fetch('/api/restablecer-contrasena/', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')

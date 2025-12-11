@@ -18,18 +18,19 @@
     <div class="top-bar">
     <link rel="icon" href="{% static 'img/favicon.png.png' %}" type="image/png">
         <div class="left-side">
-            <a href="{% url 'visualizacion_admin' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
-                <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
-            </a>
+          <!-- Logo sin comportamiento de redirección (no clicable) -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="{% static 'img/Logo azul sin fondo.png' %}" alt="EcoFact Logo" class="logo1" />
+            <img src="{% static 'img/logo empresa.png' %}" alt="Empresa logo" class="logo2" />
+          </div>
         </div>
     </div>
 
 <!-- Barra de navegación principal -->
   <header>
     <nav class="menu">
-      <!-- Enlace que lleva al inicio (login) -->
-      <a href="{% url 'login' %}">Inicio</a>  
+      <!-- Enlace que vuelve a la página anterior (no redirige siempre al login) -->
+      <a href="#" onclick="history.back(); return false;">Inicio</a>
     </nav>
   </header>
 
@@ -38,7 +39,7 @@
 
     <!-- PANTALLA 1: Ingreso del correo electrónico -->
     <div id="correo">
-      <h2>Recuperar contraseña</h2> <!-- Título de la sección -->
+      <h2>Cambio de contraseña</h2> <!-- Título de la sección -->
       <p class="small">Ingresa el correo asociado a tu cuenta.</p> <!-- Instrucción -->
       <input id="correo-input" type="email" placeholder="Ingresa tu correo"> <!-- Campo de entrada de correo -->
       <div id="correo-error" class="message-error hidden"></div> <!-- Mensaje de error oculto -->
