@@ -6,10 +6,6 @@ let intervaloReenvio = null;
 // Indica si llegamos desde el flujo de registro (para mostrar alerta de exito y redirigir)
 let is_registration_flow = false;
 
-<<<<<<< HEAD
-// Inicializar ojitos para los campos newpass/confpass (igual que login.js)
-// No password visibility toggles - removed per UX request
-=======
 // Función para mostrar/ocultar contraseñas
 function togglePasswordVisibility(inputId, toggleIcon) {
   const input = document.getElementById(inputId);
@@ -23,7 +19,6 @@ function togglePasswordVisibility(inputId, toggleIcon) {
     toggleIcon.classList.remove('active');
   }
 }
->>>>>>> 66f553e6a70989fdef22b067b4bff2793715cce3
 
 async function reenviarCodigo() {
   const linkReenviar = document.getElementById('reenviar-codigo');
