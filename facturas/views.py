@@ -230,11 +230,13 @@ def crear_factura(request):
                                     f"Venta factura {factura.id}: -{cantidad_vendida} unidades. "
                                     f"Stock anterior: {stock_prev}, nuevo stock: {stock_after}."
                                 )
+                                usuario_correo = request.user.correo_electronico_usuario if request.user.is_authenticated else None
                                 HistorialInventario.objects.create(
                                     producto_id=getattr(inventario.producto, 'id_producto', None),
                                     nombre_producto=getattr(inventario.producto, 'nombre_producto', str(inventario.producto)),
                                     accion='edited',
                                     detalles=detalles,
+                                    usuario_correo=usuario_correo,
                                 )
                             except Exception:
                                 # No queremos que falle la factura si por alguna razón no se puede escribir el historial
@@ -420,24 +422,21 @@ def crear_factura(request):
                     # === QR Y CUFE JUNTOS ===
                     y -= 50
                     
-                    # Generar QR con información detallada de la factura
-                    qr_info = f"Factura No: {factura.id}\n"
-                    qr_info += f"Fecha: {factura.fecha_factura}\n"
-                    qr_info += f"Cliente: {factura.nombre_receptor}\n"
-                    qr_info += f"NIT/CC: {factura.nit_receptor}\n"
-                    qr_info += f"\nProductos:\n"
+                    # Generar QR con URL simple (mejor compatibilidad con iPhone)
+                    # Generar URL absoluta que funciona en desarrollo y producción
+                    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
                     
-                    # Obtener detalles de productos para el QR
-                    detalles_factura = DetalleFactura.objects.filter(factura=factura)
-                    for detalle in detalles_factura:
-                        qr_info += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
+                    # Configurar QR con alta corrección de errores
+                    qr = qrcode.QRCode(
+                        version=1,
+                        error_correction=qrcode.constants.ERROR_CORRECT_H,
+                        box_size=10,
+                        border=4,
+                    )
+                    qr.add_data(qr_url)
+                    qr.make(fit=True)
                     
-                    qr_info += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
-                    qr_info += f"IVA: ${factura.iva_total_factura:,.0f}\n"
-                    qr_info += f"Total: ${factura.total_factura:,.0f}\n"
-                    qr_info += f"\nCUFE: {factura.cufe_factura}"
-                    
-                    qr_img = qrcode.make(qr_info)
+                    qr_img = qr.make_image(fill_color="black", back_color="white")
                     qr_buffer_temp = BytesIO()
                     qr_img.save(qr_buffer_temp, format="PNG")
                     qr_buffer_temp.seek(0)
@@ -665,7 +664,7 @@ def crear_factura(request):
                                 </div>
                                 
                                 <div style="text-align: center;">
-                                    <a href="http://127.0.0.1:8000/facturas/pdf/{factura.id}/" class="download-btn">
+                                    <a href="{request.build_absolute_uri(f'/facturas/pdf/{factura.id}/')}" class="download-btn">
                                         Descargar Factura PDF
                                     </a>
                                 </div>
@@ -690,6 +689,8 @@ def crear_factura(request):
                         from_email = settings.EMAIL_HOST_USER
                         to_email = [factura.correo_cliente]
                         
+                        pdf_url_absoluta = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
+                        
                         text_content = f"""
                         ¡Gracias por su compra!
                         
@@ -700,7 +701,7 @@ def crear_factura(request):
                         
                         CUFE: {factura.cufe_factura}
                         
-                        Puede descargar su factura en: http://127.0.0.1:8000/facturas/pdf/{factura.id}/
+                        Puede descargar su factura en: {pdf_url_absoluta}
                         
                         EcoFact - Sistema de Facturación Electrónica
                         """
@@ -851,22 +852,21 @@ def factura_print(request, pk):
     factura = get_object_or_404(Factura, pk=pk)
     detalles = DetalleFactura.objects.filter(factura=factura)
 
-    # Generar información detallada para el QR
-    qr_data = f"Factura No: {factura.id}\n"
-    qr_data += f"Fecha: {factura.fecha_factura}\n"
-    qr_data += f"Cliente: {factura.nombre_receptor}\n"
-    qr_data += f"NIT/CC: {factura.nit_receptor}\n"
-    qr_data += f"\nProductos:\n"
+    # Generar QR con URL simple (mejor compatibilidad con iPhone)
+    # Generar URL absoluta que funciona en desarrollo y producción
+    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
     
-    for detalle in detalles:
-        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
+    # Configurar QR con alta corrección de errores para mejor lectura
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_url)
+    qr.make(fit=True)
     
-    qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
-    qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
-    qr_data += f"Total: ${factura.total_factura:,.0f}\n"
-    qr_data += f"\nCUFE: {factura.cufe_factura}"
-    
-    qr_img = qrcode.make(qr_data)
+    qr_img = qr.make_image(fill_color="black", back_color="white")
 
     buffer = BytesIO()
     qr_img.save(buffer, format="PNG")
@@ -1012,22 +1012,21 @@ def factura_pdf(request, pk):
     # --- QR Y CUFE JUNTOS ---
     y -= 50
     
-    # Generar QR con información detallada
-    qr_data = f"Factura No: {factura.id}\n"
-    qr_data += f"Fecha: {factura.fecha_factura}\n"
-    qr_data += f"Cliente: {factura.nombre_receptor}\n"
-    qr_data += f"NIT/CC: {factura.nit_receptor}\n"
-    qr_data += f"\nProductos:\n"
+    # Generar QR con URL simple (más fácil de escanear en iPhone)
+    # Generar URL absoluta que funciona en desarrollo y producción
+    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
     
-    for detalle in detalles:
-        qr_data += f"- {detalle.producto.nombre_producto} x{detalle.cantidad} = ${detalle.total:,.0f}\n"
+    # Configurar QR con mejor calidad para lectura en móviles
+    qr = qrcode.QRCode(
+        version=1,  # Tamaño automático
+        error_correction=qrcode.constants.ERROR_CORRECT_H,  # Máxima corrección de errores
+        box_size=10,  # Tamaño de cada caja
+        border=4,  # Borde mínimo
+    )
+    qr.add_data(qr_url)
+    qr.make(fit=True)
     
-    qr_data += f"\nSubtotal: ${factura.sutotal_factura:,.0f}\n"
-    qr_data += f"IVA: ${factura.iva_total_factura:,.0f}\n"
-    qr_data += f"Total: ${factura.total_factura:,.0f}\n"
-    qr_data += f"\nCUFE: {factura.cufe_factura}"
-    
-    qr_img = qrcode.make(qr_data)
+    qr_img = qr.make_image(fill_color="black", back_color="white")
     qr_buffer = BytesIO()
     qr_img.save(qr_buffer, format="PNG")
     qr_buffer.seek(0)

@@ -64,7 +64,10 @@
           <ul class="historial-card-list">
             {% if añadidos %}
               {% for r in añadidos %}
-                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+                <li>
+                  Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}
+                  {% if r.usuario_correo %}<br><small style="color: #666;">Por: {{ r.usuario_correo }}</small>{% endif %}
+                </li>
               {% endfor %}
             {% else %}
               <li>No se han añadido productos en este rango.</li>
@@ -77,7 +80,10 @@
           <ul class="historial-card-list">
             {% if eliminados %}
               {% for r in eliminados %}
-                <li>Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}</li>
+                <li>
+                  Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}
+                  {% if r.usuario_correo %}<br><small style="color: #666;">Por: {{ r.usuario_correo }}</small>{% endif %}
+                </li>
               {% endfor %}
             {% else %}
               <li>No se han eliminado productos en este rango.</li>
@@ -90,13 +96,9 @@
           <ul class="historial-card-list">
             {% if editados %}
               {% for r in editados %}
-                <li class="historial-edicion-item">
-                  <div class="historial-edicion-header">
-                    <strong>Producto ({{ r.producto_id }})</strong>
-                    {% if r.nombre_producto %}&nbsp;{{ r.nombre_producto }}{% endif %}
-                    &nbsp;-&nbsp;<span class="historial-fecha">{{ r.timestamp|localtime|date:"H:i" }}</span>
-                  </div>
-
+                <li>
+                  Producto ({{ r.producto_id }}) {{ r.nombre_producto }} - {{ r.timestamp|localtime|date:"d/m/Y H:i" }}
+                  {% if r.usuario_correo %}<br><small style="color: #666;">Por: {{ r.usuario_correo }}</small>{% endif %}
                   {% if r.modificaciones %}
                     <ul class="modificaciones-list">
                       {% for field, vals in r.modificaciones.items %}
@@ -148,6 +150,10 @@
                     <td>${{ d.precio }}</td>
                   </tr>
                 {% endfor %}
+                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                  <td colspan="4" style="text-align: right; padding-right: 20px;">Total de productos vendidos: {{ total_productos_vendidos }}</td>
+                  <td>${{ suma_precios }}</td>
+                </tr>
               {% else %}
                 <tr>
                   <td colspan="5">No se encontraron ventas en el rango seleccionado.</td>

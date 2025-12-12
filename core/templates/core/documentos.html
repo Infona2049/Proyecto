@@ -51,36 +51,27 @@
   <!-- Contenedor de documentos -->
   <section class="documentos">
     <h3>Documentos</h3>
-<<<<<<< HEAD
-    {% if documentos %}
-      {% for doc in documentos %}
-        <a href="{{ MEDIA_URL }}{{ doc.url }}" class="doc-item" download="{{ doc.filename }}">{{ doc.titulo }}</a>
-      {% endfor %}
-    {% else %}
-      <p style="text-align: center; color: #666; padding: 20px;">No hay documentos disponibles para tu rol.</p>
-=======
     
     <!-- Documentos para Administrador -->
     {% if user.rol_usuario == 'admin' %}
-      <a href="{% static 'media/documents/Manual Usuario Administrador.pdf' %}" class="doc-item" download>Manual de Usuario Administrador</a>
-      <a href="{% static 'media/documents/Manual Tecnico.pdf' %}" class="doc-item" download>Manual Técnico</a>
-      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
-      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
+      <a href="/media/documents/MANUAL ADMINISTRADOR.pdf" class="doc-item" download>Manual de Usuario Administrador</a>
+      <a href="/media/documents/Manual Tecnico.pdf" class="doc-item" download>Manual Técnico</a>
+      <a href="/media/documents/Politica de proteccion de datos.pdf" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="/media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf" class="doc-item" download>Políticas de Privacidad</a>
     {% endif %}
     
     <!-- Documentos para Vendedor -->
     {% if user.rol_usuario == 'vendedor' %}
-      <a href="{% static 'media/documents/Manual Usuario Vendedor.pdf' %}" class="doc-item" download>Manual de Usuario Vendedor</a>
-      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
-      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
+      <a href="/media/documents/MANUAL VENDEDOR .pdf" class="doc-item" download>Manual de Usuario Vendedor</a>
+      <a href="/media/documents/Politica de proteccion de datos.pdf" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="/media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf" class="doc-item" download>Políticas de Privacidad</a>
     {% endif %}
     
     <!-- Documentos para Cliente -->
     {% if user.rol_usuario == 'cliente' %}
-      <a href="{% static 'media/documents/Manual Usuario Cliente.pdf' %}" class="doc-item" download>Manual de Usuario Cliente</a>
-      <a href="{% static 'media/documents/Politica de proteccion de datos.pdf' %}" class="doc-item" download>Política de Protección de Datos</a>
-      <a href="{% static 'media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf' %}" class="doc-item" download>Políticas de Privacidad</a>
->>>>>>> 66f553e6a70989fdef22b067b4bff2793715cce3
+      <a href="/media/documents/MANUAL DE USUARIO CLIENTE .pdf" class="doc-item" download>Manual de Usuario Cliente</a>
+      <a href="/media/documents/Politica de proteccion de datos.pdf" class="doc-item" download>Política de Protección de Datos</a>
+      <a href="/media/documents/POLÍTICAS DE PRIVACIDAD.docx.pdf" class="doc-item" download>Políticas de Privacidad</a>
     {% endif %}
   </section>
 

@@ -30,7 +30,12 @@ def registro_producto_view(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
-            producto = form.save()
+            producto = form.save(commit=False)
+            # Agregar el correo del usuario al producto antes de guardar
+            if request.user.is_authenticated:
+                producto._usuario_correo = request.user.correo_electronico_usuario
+            producto.save()
+            
             # Obtener stock inicial (campo opcional del formulario)
             stock_actual = form.cleaned_data.get('stock_actual_inventario', 0) or 0
             Inventario.objects.create(
@@ -213,11 +218,13 @@ def editar_inventario_view(request, pk):
 
         if cambios:
             import json
+            usuario_correo = request.user.correo_electronico_usuario if request.user.is_authenticated else None
             HistorialInventario.objects.create(
                 producto_id=producto.pk,
                 nombre_producto=producto.nombre_producto or '',
                 accion='edited',
                 detalles=json.dumps(cambios, ensure_ascii=False),
+                usuario_correo=usuario_correo,
             )
     except Exception:
         pass
@@ -255,8 +262,14 @@ def eliminar_inventario_view(request, pk):
 
     # Realizar operaciones dentro de una transacción atómica
     with transaction.atomic():
+        # Guardar el correo del usuario para usarlo después
+        usuario_correo = request.user.correo_electronico_usuario if request.user.is_authenticated else None
+
         # Eliminar primero el registro de inventario siempre
         inventario.delete()
+
+        # Asignar el correo al producto justo antes de eliminarlo
+        producto._usuario_correo = usuario_correo
 
         if force:
             # Borrado forzado: eliminar detalles que referencian el producto, luego el producto
@@ -373,15 +386,23 @@ def historial_inventario_view(request):
                 'timestamp': r.timestamp,
                 'modificaciones': modificaciones,
                 'historial_pk': r.pk,
+                'usuario_correo': r.usuario_correo,
             })
     except Exception:
         editados_lista = []
+
+    # Calcular totales de ventas
+    from decimal import Decimal
+    total_productos_vendidos = ventas.count()
+    suma_precios = sum(Decimal(str(v.precio)) for v in ventas) if ventas.exists() else Decimal('0')
 
     context = {
         'añadidos': añadidos,
         'eliminados': eliminados,
         'editados': editados_lista,
         'ventas': ventas,
+        'total_productos_vendidos': total_productos_vendidos,
+        'suma_precios': suma_precios,
         'fecha_inicial': fecha_inicial or '',
         'fecha_final': fecha_final or '',
     }

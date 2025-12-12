@@ -41,10 +41,13 @@ def producto_saved(sender, instance, created, **kwargs):
     """
     try:
         if created:
+            # Intentar obtener el usuario del contexto de la request si está disponible
+            usuario_correo = getattr(instance, '_usuario_correo', None)
             HistorialInventario.objects.create(
                 producto_id=instance.pk,
                 nombre_producto=instance.nombre_producto or '',
                 accion='added',
+                usuario_correo=usuario_correo,
             )
             return
 
@@ -96,11 +99,14 @@ def producto_saved(sender, instance, created, **kwargs):
 
         # Solo crear registro 'edited' si hubo modificaciones reales
         if modificaciones:
+            # Intentar obtener el usuario del contexto de la request si está disponible
+            usuario_correo = getattr(instance, '_usuario_correo', None)
             HistorialInventario.objects.create(
                 producto_id=instance.pk,
                 nombre_producto=instance.nombre_producto or '',
                 accion='edited',
                 detalles=json.dumps(modificaciones, ensure_ascii=False),
+                usuario_correo=usuario_correo,
             )
     except Exception:
         # Evitar que errores en señales rompan la operación principal
@@ -110,10 +116,13 @@ def producto_saved(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Producto)
 def producto_deleted(sender, instance, **kwargs):
     try:
+        # Intentar obtener el usuario del contexto de la request si está disponible
+        usuario_correo = getattr(instance, '_usuario_correo', None)
         HistorialInventario.objects.create(
             producto_id=instance.pk,
             nombre_producto=instance.nombre_producto or '',
             accion='deleted',
+            usuario_correo=usuario_correo,
         )
     except Exception:
         pass

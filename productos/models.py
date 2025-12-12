@@ -80,6 +80,7 @@ class HistorialInventario(models.Model):
     nombre_producto = models.CharField(max_length=200)
     accion = models.CharField(max_length=10, choices=ACTION_CHOICES)
     detalles = models.TextField(blank=True, null=True)
+    usuario_correo = models.EmailField(max_length=255, blank=True, null=True)  # Correo del usuario que realizó la acción
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
