@@ -424,7 +424,7 @@ def crear_factura(request):
                     
                     # Generar QR con URL simple (mejor compatibilidad con iPhone)
                     # Generar URL absoluta que funciona en desarrollo y producción
-                    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
+                    qr_url = request.build_absolute_uri(f"/facturas/{factura.id}/pdf/")
                     
                     # Configurar QR con alta corrección de errores
                     qr = qrcode.QRCode(
@@ -854,7 +854,7 @@ def factura_print(request, pk):
 
     # Generar QR con URL simple (mejor compatibilidad con iPhone)
     # Generar URL absoluta que funciona en desarrollo y producción
-    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
+    qr_url = request.build_absolute_uri(f"/facturas/{factura.id}/pdf/")
     
     # Configurar QR con alta corrección de errores para mejor lectura
     qr = qrcode.QRCode(
@@ -1014,7 +1014,7 @@ def factura_pdf(request, pk):
     
     # Generar QR con URL simple (más fácil de escanear en iPhone)
     # Generar URL absoluta que funciona en desarrollo y producción
-    qr_url = request.build_absolute_uri(f"/facturas/pdf/{factura.id}/")
+    qr_url = request.build_absolute_uri(f"/facturas/{factura.id}/pdf/")
     
     # Configurar QR con mejor calidad para lectura en móviles
     qr = qrcode.QRCode(
